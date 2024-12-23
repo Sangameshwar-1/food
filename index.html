@@ -70,8 +70,6 @@
       <input type="text" id="contact" placeholder="Contact Number" required>
       <button type="submit">Add Donor</button>
     </form>
-    <h2>Donors List</h2>
-    <ul id="donorsList"></ul>
   </div>
 
   <!-- Firebase SDK -->
@@ -118,27 +116,7 @@
       }
     });
 
-    // Fetch donors
-    async function fetchDonors() {
-      try {
-        const snapshot = await database.ref('donors').once('value');
-        const donors = snapshot.val();
-        const donorsList = document.getElementById('donorsList');
-        donorsList.innerHTML = '';
-
-        for (const id in donors) {
-          const donor = donors[id];
-          const listItem = document.createElement('li');
-          listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
-          donorsList.appendChild(listItem);
-        }
-      } catch (error) {
-        console.error('Error fetching donors:', error);
-      }
-    }
-
-    // Fetch donors on page load
-    fetchDonors();
+ 
   </script>
 </body>
 </html>

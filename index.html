@@ -13,7 +13,8 @@
     }
 
     .container {
-      width: 65%;
+      width: 80%;
+      max-width: 500px;
       margin: 50px auto;
       padding: 20px;
       background: #fff;
@@ -36,6 +37,8 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     button {
@@ -45,6 +48,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      width: 100%;
     }
 
     button:hover {
@@ -64,6 +68,25 @@
     .view-donors-button-container {
       text-align: center;
       margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        padding: 10px;
+      }
+
+      h1, h2 {
+        font-size: 1.5em;
+      }
+
+      input {
+        font-size: 1em;
+      }
+
+      li {
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -122,7 +145,7 @@
 
         alert('Donor added successfully!');
         document.getElementById('donorForm').reset();
-        fetchDonors();
+        uploadToSpreadsheet({ name, bloodType, contact, address });
       } catch (error) {
         console.error('Error adding donor:', error);
       }
@@ -132,6 +155,25 @@
     document.getElementById('viewDonorsButton').addEventListener('click', () => {
       window.location.href = 'list.html';
     });
+
+    // Function to upload data to Google Spreadsheet
+    function uploadToSpreadsheet(data) {
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbznfPXeTUS7wfyG9FVQCDmeyT7EV2oD1ljs0pype7X7XTda3HS5gFLmQ7xi0A1hy_-1/exec';
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(response => {
+        console.log('Success:', response);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
   </script>
 </body>
 </html>

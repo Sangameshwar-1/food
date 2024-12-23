@@ -60,11 +60,13 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    .note1{
-      colour:yellow;
+
+    .note1 {
+      color: yellow;
     }
-    .note2{
-      colour:yellow;
+
+    .note2 {
+      color: yellow;
     }
 
     .address {
@@ -93,15 +95,15 @@
 
     <!-- Search bar -->
     <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
-    <div id="note1">
-      <p> Search by name or Blood group</p>
+    <div id="note1" class="note1">
+      <p>Search by name or Blood group</p>
     </div>
     <h2>Donors List</h2>
+    <div id="note1" class="note1">
+        <p>Click on the Name to view the Address</p>
+    </div>
     <div class="scrollable-container">
       <ul id="donorsList"></ul>
-      <div id="note2">
-          <p>Click on the Name to view the Address</p>
-      </div>
     </div>
   </div>
 

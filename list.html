@@ -95,6 +95,7 @@
           const donor = donors[id];
           const listItem = document.createElement('li');
           listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
+          listItem.addEventListener('click', () => alert(`Address: ${donor.address}`));
           donorsList.appendChild(listItem);
         }
       } catch (error) {
@@ -116,6 +117,7 @@
       filteredDonors.forEach(donor => {
         const listItem = document.createElement('li');
         listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
+        listItem.addEventListener('click', () => alert(`Address: ${donor.address}`));
         donorsList.appendChild(listItem);
       });
     }

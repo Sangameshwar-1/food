@@ -48,6 +48,12 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
+    .address {
+      display: none;
+      color: #555;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -94,8 +100,11 @@
         for (const id in donors) {
           const donor = donors[id];
           const listItem = document.createElement('li');
-          listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
-          listItem.addEventListener('click', () => alert(`Address: ${donor.address}`));
+          listItem.innerHTML = `${donor.name} - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+          listItem.addEventListener('click', () => {
+            const addressDiv = listItem.querySelector('.address');
+            addressDiv.style.display = addressDiv.style.display === 'none' ? 'block' : 'none';
+          });
           donorsList.appendChild(listItem);
         }
       } catch (error) {
@@ -116,8 +125,11 @@
 
       filteredDonors.forEach(donor => {
         const listItem = document.createElement('li');
-        listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
-        listItem.addEventListener('click', () => alert(`Address: ${donor.address}`));
+        listItem.innerHTML = `${donor.name} - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        listItem.addEventListener('click', () => {
+          const addressDiv = listItem.querySelector('.address');
+          addressDiv.style.display = addressDiv.style.display === 'none' ? 'block' : 'none';
+        });
         donorsList.appendChild(listItem);
       });
     }

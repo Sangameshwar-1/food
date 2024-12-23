@@ -145,7 +145,7 @@
 
         alert('Donor added successfully!');
         document.getElementById('donorForm').reset();
-        uploadToSpreadsheet({ name, bloodType, contact, address });
+        uploadToSpreadsheet({ Name: name, "Mobile No": contact, Address: address, Group: bloodType });
       } catch (error) {
         console.error('Error adding donor:', error);
       }
@@ -158,12 +158,12 @@
 
     // Function to upload data to Google Spreadsheet
     function uploadToSpreadsheet(data) {
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbznfPXeTUS7wfyG9FVQCDmeyT7EV2oD1ljs0pype7X7XTda3HS5gFLmQ7xi0A1hy_-1/exec';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyQmqeF5tvpivhTT0YDKGFDdq3a7Vkyr1CslCg7wZHt23k4_kHQHRBY6xtg1cejYn1y/exec';
       fetch(scriptURL, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: new URLSearchParams(data),
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
       })
       .then(response => response.json())

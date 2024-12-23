@@ -1,73 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blood Donor Registration</title>
-    <!-- Include Firebase JS SDK (version 9 and above, uses module system) -->
-    <script type="module">
-        // Importing Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBQOhH2t5XPieLGlM3anZYco06-PvQt37c",
-            authDomain: "adpsr-75e1f.firebaseapp.com",
-            databaseURL: "https://adpsr-75e1f-default-rtdb.firebaseio.com",
-            projectId: "adpsr-75e1f",
-            storageBucket: "adpsr-75e1f.appspot.com",
-            messagingSenderId: "959425930437",
-            appId: "1:959425930437:web:cd3bae057e5b657a32fcac",
-            measurementId: "G-1X15K2TPH4"
-        };
+    .container {
+      width: 50%;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
 
-        // Handle Form Submission
-        document.getElementById("donorForm").addEventListener("submit", function(event) {
-            event.preventDefault();
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-            // Get form values
-            const name = document.getElementById("name").value;
-            const bloodType = document.getElementById("bloodType").value;
-            const contact = document.getElementById("contact").value;
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-            // Push data to Firebase Realtime Database
-            const donorData = {
-                name: name,
-                bloodType: bloodType,
-                contact: contact
-            };
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-            // Reference to 'donors' node in Realtime Database
-            const donorRef = ref(database, 'donors');
+    button:hover {
+      background: #0056b3;
+    }
 
-            // Add new donor data
-            push(donorRef, donorData)
-                .then(() => {
-                    alert("Donor Registered Successfully!");
-                    document.getElementById("donorForm").reset();
-                })
-                .catch((error) => {
-                    alert("Error: " + error.message);
-                });
-        });
-    </script>
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-    <h1>Blood Donor Registration</h1>
+  <div class="container">
+    <h1>Donor Management System</h1>
     <form id="donorForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" required><br>
-        <label for="bloodType">Blood Type:</label>
-        <input type="text" id="bloodType" required><br>
-        <label for="contact">Contact:</label>
-        <input type="text" id="contact" required><br>
-        <button type="submit">Submit</button>
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="bloodType" placeholder="Blood Type" required>
+      <input type="text" id="contact" placeholder="Contact Number" required>
+      <button type="submit">Add Donor</button>
     </form>
+    <h2>Donors List</h2>
+    <ul id="donorsList"></ul>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+      authDomain: "blood-7b054.firebaseapp.com",
+      databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+      projectId: "blood-7b054",
+      storageBucket: "blood-7b054.firebasestorage.app",
+      messagingSenderId: "926378767902",
+      appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+      measurementId: "G-HTGC1SJYH6"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Add donor
+    document.getElementById('donorForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const bloodType = document.getElementById('bloodType').value;
+      const contact = document.getElementById('contact').value;
+
+      try {
+        await firebase.database().ref('donors').push({
+          name,
+          bloodType,
+          contact
+        });
+
+        alert('Donor added successfully!');
+        document.getElementById('donorForm').reset();
+        fetchDonors();
+      } catch (error) {
+        console.error('Error adding donor:', error);
+      }
+    });
+
+    // Fetch donors
+    async function fetchDonors() {
+      try {
+        const snapshot = await firebase.database().ref('donors').once('value');
+        const donors = snapshot.val();
+        const donorsList = document.getElementById('donorsList');
+        donorsList.innerHTML = '';
+
+        for (const id in donors) {
+          const donor = donors[id];
+          const listItem = document.createElement('li');
+          listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
+          donorsList.appendChild(listItem);
+        }
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+      }
+    }
+
+    // Fetch donors on page load
+    fetchDonors();
+  </script>
 </body>
 </html>
+
 

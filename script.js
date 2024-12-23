@@ -1,67 +1,89 @@
-// Global variables to hold Google Sheets API and OAuth client information
-let gapiLoaded = false;
-let SHEET_ID = '17xxan9QpTSfKP7B8MmfsVSnsI9r5tg6BAU3F7KVaZdg'; // Replace with your actual Google Sheets ID
-let API_KEY = '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'; // Replace with your Google Sheets API key
-let CLIENT_ID = '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com'; // Replace with your OAuth client ID
+// Ensure the script runs after the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const submitButton = document.getElementById('submit');
+    
+    // Add an event listener to the submit button after DOM is loaded
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
 
-// Function to handle form submission
-function handleFormSubmit() {
-  // Get the form input values
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const message = document.getElementById('message').value;
+            // Simple validation before submitting
+            if (!name || !email || !message) {
+                alert("Please fill all fields.");
+                return;
+            }
 
-  // Prepare the data to be sent to the Google Sheet
-  const values = [[name, email, message]];
-
-  const requestBody = {
-    values: values,
-  };
-
-  // Make a call to the Google Sheets API
-  gapi.client.sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: 'A1:C1', // Adjust the range as needed
-    valueInputOption: 'RAW',
-    resource: requestBody,
-  })
-    .then((response) => {
-      console.log('Data successfully added to the Google Sheet!');
-      alert('Data successfully added to the Google Sheet!');
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-      alert('Error adding data to the Google Sheet.');
-    });
-}
-
-// Function to load Google API and setup the sheets service
-function initClient() {
-  gapi.client.setApiKey(API_KEY);
-  return gapi.client
-    .load('https://sheets.googleapis.com/$discovery/rest?version=v4')
-    .then(() => {
-      console.log('GAPI client loaded for Google Sheets API');
-      gapiLoaded = true;
-    })
-    .catch((error) => {
-      console.error('Error loading GAPI client for Google Sheets API:', error);
-    });
-}
-
-// Wait for the Google API to be ready, and then set up the button click event
-function onApiLoad() {
-  gapi.load('client', initClient);
-}
-
-// Add event listener to the submit button
-document.getElementById('submit').addEventListener('click', () => {
-  if (!gapiLoaded) {
-    alert('Google Sheets API is not loaded yet. Please wait.');
-    return;
-  }
-  handleFormSubmit();
+            // Call the function to submit the form to Google Sheets
+            submitToGoogleSheets(name, email, message);
+        });
+    } else {
+        console.log("Submit button not found");
+    }
 });
 
-onApiLoad();
+// Function to submit data to Google Sheets using Google API
+function submitToGoogleSheets(name, email, message) {
+    // Here you should replace with your own Google Sheets API logic
+    console.log("Data to submit:", name, email, message);
+
+    // Load the Google API client and authenticate
+    gapi.load('client:auth2', function() {
+        gapi.auth2.init({
+            client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+        }).then(function() {
+            gapi.client.load('sheets', 'v4', function() {
+                // Replace with your Google Spreadsheet ID and desired range
+                const params = {
+                    spreadsheetId: 'Y17xxan9QpTSfKP7B8MmfsVSnsI9r5tg6BAU3F7KVaZdg', // Replace with your Google Spreadsheet ID
+                    range: 'Sheet1!A1', // Update with your desired range
+                    valueInputOption: 'RAW', // Define how values will be interpreted
+                };
+
+                // Data to submit to the spreadsheet
+                const values = [
+                    [name, email, message], // The data to be inserted in the sheet
+                ];
+
+                const body = {
+                    values: values
+                };
+
+                // Make the API call to append data to the sheet
+                const request = gapi.client.sheets.spreadsheets.values.append(params, body);
+                request.then(function(response) {
+                    console.log('Data submitted successfully:', response);
+                    alert('Your data has been submitted successfully!');
+                }, function(error) {
+                    console.error('Error submitting data:', error);
+                    alert('Error submitting your data.');
+                });
+            });
+        });
+    });
+}
+
+// Function to handle OAuth 2.0 client initialization
+function initClient() {
+    gapi.client.init({
+        apiKey: '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', // Replace with your Google API Key
+        clientId: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com', // Replace with your Google Client ID
+        scope: 'https://www.googleapis.com/auth/spreadsheets', // Scope to access Sheets
+        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+    }).then(function () {
+        console.log("Google API client initialized successfully.");
+    }, function(error) {
+        console.error("Error initializing Google API client:", error);
+    });
+}
+
+// Load the Google API client library
+function loadGoogleAPI() {
+    gapi.load('client:auth2', initClient);
+}
+
+// Automatically load Google API on page load
+window.onload = loadGoogleAPI;
+
 

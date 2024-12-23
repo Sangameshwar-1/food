@@ -67,19 +67,15 @@
           method: 'POST',
           body: JSON.stringify(formData),
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json',  // Ensure the content type is set to JSON
           },
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to submit data.');
-        }
-
-        const result = await response.json();
-        alert(result.message || 'Data submitted successfully!');
+        const result = await response.json();  // Parse the JSON response
+        alert(result.message);  // Show the success or error message
       } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to submit data. Please try again later.');
+        console.error('Error:', error);  // Log any errors in the console
+        alert('There was an error submitting the form.');
       }
     });
   </script>

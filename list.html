@@ -55,7 +55,8 @@
       font-style: italic;
     }
 
-    .highlight {
+    .highlight .address {
+      display: block;
       background-color: yellow;
     }
   </style>
@@ -106,8 +107,6 @@
           const listItem = document.createElement('li');
           listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
-            const addressDiv = listItem.querySelector('.address');
-            addressDiv.style.display = addressDiv.style.display === 'none' ? 'block' : 'none';
             listItem.classList.toggle('highlight');
           });
           donorsList.appendChild(listItem);
@@ -132,8 +131,6 @@
         const listItem = document.createElement('li');
         listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
         listItem.querySelector('.donor-name').addEventListener('click', () => {
-          const addressDiv = listItem.querySelector('.address');
-          addressDiv.style.display = addressDiv.style.display === 'none' ? 'block' : 'none';
           listItem.classList.toggle('highlight');
         });
         donorsList.appendChild(listItem);

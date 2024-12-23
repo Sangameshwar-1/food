@@ -5,92 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Push User Name to Google Sheets</title>
   <script src="https://apis.google.com/js/api.js" async defer></script>
-  <script>
-    let gapiInitialized = false;
-
-    // Initialize the Google API client library
-    function loadClient() {
-      gapi.client.init({
-        'apiKey': 'AIzaSyBFXAY4AGkHVssmvgwDQG2UiEqAWowpJ10',  // Replace with your API Key
-        'clientId': '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com',  // Replace with your OAuth 2.0 Client ID
-        'scope': 'https://www.googleapis.com/auth/spreadsheets',
-        'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+<script>
+  function start() {
+    gapi.load('client:auth2', function() {
+      gapi.auth2.init({
+        client_id: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com',  // Replace with your actual client ID
       }).then(function() {
-        // Authorization successful
-        console.log('Google API client initialized');
-        gapiInitialized = true;
+        console.log('Google API client loaded successfully');
       }, function(error) {
-        console.error('Error initializing Google API client', error);
+        console.error('Error initializing Google API client:', error);
       });
-    }
-
-    function authenticate() {
-      if (!gapiInitialized) {
-        console.log('gapi client not initialized yet.');
-        return;
-      }
-      const authInstance = gapi.auth2.getAuthInstance();
-      if (!authInstance) {
-        console.error('Authentication instance not available');
-        return;
-      }
-
-      authInstance.signIn().then(function() {
-        console.log('Signed in');
-        loadClient();
-      });
-    }
-
-    // Push User Name to Google Sheet
-    async function pushUserNameToSheet(userName) {
-      const spreadsheetId = '17xxan9QpTSfKP7B8MmfsVSnsI9r5tg6BAU3F7KVaZdg';  // Replace with your Google Sheets ID
-      const range = 'Sheet1!A2';  // Adjust the range as per your sheet structure
-      const valueRange = {
-        "values": [[userName]]  // Push the user name in the first column (A)
-      };
-
-      try {
-        const response = await gapi.client.sheets.spreadsheets.values.update({
-          spreadsheetId: spreadsheetId,
-          range: range,
-          valueInputOption: "RAW",
-          resource: valueRange
-        });
-
-        console.log('User name pushed to Google Sheet:', response);
-      } catch (error) {
-        console.error('Error pushing data to Google Sheets:', error);
-      }
-    }
-
-    // Main function to push data to Google Sheets
-    function pushNameToSheet() {
-      const userName = prompt("Please enter your name:");  // Prompt the user for their name
-      if (userName) {
-        pushUserNameToSheet(userName);
-        alert('User name successfully pushed to Google Sheets!');
-      } else {
-        alert('Name is required.');
-      }
-    }
-
-    // Load the Google API client and authenticate
-    function start() {
-      gapi.load('client:auth2', function() {
-        gapi.auth2.init({
-          client_id: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com'  // Replace with your OAuth 2.0 Client ID
-        }).then(function() {
-          // Google API client is initialized, ready for use
-          console.log('Google API client loaded successfully');
-        }, function(error) {
-          console.error('Error initializing Google API client:', error);
-        });
-      });
-    }
-  </script>
-</head>
+    });
+  }
+</script>
 <body onload="start()">
-  <button onclick="authenticate()">Sign in to Google</button>
-  <button onclick="pushNameToSheet()">Push User Name to Google Sheets</button>
-</body>
+
 </html>

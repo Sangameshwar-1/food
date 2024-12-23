@@ -105,7 +105,7 @@
         for (const id in donors) {
           const donor = donors[id];
           const listItem = document.createElement('li');
-          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">    ->${donor.address}</div>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
             listItem.classList.toggle('highlight');
           });

@@ -13,7 +13,8 @@
     }
 
     .container {
-      width: 50%;
+      width: 85%;
+      max-width: 500px;
       margin: 50px auto;
       padding: 20px;
       background: #fff;
@@ -36,6 +37,8 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     button {
@@ -45,6 +48,7 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      width: 100%;
     }
 
     button:hover {
@@ -64,6 +68,12 @@
     .view-donors-button-container {
       text-align: center;
       margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+      }
     }
   </style>
 </head>

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
+import os
 
 app = Flask(__name__)
 
@@ -46,4 +47,5 @@ def send_data():
     return jsonify({'message': 'Data sent successfully'}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+

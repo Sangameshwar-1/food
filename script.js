@@ -31,7 +31,7 @@ function submitToGoogleSheets(name, email, message) {
     // Load the Google API client and authenticate
     gapi.load('client:auth2', function() {
         gapi.auth2.init({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your Google Client ID
+            client_id: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com', // Replace with your Google Client ID
         }).then(function() {
             gapi.client.load('sheets', 'v4', function() {
                 // Replace with your Google Spreadsheet ID and desired range
@@ -67,7 +67,7 @@ function submitToGoogleSheets(name, email, message) {
 // Function to handle OAuth 2.0 client initialization
 function initClient() {
     gapi.client.init({
-        apiKey: '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', // Replace with your Google API Key
+        apiKey: 'AIzaSyCPkM1rkKObsB1d_osFMqA5t916B78aYTI', // Replace with your Google API Key
         clientId: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com', // Replace with your Google Client ID
         scope: 'https://www.googleapis.com/auth/spreadsheets', // Scope to access Sheets
         discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],

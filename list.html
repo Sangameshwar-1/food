@@ -32,6 +32,17 @@
       border-radius: 4px;
     }
 
+    .scrollable-container {
+      max-height: 400px; /* Adjust the height as needed */
+      overflow-y: auto;
+      scrollbar-width: none; /* Hide scroll bar for Firefox */
+      -ms-overflow-style: none;  /* Hide scroll bar for Internet Explorer and Edge */
+    }
+
+    .scrollable-container::-webkit-scrollbar {
+      display: none; /* Hide scroll bar for Chrome, Safari, and Opera */
+    }
+
     ul {
       list-style-type: none;
       padding: 0;
@@ -43,6 +54,7 @@
     }
 
     .search-bar {
+      display: none; /* Hide the search bar */
       margin-bottom: 20px;
       padding: 10px;
       border: 1px solid #ccc;
@@ -59,6 +71,14 @@
       display: block;
       background-color: yellow;
     }
+
+    .donor-item:nth-child(odd) {
+      background-color: #ffffff;
+    }
+
+    .donor-item:nth-child(even) {
+      background-color: #f0f0f0;
+    }
   </style>
 </head>
 <body>
@@ -69,7 +89,9 @@
     <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
     
     <h2>Donors List</h2>
-    <ul id="donorsList"></ul>
+    <div class="scrollable-container">
+      <ul id="donorsList"></ul>
+    </div>
   </div>
 
   <!-- Firebase SDK -->
@@ -105,7 +127,8 @@
         for (const id in donors) {
           const donor = donors[id];
           const listItem = document.createElement('li');
-          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">    ->${donor.address}</div>`;
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
             listItem.classList.toggle('highlight');
           });
@@ -129,7 +152,8 @@
 
       filteredDonors.forEach(donor => {
         const listItem = document.createElement('li');
-        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">      ->${donor.address}</div>`;
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
         listItem.querySelector('.donor-name').addEventListener('click', () => {
           listItem.classList.toggle('highlight');
         });

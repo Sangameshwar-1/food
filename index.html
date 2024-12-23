@@ -72,6 +72,7 @@
       <input type="text" id="address" placeholder="Address" required>
       <button type="submit">Add Donor</button>
     </form>
+    <button id="viewDonorsButton">View Donors</button>
   </div>
 
   <!-- Firebase SDK -->
@@ -118,6 +119,11 @@
       } catch (error) {
         console.error('Error adding donor:', error);
       }
+    });
+
+    // Redirect to list.html on button click
+    document.getElementById('viewDonorsButton').addEventListener('click', () => {
+      window.location.href = 'list.html';
     });
   </script>
 </body>

@@ -3,26 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com;">
-
-
-  <title>Google Sheets API Example</title>
+  <title>Push User Name to Google Sheets</title>
   <script src="https://apis.google.com/js/api.js"></script>
-  <script src="script.js" defer></script> <!-- defer ensures the script runs after HTML is loaded -->
+  <script>
+    // Initialize the Google API client library
+    function loadClient() {
+      gapi.client.init({
+        'apiKey': 'AIzaSyCPkM1rkKObsB1d_osFMqA5t916B78aYTI',  // Replace with your API Key
+        'clientId': '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com',  // Replace with your OAuth 2.0 Client ID
+        'scope': 'https://www.googleapis.com/auth/spreadsheets',
+        'discoveryDocs': ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+      }).then(function() {
+        // Authorization successful
+        console.log('Google API client initialized');
+      }, function(error) {
+        console.error('Error initializing Google API client', error);
+      });
+    }
+
+    function authenticate() {
+      gapi.auth2.getAuthInstance().signIn().then(function() {
+        console.log('Signed in');
+        loadClient();
+      });
+    }
+
+    // Push User Name to Google Sheet
+    async function pushUserNameToSheet(userName) {
+      const spreadsheetId = '1NobdIkJyWLpi-ENmwu_KQKi-gCVw5vbC057BiMaQYes';  // Replace with your Google Sheets ID
+      const range = 'Sheet1!A2';  // Adjust the range as per your sheet structure
+      const valueRange = {
+        "values": [[userName]]  // Push the user name in the first column (A)
+      };
+
+      const response = await gapi.client.sheets.spreadsheets.values.update({
+        spreadsheetId: spreadsheetId,
+        range: range,
+        valueInputOption: "RAW",
+        resource: valueRange
+      });
+
+      console.log('User name pushed to Google Sheet:', response);
+    }
+
+    // Main function to push data to Google Sheets
+    function pushNameToSheet() {
+      const userName = prompt("Please enter your name:");  // Prompt the user for their name
+      if (userName) {
+        pushUserNameToSheet(userName);
+        alert('User name successfully pushed to Google Sheets!');
+      } else {
+        alert('Name is required.');
+      }
+    }
+
+    // Load the Google API client and authenticate
+    function start() {
+      gapi.load('client:auth2', function() {
+        gapi.auth2.init({
+          client_id: '704525461093-8itmgn4dqt90kaec6eau2quvfatilnj8.apps.googleusercontent.com8'  // Replace with your OAuth 2.0 Client ID
+        });
+      });
+    }
+  </script>
 </head>
 <body>
-  <h2>Submit Data to Google Sheets</h2>
-  <form id="dataForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-
-    <label for="message">Message:</label>
-    <textarea id="message" name="message" required></textarea>
-
-    <button type="button" id="submit">Submit</button>
-  </form>
+  <button onclick="authenticate()">Sign in to Google</button>
+  <button onclick="pushNameToSheet()">Push User Name to Google Sheets</button>
 </body>
 </html>
+

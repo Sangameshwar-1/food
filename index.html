@@ -26,29 +26,10 @@
       color: #333;
     }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
     input {
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
-    }
-
-    button {
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0056b3;
     }
 
     ul {
@@ -61,25 +42,42 @@
       border-bottom: 1px solid #ccc;
     }
 
-    .view-donors-button-container {
-      text-align: center;
-      margin-top: 20px;
+    .search-bar {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .address {
+      display: none;
+      color: #555;
+      font-style: italic;
+    }
+
+    .highlight .address {
+      display: block;
+      background-color: yellow;
+    }
+
+    .donor-item:nth-child(odd) {
+      background-color: #ffffff;
+    }
+
+    .donor-item:nth-child(even) {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Donor Management System</h1>
-    <form id="donorForm">
-      <input type="text" id="name" placeholder="Name" required>
-      <input type="text" id="bloodType" placeholder="Blood Type" required>
-      <input type="text" id="contact" placeholder="Contact Number" required>
-      <input type="text" id="address" placeholder="Address" required>
-      <button type="submit">Add Donor</button>
-    </form>
-  </div>
-  <div class="view-donors-button-container">
-    <button id="viewDonorsButton">View Donors</button>
+
+    <!-- Search bar -->
+    <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
+    
+    <h2>Donors List</h2>
+    <ul id="donorsList"></ul>
   </div>
 
   <!-- Firebase SDK -->
@@ -103,35 +101,54 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Add donor
-    document.getElementById('donorForm').addEventListener('submit', async (event) => {
-      event.preventDefault();
-
-      const name = document.getElementById('name').value;
-      const bloodType = document.getElementById('bloodType').value;
-      const contact = document.getElementById('contact').value;
-      const address = document.getElementById('address').value;
-
+    // Fetch donors
+    let donors = [];
+    async function fetchDonors() {
       try {
-        await database.ref('donors').push({
-          name,
-          bloodType,
-          contact,
-          address
-        });
+        const snapshot = await database.ref('donors').once('value');
+        donors = snapshot.val() || {};
+        const donorsList = document.getElementById('donorsList');
+        donorsList.innerHTML = '';
 
-        alert('Donor added successfully!');
-        document.getElementById('donorForm').reset();
-        fetchDonors();
+        for (const id in donors) {
+          const donor = donors[id];
+          const listItem = document.createElement('li');
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+          listItem.querySelector('.donor-name').addEventListener('click', () => {
+            listItem.classList.toggle('highlight');
+          });
+          donorsList.appendChild(listItem);
+        }
       } catch (error) {
-        console.error('Error adding donor:', error);
+        console.error('Error fetching donors:', error);
       }
-    });
+    }
 
-    // Redirect to list.html on button click
-    document.getElementById('viewDonorsButton').addEventListener('click', () => {
-      window.location.href = 'list.html';
-    });
+    // Filter donors based on search input
+    function filterDonors() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const donorsList = document.getElementById('donorsList');
+      donorsList.innerHTML = '';
+
+      const filteredDonors = Object.values(donors).filter(donor =>
+        donor.name.toLowerCase().includes(searchQuery) ||
+        donor.bloodType.toLowerCase().includes(searchQuery)
+      );
+
+      filteredDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
+        });
+        donorsList.appendChild(listItem);
+      });
+    }
+
+    // Fetch donors on page load
+    fetchDonors();
   </script>
 </body>
 </html>

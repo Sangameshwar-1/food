@@ -37,7 +37,7 @@ def send_data():
     client = authenticate_google_sheets()
 
     # Open the spreadsheet (replace 'Your Spreadsheet Name' with your sheet name)
-    sheet = client.open('Your Spreadsheet Name').sheet1
+    sheet = client.open('blood').sheet1
 
     # Append rows to the sheet
     for row in data['rows']:

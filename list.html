@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 50%;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .search-bar {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Donor Management System</h1>
+
+    <!-- Search bar -->
+    <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
+    
+    <h2>Donors List</h2>
+    <ul id="donorsList"></ul>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+      authDomain: "blood-7b054.firebaseapp.com",
+      databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+      projectId: "blood-7b054",
+      storageBucket: "blood-7b054.firebasestorage.app",
+      messagingSenderId: "926378767902",
+      appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+      measurementId: "G-HTGC1SJYH6"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Fetch donors
+    let donors = [];
+    async function fetchDonors() {
+      try {
+        const snapshot = await database.ref('donors').once('value');
+        donors = snapshot.val() || {};
+        const donorsList = document.getElementById('donorsList');
+        donorsList.innerHTML = '';
+
+        for (const id in donors) {
+          const donor = donors[id];
+          const listItem = document.createElement('li');
+          listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
+          donorsList.appendChild(listItem);
+        }
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+      }
+    }
+
+    // Filter donors based on search input
+    function filterDonors() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const donorsList = document.getElementById('donorsList');
+      donorsList.innerHTML = '';
+
+      const filteredDonors = Object.values(donors).filter(donor =>
+        donor.name.toLowerCase().includes(searchQuery) ||
+        donor.bloodType.toLowerCase().includes(searchQuery)
+      );
+
+      filteredDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${donor.name} - ${donor.bloodType} - ${donor.contact}`;
+        donorsList.appendChild(listItem);
+      });
+    }
+
+    // Fetch donors on page load
+    fetchDonors();
+  </script>
+</body>
+</html>

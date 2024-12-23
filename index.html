@@ -76,8 +76,8 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
   <script>
     // Firebase configuration
@@ -105,7 +105,7 @@
       const contact = document.getElementById('contact').value;
 
       try {
-        await firebase.database().ref('donors').push({
+        await database.ref('donors').push({
           name,
           bloodType,
           contact
@@ -122,7 +122,7 @@
     // Fetch donors
     async function fetchDonors() {
       try {
-        const snapshot = await firebase.database().ref('donors').once('value');
+        const snapshot = await database.ref('donors').once('value');
         const donors = snapshot.val();
         const donorsList = document.getElementById('donorsList');
         donorsList.innerHTML = '';
@@ -143,5 +143,3 @@
   </script>
 </body>
 </html>
-
-

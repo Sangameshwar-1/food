@@ -157,9 +157,15 @@
       return data.ip;
     }
 
+    // Encode IP address for Firebase path
+    function encodeForFirebase(path) {
+      return path.replace(/\./g, '%2E');
+    }
+
     // Update Firebase with IP address
     async function updateIPInFirebase(ip) {
-      const ipRef = database.ref('ips/' + ip);
+      const encodedIP = encodeForFirebase(ip);
+      const ipRef = database.ref('ips/' + encodedIP);
       const snapshot = await ipRef.once('value');
       const now = new Date().toLocaleString();
 

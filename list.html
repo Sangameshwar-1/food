@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,8 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    h1, h2 {
+    h1,
+    h2 {
       text-align: center;
       color: #333;
     }
@@ -33,14 +35,14 @@
     }
 
     .scrollable-container {
-      max-height: 400px; /* Adjust the height as needed */
+      max-height: 400px;
       overflow-y: auto;
-      scrollbar-width: none; /* Hide scroll bar for Firefox */
-      -ms-overflow-style: none;  /* Hide scroll bar for Internet Explorer and Edge */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     .scrollable-container::-webkit-scrollbar {
-      display: none; /* Hide scroll bar for Chrome, Safari, and Opera */
+      display: none;
     }
 
     ul {
@@ -54,7 +56,6 @@
     }
 
     .search-bar {
-      display: block; /* Make the search bar visible */
       margin-bottom: 20px;
       padding: 10px;
       border: 1px solid #ccc;
@@ -62,10 +63,9 @@
     }
 
     .note1 {
-      text-align:center;
+      text-align: center;
       color: red;
     }
-
 
     .address {
       display: none;
@@ -87,83 +87,80 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Donor Management System</h1>
 
-    <!-- Search bar -->
     <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
     <div id="note1" class="note1">
       <p>Search by name or Blood group</p>
     </div>
     <h2>Donors List</h2>
     <div id="note1" class="note1">
-        <p>Click on the Name to view the Address</p>
+      <p>Click on the Name to view the Address</p>
     </div>
     <div class="scrollable-container">
       <ul id="donorsList"></ul>
     </div>
+    <h2>Distance to Recipient</h2>
+    <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's address">
+    <button onclick="fetchDistances()">Calculate Distances</button>
+    <div class="scrollable-container">
+      <ul id="distancesList"></ul>
+    </div>
   </div>
-      <h1>Distance Calculator</h1>
-    <form id="distanceForm">
-        <label for="startPlace">Start Place: </label>
-        <input type="text" id="startPlace" placeholder="e.g., Hyderabad" required>
-        <br>
-        <label for="endPlace">End Place: </label>
-        <input type="text" id="endPlace" placeholder="e.g., Mumbai" required>
-        <br>
-        <button type="submit">Calculate Distance</button>
-    </form>
-    <p id="result"></p>
-
-    <script>
-        const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
-
-        async function getCoordinates(place) {
-            const geocodeUrl = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(place)}`;
-            const response = await fetch(geocodeUrl);
-            const data = await response.json();
-            if (data.features && data.features.length > 0) {
-                const [lon, lat] = data.features[0].geometry.coordinates;
-                return { lat, lon };
-            } else {
-                throw new Error(`Unable to find coordinates for ${place}`);
-            }
-        }
-
-        async function calculateDistance(event) {
-            event.preventDefault();
-            const startPlace = document.getElementById('startPlace').value;
-            const endPlace = document.getElementById('endPlace').value;
-            const result = document.getElementById('result');
-
-            try {
-                // Get coordinates for both places
-                const startCoords = await getCoordinates(startPlace);
-                const endCoords = await getCoordinates(endPlace);
-
-                // Fetch distance
-                const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
-                const response = await fetch(directionsUrl);
-                const data = await response.json();
-                const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
-                const duration = data.features[0].properties.segments[0].duration / 60; // Convert seconds to minutes
-
-                result.textContent = `Distance: ${distance.toFixed(2)} km, Duration: ${duration.toFixed(2)} minutes`;
-            } catch (error) {
-                console.error(error);
-                result.textContent = `Error: ${error.message}`;
-            }
-        }
-
-        document.getElementById('distanceForm').addEventListener('submit', calculateDistance);
-    </script>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
   <script>
+    const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
+
+    async function getCoordinates(place) {
+      const geocodeUrl = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(place)}`;
+      const response = await fetch(geocodeUrl);
+      const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [lon, lat] = data.features[0].geometry.coordinates;
+        return { lat, lon };
+      } else {
+        throw new Error(`Unable to find coordinates for ${place}`);
+      }
+    }
+
+    async function calculateDistance(startCoords, endCoords) {
+      const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
+      const response = await fetch(directionsUrl);
+      const data = await response.json();
+      const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+      return distance.toFixed(2);
+    }
+
+    async function fetchDistances() {
+      const recipientAddress = document.getElementById('recipientAddress').value;
+      if (!recipientAddress) {
+        alert('Please enter the recipient\'s address.');
+        return;
+      }
+
+      try {
+        const recipientCoords = await getCoordinates(recipientAddress);
+        const distancesList = document.getElementById('distancesList');
+        distancesList.innerHTML = '';
+
+        for (const id in donors) {
+          const donor = donors[id];
+          const donorCoords = await getCoordinates(donor.address);
+          const distance = await calculateDistance(donorCoords, recipientCoords);
+
+          const listItem = document.createElement('li');
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `${donor.name} - ${donor.bloodType} - ${donor.contact} - ${distance} km <div class="address">${donor.address}</div>`;
+          distancesList.appendChild(listItem);
+        }
+      } catch (error) {
+        console.error('Error calculating distances:', error);
+      }
+    }
+
     // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
@@ -230,4 +227,5 @@
     fetchDonors();
   </script>
 </body>
+
 </html>

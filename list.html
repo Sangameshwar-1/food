@@ -233,7 +233,7 @@
       try {
         const recipientCoords = await getCoordinates(recipientAddress);
         const distancesList = document.getElementById('distancesList');
-        distancesList.innerHTML = '';
+        distancesList.innerHTML = ''; // Clear the distances list before appending new items
 
         const distances = [];
 

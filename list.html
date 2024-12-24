@@ -159,19 +159,26 @@
         const distancesList = document.getElementById('distancesList');
         distancesList.innerHTML = '';
 
+        const distances = [];
+
         for (const id in donors) {
           const donor = donors[id];
           const donorCoords = await getCoordinates(donor.district);
           const distance = await calculateDistance(donorCoords, recipientCoords);
+          distances.push({ donor, distance });
+        }
 
+        distances.sort((a, b) => a.distance - b.distance);
+
+        distances.forEach(item => {
           const listItem = document.createElement('li');
           listItem.classList.add('donor-item');
-          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} - ${distance} <div class="address">${donor.address}</div>`;
+          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
             listItem.classList.toggle('highlight');
           });
           distancesList.appendChild(listItem);
-        }
+        });
       } catch (error) {
         console.error('Error calculating distances:', error);
       }

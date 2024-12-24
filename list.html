@@ -104,6 +104,60 @@
       <ul id="donorsList"></ul>
     </div>
   </div>
+      <h1>Distance Calculator</h1>
+    <form id="distanceForm">
+        <label for="startPlace">Start Place: </label>
+        <input type="text" id="startPlace" placeholder="e.g., Hyderabad" required>
+        <br>
+        <label for="endPlace">End Place: </label>
+        <input type="text" id="endPlace" placeholder="e.g., Mumbai" required>
+        <br>
+        <button type="submit">Calculate Distance</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
+
+        async function getCoordinates(place) {
+            const geocodeUrl = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(place)}`;
+            const response = await fetch(geocodeUrl);
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+                const [lon, lat] = data.features[0].geometry.coordinates;
+                return { lat, lon };
+            } else {
+                throw new Error(`Unable to find coordinates for ${place}`);
+            }
+        }
+
+        async function calculateDistance(event) {
+            event.preventDefault();
+            const startPlace = document.getElementById('startPlace').value;
+            const endPlace = document.getElementById('endPlace').value;
+            const result = document.getElementById('result');
+
+            try {
+                // Get coordinates for both places
+                const startCoords = await getCoordinates(startPlace);
+                const endCoords = await getCoordinates(endPlace);
+
+                // Fetch distance
+                const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
+                const response = await fetch(directionsUrl);
+                const data = await response.json();
+                const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+                const duration = data.features[0].properties.segments[0].duration / 60; // Convert seconds to minutes
+
+                result.textContent = `Distance: ${distance.toFixed(2)} km, Duration: ${duration.toFixed(2)} minutes`;
+            } catch (error) {
+                console.error(error);
+                result.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        document.getElementById('distanceForm').addEventListener('submit', calculateDistance);
+    </script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>

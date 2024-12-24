@@ -159,8 +159,36 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
   <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+      authDomain: "blood-7b054.firebaseapp.com",
+      databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+      projectId: "blood-7b054",
+      storageBucket: "blood-7b054.firebasestorage.app",
+      messagingSenderId: "926378767902",
+      appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+      measurementId: "G-HTGC1SJYH6"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is authenticated
+        fetchDonors();
+      } else {
+        // User is not authenticated, redirect to index.html
+        window.location.href = 'index.html';
+      }
+    });
+
     const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
 
     async function getCoordinates(place) {
@@ -225,22 +253,6 @@
         console.error('Error calculating distances:', error);
       }
     }
-
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
-      authDomain: "blood-7b054.firebaseapp.com",
-      databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
-      projectId: "blood-7b054",
-      storageBucket: "blood-7b054.firebasestorage.app",
-      messagingSenderId: "926378767902",
-      appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
-      measurementId: "G-HTGC1SJYH6"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
 
     let donors = [];
     let currentPage = 1;
@@ -314,9 +326,6 @@
         donorsList.appendChild(listItem);
       });
     }
-
-    // Fetch donors on page load
-    fetchDonors();
   </script>
 </body>
 

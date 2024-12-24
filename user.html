@@ -121,6 +121,9 @@
   <div class="view-donors-button-container">
     <button id="viewDonorsButton">View Donors</button>
   </div>
+  <div class="view-donors-button-container">
+    <button id="logoutButton">Logout</button>
+  </div>
 
   <footer>
     <p>Developed by: Sangameshwar IIIT HYD</p>
@@ -242,6 +245,15 @@
     // Redirect to list.html on button click
     document.getElementById('viewDonorsButton').addEventListener('click', () => {
       window.location.href = 'list.html';
+    });
+
+    // Logout functionality
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
     });
 
     // Function to upload data to Google Spreadsheet

@@ -134,8 +134,12 @@
       const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
       const response = await fetch(directionsUrl);
       const data = await response.json();
-      const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
-      return distance.toFixed(2);
+      if (data.features && data.features[0]) {
+        const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+        return distance.toFixed(2);
+      } else {
+        throw new Error('Unable to calculate distance');
+      }
     }
 
     async function fetchDistances() {

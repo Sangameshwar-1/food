@@ -158,7 +158,7 @@
 
         for (const id in donors) {
           const donor = donors[id];
-          const donorCoords = await getCoordinates(donor.address);
+          const donorCoords = await getCoordinates(donor.district);
           const distance = await calculateDistance(donorCoords, recipientCoords);
 
           const listItem = document.createElement('li');

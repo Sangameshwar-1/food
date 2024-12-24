@@ -98,6 +98,13 @@
             margin-top: 10px;
         }
 
+        .user-count {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
         @media (max-width: 600px) {
             .login-container {
                 padding: 20px;
@@ -128,6 +135,7 @@
     <div class="error-message" id="error-message"></div>
     <div class="reset-link" id="reset-link">Forgot Password?</div>
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
+    <div class="user-count" id="user-count"></div>
 </div>
 
 <script>
@@ -137,6 +145,7 @@
   const resetLink = document.getElementById("reset-link");
   const formTitle = document.getElementById("form-title");
   const authButton = document.getElementById("auth-button");
+  const userCountDiv = document.getElementById("user-count");
 
   let isLogin = true;
 
@@ -203,6 +212,12 @@
             timestamp: timestamp
           });
         }
+      });
+
+      // Fetch and display the number of unique IPs
+      database.ref('loginAttempts').once('value', snapshot => {
+        const uniqueIPs = snapshot.numChildren();
+        userCountDiv.textContent = `Number of unique users: ${uniqueIPs}`;
       });
     })
     .catch((error) => {

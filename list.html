@@ -85,6 +85,18 @@
     .donor-item:nth-child(even) {
       background-color: #f0f0f0;
     }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      margin-top: 20px;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 
@@ -105,7 +117,7 @@
     </div>
     <h2>Distance to Recipient</h2>
     <div id="note1" class="note1">
-        <p>Finding the distance btw the district ofdonor and recipient </p>
+        <p>Finding the distance between the district of donor and recipient</p>
     </div>
     <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's district">
     <button onclick="fetchDistances()">Calculate Distances</button>
@@ -113,6 +125,13 @@
       <ul id="distancesList"></ul>
     </div>
   </div>
+
+  <footer>
+    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <p>Contact: salesangameshwar1@gmail.com </p>
+    <p>Development Support: Dr.Vamshi Medical Institute </p>
+    <p>Contact: support@example.com</p>
+  </footer>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>

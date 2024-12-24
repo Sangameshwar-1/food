@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +23,8 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    h1, h2 {
+    h1,
+    h2 {
       text-align: center;
       color: #333;
     }
@@ -76,7 +78,8 @@
         padding: 10px;
       }
 
-      h1, h2 {
+      h1,
+      h2 {
         font-size: 1.5em;
       }
 
@@ -90,6 +93,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>Donor Management System</h1>
@@ -98,6 +102,7 @@
       <input type="text" id="bloodType" placeholder="Blood Type" required>
       <input type="text" id="contact" placeholder="Contact Number" required>
       <input type="text" id="address" placeholder="Address" required>
+      <input type="text" id="district" placeholder="District" required>
       <button type="submit">Add Donor</button>
     </form>
   </div>
@@ -134,18 +139,26 @@
       const bloodType = document.getElementById('bloodType').value;
       const contact = document.getElementById('contact').value;
       const address = document.getElementById('address').value;
+      const district = document.getElementById('district').value;
 
       try {
         await database.ref('donors').push({
           name,
           bloodType,
           contact,
-          address
+          address,
+          district
         });
 
         alert('Donor added successfully!');
         document.getElementById('donorForm').reset();
-        uploadToSpreadsheet({ Name: name, "Mobile No": contact, Address: address, Group: bloodType });
+        uploadToSpreadsheet({
+          Name: name,
+          "Mobile No": contact,
+          Address: address,
+          Group: bloodType,
+          District: district
+        });
       } catch (error) {
         console.error('Error adding donor:', error);
       }
@@ -166,14 +179,15 @@
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       })
-      .then(response => response.json())
-      .then(response => {
-        console.log('Success:', response);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+        .then(response => response.json())
+        .then(response => {
+          console.log('Success:', response);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     }
   </script>
 </body>
+
 </html>

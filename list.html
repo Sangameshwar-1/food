@@ -86,6 +86,25 @@
       background-color: #f0f0f0;
     }
 
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      background: #ccc;
+    }
+
     footer {
       text-align: center;
       padding: 20px;
@@ -115,9 +134,13 @@
     <div class="scrollable-container">
       <ul id="donorsList"></ul>
     </div>
+    <div class="pagination">
+      <button id="prevButton" onclick="prevPage()">Previous</button>
+      <button id="nextButton" onclick="nextPage()">Next</button>
+    </div>
     <h2>Distance to Recipient</h2>
     <div id="note1" class="note1">
-        <p>Finding the distance between the district of donor and recipient</p>
+      <p>Finding the distance between the district of donor and recipient</p>
     </div>
     <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's district">
     <button onclick="fetchDistances()">Calculate Distances</button>
@@ -128,8 +151,8 @@
 
   <footer>
     <p>Developed by: Sangameshwar IIIT HYD</p>
-    <p>Contact: salesangameshwar1@gmail.com </p>
-    <p>Development Support: Dr.Vamshi Medical Institute </p>
+    <p>Contact: salesangameshwar1@gmail.com</p>
+    <p>Development Support: Dr.Vamshi Medical Institute Vikarabad</p>
     <p>Contact: support@example.com</p>
   </footer>
 
@@ -219,27 +242,54 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Fetch donors
     let donors = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
     async function fetchDonors() {
       try {
         const snapshot = await database.ref('donors').once('value');
         donors = snapshot.val() || {};
-        const donorsList = document.getElementById('donorsList');
-        donorsList.innerHTML = '';
-
-        for (const id in donors) {
-          const donor = donors[id];
-          const listItem = document.createElement('li');
-          listItem.classList.add('donor-item');
-          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
-          listItem.querySelector('.donor-name').addEventListener('click', () => {
-            listItem.classList.toggle('highlight');
-          });
-          donorsList.appendChild(listItem);
-        }
+        displayDonors();
       } catch (error) {
         console.error('Error fetching donors:', error);
+      }
+    }
+
+    function displayDonors() {
+      const donorsList = document.getElementById('donorsList');
+      donorsList.innerHTML = '';
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+
+      const currentDonors = Object.values(donors).slice(start, end);
+
+      currentDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
+        });
+        donorsList.appendChild(listItem);
+      });
+
+      document.getElementById('prevButton').disabled = currentPage === 1;
+      document.getElementById('nextButton').disabled = end >= Object.values(donors).length;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        displayDonors();
+      }
+    }
+
+    function nextPage() {
+      if ((currentPage * pageSize) < Object.values(donors).length) {
+        currentPage++;
+        displayDonors();
       }
     }
 

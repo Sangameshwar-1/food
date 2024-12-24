@@ -124,6 +124,7 @@
       const data = await response.json();
       if (data.features && data.features.length > 0) {
         const [lon, lat] = data.features[0].geometry.coordinates;
+        console.log(`Coordinates for ${place}: ${lat}, ${lon}`);
         return { lat, lon };
       } else {
         throw new Error(`Unable to find coordinates for ${place}`);
@@ -136,6 +137,7 @@
       const data = await response.json();
       if (data.features && data.features[0]) {
         const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+        console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
         return distance.toFixed(2);
       } else {
         throw new Error('Unable to calculate distance');

@@ -97,6 +97,23 @@
             display: block;
             margin-top: 10px;
         }
+
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            input[type="email"],
+            input[type="password"],
+            button {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -111,7 +128,6 @@
     <div class="error-message" id="error-message"></div>
     <div class="reset-link" id="reset-link">Forgot Password?</div>
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
-  
 </div>
 
 <script>
@@ -141,15 +157,27 @@
   resetLink.addEventListener("click", () => {
     const email = prompt("Please enter your email address:");
     if (email) {
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          alert("Password reset email sent!");
+      auth.fetchSignInMethodsForEmail(email)
+        .then((signInMethods) => {
+          if (signInMethods.length > 0) {
+            auth.sendPasswordResetEmail(email)
+              .then(() => {
+                alert("Password reset email sent!");
+              })
+              .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+                errorMessageDiv.textContent = "Error sending password reset email: " + errorMessage;
+              });
+          } else {
+            alert("No user found with this email address.");
+          }
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorCode, errorMessage);
-          errorMessageDiv.textContent = "Error sending password reset email: " + errorMessage;
+          console.error("Error fetching sign-in methods:", error.message);
+          errorMessageDiv.textContent = "Error fetching sign-in methods: " + error.message;
+          errorMessageDiv.style.display = "block";
         });
     }
   });

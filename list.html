@@ -104,6 +104,9 @@
       <ul id="donorsList"></ul>
     </div>
     <h2>Distance to Recipient</h2>
+    <div id="note1" class="note1">
+        <p>Finding the distance btw the district ofdonor and recipient </p>
+    </div>
     <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's address">
     <button onclick="fetchDistances()">Calculate Distances</button>
     <div class="scrollable-container">
@@ -163,7 +166,10 @@
 
           const listItem = document.createElement('li');
           listItem.classList.add('donor-item');
-          listItem.innerHTML = `${donor.name} - ${donor.bloodType} - ${donor.contact} - ${distance} km <div class="address">${donor.address}</div>`;
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} - ${distance} <div class="address">${donor.address}</div>`;
+          listItem.querySelector('.donor-name').addEventListener('click', () => {
+            listItem.classList.toggle('highlight');
+          });
           distancesList.appendChild(listItem);
         }
       } catch (error) {

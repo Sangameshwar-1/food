@@ -89,6 +89,14 @@
             display: block;
             margin-top: 10px;
         }
+
+        .reset-link {
+            color: #007bff;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -101,13 +109,16 @@
         <button type="submit" id="auth-button">Login</button>
     </form>
     <div class="error-message" id="error-message"></div>
+    <div class="reset-link" id="reset-link">Forgot Password?</div>
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
+  
 </div>
 
 <script>
   const authForm = document.getElementById("auth-form");
   const errorMessageDiv = document.getElementById("error-message");
   const toggleLink = document.getElementById("toggle-link");
+  const resetLink = document.getElementById("reset-link");
   const formTitle = document.getElementById("form-title");
   const authButton = document.getElementById("auth-button");
 
@@ -125,6 +136,22 @@
       toggleLink.textContent = "Already have an account? Login";
     }
     errorMessageDiv.textContent = "";
+  });
+
+  resetLink.addEventListener("click", () => {
+    const email = prompt("Please enter your email address:");
+    if (email) {
+      auth.sendPasswordResetEmail(email)
+        .then(() => {
+          alert("Password reset email sent!");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          errorMessageDiv.textContent = "Error sending password reset email: " + errorMessage;
+        });
+    }
   });
 
   // Fetch user's IP address and store it in Firebase

@@ -179,12 +179,17 @@
     const auth = firebase.auth();
     const database = firebase.database();
 
-    auth.onAuthStateChanged((user) => {
+    async function fetchAllowedEmails() {
+      const response = await fetch('allowed_users.json');
+      return response.json();
+    }
+
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
         // User is authenticated
-        const allowedEmails = ['test@gmail.com', 'vamshi@gmail.com'];
+        const allowedEmails = await fetchAllowedEmails();
         if (!allowedEmails.includes(user.email)) {
-          // User is not allowed, redirect to index.html
+          // User is not allowed, redirect to user.html
           window.location.href = 'user.html';
         } else {
           fetchDonors();

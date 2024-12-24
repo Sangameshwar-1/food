@@ -181,18 +181,25 @@
 
     async function fetchAllowedEmails() {
       const response = await fetch('allowed_users.json');
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
       return response.json();
     }
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // User is authenticated
-        const allowedEmails = await fetchAllowedEmails();
-        if (!allowedEmails.includes(user.email)) {
-          // User is not allowed, redirect to user.html
-          window.location.href = 'user.html';
-        } else {
-          fetchDonors();
+        try {
+          const allowedEmails = await fetchAllowedEmails();
+          if (!allowedEmails.includes(user.email)) {
+            // User is not allowed, redirect to user.html
+            window.location.href = 'user.html';
+          } else {
+            fetchDonors();
+          }
+        } catch (error) {
+          console.error('Error fetching allowed users:', error);
+          alert('Error fetching allowed users. Please try again later.');
         }
       } else {
         // User is not authenticated, redirect to index.html

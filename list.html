@@ -187,25 +187,27 @@
       return response.json();
     }
 
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const allowedEmails = await fetchAllowedEmails();
-          if (!allowedEmails.includes(user.email)) {
-            // User is not allowed, redirect to user.html
-            window.location.href = 'user.html';
-          } else {
-            fetchDonors();
+    window.onload = function() {
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            const allowedEmails = await fetchAllowedEmails();
+            if (!allowedEmails.includes(user.email)) {
+              // User is not allowed, redirect to user.html
+              window.location.href = 'user.html';
+            } else {
+              fetchDonors();
+            }
+          } catch (error) {
+            console.error('Error fetching allowed users:', error);
+            alert('Error fetching allowed users. Please try again later.');
           }
-        } catch (error) {
-          console.error('Error fetching allowed users:', error);
-          alert('Error fetching allowed users. Please try again later.');
+        } else {
+          // User is not authenticated, redirect to index.html
+          window.location.href = 'index.html';
         }
-      } else {
-        // User is not authenticated, redirect to index.html
-        window.location.href = 'index.html';
-      }
-    });
+      });
+    };
 
     const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
 

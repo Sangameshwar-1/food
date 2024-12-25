@@ -155,15 +155,17 @@
     const auth = firebase.auth();
     const database = firebase.database();
 
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is authenticated
-        getAndPushIP();
-      } else {
-        // User is not authenticated, redirect to index.html
-        window.location.href = 'index.html';
-      }
-    });
+    window.onload = function() {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          // User is authenticated
+          getAndPushIP();
+        } else {
+          // User is not authenticated, redirect to index.html
+          window.location.href = 'index.html';
+        }
+      });
+    };
 
     function getAndPushIP() {
       fetch('https://ipinfo.io/json')  // Using ipinfo.io

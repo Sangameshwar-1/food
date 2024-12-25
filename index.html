@@ -235,6 +235,7 @@
           const user = userCredential.user;
           console.log("Logged in as:", user.email);
           alert("Login successful!");
+          // Redirect after alert to prevent double alert
           window.location.href = "user.html"; // Example redirection after successful login
         })
         .catch((error) => {
@@ -249,6 +250,7 @@
           const user = userCredential.user;
           console.log("Account created for:", user.email);
           alert("Account creation successful!");
+          // Redirect after alert to prevent double alert
           window.location.href = "user.html"; // Example redirection after successful account creation
         })
         .catch((error) => {

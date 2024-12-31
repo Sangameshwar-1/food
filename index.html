@@ -180,17 +180,17 @@
     const database = firebase.database();
 
     async function fetchAllowedEmails() {
-      try {
-        const response = await fetch('allowed_users.json'); // Ensure this path is correct and the file is accessible
-        if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json();
-      } catch (error) {
-        console.error('Error fetching allowed users;
-      }
+  try {
+    const response = await fetch('allowed_users.json'); // Ensure this path is correct and the file is accessible
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
     }
-
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching allowed users:', error);
+  }
+}
+    
     window.onload = function() {
       auth.onAuthStateChanged(async (user) => {
         if (user) {

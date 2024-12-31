@@ -181,13 +181,18 @@
 
     async function fetchAllowedEmails() {
       try {
-        const response = await fetch('allowed_users.json'); // Ensure this path is correct and the file is accessible
+        const response = await fetch('allowed_users.json');
         if (!response.ok) {
-          throw new Error('Network response was not ok ' + response.statusText);
+          throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        return response.json();
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format: expected an array');
+        }
+        return data;
       } catch (error) {
         console.error('Error fetching allowed users:', error);
+        alert(`Error fetching allowed users: ${error.message}`);
         throw error;
       }
     }

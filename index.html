@@ -25,6 +25,16 @@
       const database = firebase.database();
     </script>
     <style>
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f4f7;
@@ -33,6 +43,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            animation: fadeIn 1s ease-in-out;
         }
 
         .login-container {
@@ -42,11 +53,13 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            animation: slideIn 0.5s ease-in-out;
         }
 
         h2 {
             text-align: center;
             color: #333;
+            animation: fadeIn 1.5s ease-in-out;
         }
 
         input[type="email"],
@@ -57,6 +70,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            animation: fadeIn 2s ease-in-out;
         }
 
         button {
@@ -69,6 +83,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            animation: fadeIn 2.5s ease-in-out;
         }
 
         button:hover {
@@ -80,22 +95,17 @@
             font-size: 14px;
             text-align: center;
             margin-top: 10px;
+            animation: fadeIn 3s ease-in-out;
         }
 
-        .toggle-link {
-            color: #007bff;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-        }
-
+        .toggle-link,
         .reset-link {
             color: #007bff;
             cursor: pointer;
             text-align: center;
             display: block;
             margin-top: 10px;
+            animation: fadeIn 3.5s ease-in-out;
         }
 
         .user-count {
@@ -103,6 +113,7 @@
             margin-top: 20px;
             font-size: 18px;
             color: #333;
+            animation: fadeIn 4s ease-in-out;
         }
 
         @media (max-width: 600px) {

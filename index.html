@@ -39,11 +39,9 @@
             font-family: Arial, sans-serif;
             background-color: #f0f4f7;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
             flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
         }
 
         .login-container {
@@ -55,6 +53,7 @@
             max-width: 400px;
             animation: fadeIn 0.5s ease-in-out;
             border: 2px solid #4CAF50; /* Added border color */
+            margin: auto;
         }
 
         .fade-in {
@@ -133,12 +132,13 @@
 
         footer {
             text-align: center;
-            margin-top: 20px;
-            color: #333;
-            background-color: #f0f4f7;
+            color: #fff;
+            background-color: #333;
             padding: 10px;
             width: 100%;
             border-top: 1px solid #ccc;
+            position: absolute;
+            bottom: 0;
         }
 
         @media (max-width: 600px) {

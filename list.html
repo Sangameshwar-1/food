@@ -112,22 +112,29 @@
     }
 
     .loader {
-       border: 6px solid #f3f3f3;
-       border-radius: 50%;
-       border-top: 6px solid #3498db;
-       width: 30px;
-       height: 30px;
-       animation: spin 2s linear infinite;
-       margin: auto;
+      border: 6px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 6px solid #3498db;
+      width: 30px;
+      height: 30px;
+      animation: spin 2s linear infinite;
+      margin: auto;
     }
 
     @keyframes spin {
       0% {
         transform: rotate(0deg);
-      } 
+      }
       100% {
         transform: rotate(360deg);
       }
+    }
+
+    .error-message {
+      text-align: center;
+      color: red;
+      display: none;
+      margin-top: 20px;
     }
 
     footer {
@@ -180,6 +187,7 @@
       <div class="loader"></div>
       <p>Calculating distances...</p>
     </div>
+    <div class="error-message" id="distanceError">No donor found or district may be wrong.</div>
   </div>
 
   <footer>
@@ -189,13 +197,11 @@
     <p>Contact: support@example.com</p>
   </footer>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
   <script>
-    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
       authDomain: "blood-7b054.firebaseapp.com",
@@ -207,7 +213,6 @@
       measurementId: "G-HTGC1SJYH6"
     };
 
-    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
@@ -236,7 +241,6 @@
           try {
             const allowedEmails = await fetchAllowedEmails();
             if (!allowedEmails.includes(user.email)) {
-              // User is not allowed, redirect to user.html
               window.location.href = 'user.html';
             } else {
               fetchDonors();
@@ -245,17 +249,17 @@
             alert('Error fetching allowed users. Please try again later.');
           }
         } else {
-          // User is not authenticated, redirect to index.html
           window.location.href = 'index.html';
         }
       });
     };
 
-    const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
+    const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843';
 
     async function getCoordinates(place) {
       const geocodeUrl = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(place)}`;
       const response = await fetch(geocodeUrl);
+      if (!response.ok) throw new Error('Failed to fetch coordinates');
       const data = await response.json();
       if (data.features && data.features.length > 0) {
         const [lon, lat] = data.features[0].geometry.coordinates;
@@ -269,9 +273,10 @@
     async function calculateDistance(startCoords, endCoords) {
       const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
       const response = await fetch(directionsUrl);
+      if (!response.ok) throw new Error('Failed to calculate distance');
       const data = await response.json();
       if (data.features && data.features[0]) {
-        const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+        const distance = data.features[0].properties.segments[0].distance / 1000;
         console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
         return distance.toFixed(2);
       } else {
@@ -290,7 +295,7 @@
         document.getElementById('distancesLoading').style.display = 'block';
         const recipientCoords = await getCoordinates(recipientAddress);
         const distancesList = document.getElementById('distancesList');
-        distancesList.innerHTML = ''; // Clear the distances list before appending new items
+        distancesList.innerHTML = '';
 
         const distances = [];
 
@@ -303,20 +308,25 @@
 
         distances.sort((a, b) => a.distance - b.distance);
 
-        distances.forEach(item => {
-          const listItem = document.createElement('li');
-          listItem.classList.add('donor-item');
-          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`;
-          listItem.querySelector('.donor-name').addEventListener('click', () => {
-            listItem.classList.toggle('highlight');
+        if (distances.length === 0) {
+          document.getElementById('distanceError').style.display = 'block';
+        } else {
+          document.getElementById('distanceError').style.display = 'none';
+          distances.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('donor-item');
+            listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`;
+            listItem.querySelector('.donor-name').addEventListener('click', () => {
+              listItem.classList.toggle('highlight');
+            });
+            distancesList.appendChild(listItem);
           });
-          distancesList.appendChild(listItem);
-        });
+        }
       } catch (error) {
         console.error('Error calculating distances:', error);
+        document.getElementById('distanceError').style.display = 'block';
       } finally {
         document.getElementById('distancesLoading').style.display = 'none';
-listItem.innerHTML = 'No donor found or district may wrong.';
       }
     }
 
@@ -374,7 +384,6 @@ listItem.innerHTML = 'No donor found or district may wrong.';
       }
     }
 
-    // Filter donors based on search input
     function filterDonors() {
       const searchQuery = document.getElementById('search').value.toLowerCase();
       const donorsList = document.getElementById('donorsList');

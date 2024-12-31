@@ -30,9 +30,9 @@
             100% { opacity: 1; }
         }
 
-        @keyframes slideIn {
-            0% { transform: translateY(-50px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
         body {
@@ -43,7 +43,6 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            animation: fadeIn 1s ease-in-out;
         }
 
         .login-container {
@@ -53,13 +52,20 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
-            animation: slideIn 0.5s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out;
         }
 
         h2 {
             text-align: center;
             color: #333;
-            animation: fadeIn 1.5s ease-in-out;
         }
 
         input[type="email"],
@@ -70,7 +76,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-            animation: fadeIn 2s ease-in-out;
         }
 
         button {
@@ -83,7 +88,6 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
-            animation: fadeIn 2.5s ease-in-out;
         }
 
         button:hover {
@@ -95,7 +99,6 @@
             font-size: 14px;
             text-align: center;
             margin-top: 10px;
-            animation: fadeIn 3s ease-in-out;
         }
 
         .toggle-link,
@@ -105,7 +108,6 @@
             text-align: center;
             display: block;
             margin-top: 10px;
-            animation: fadeIn 3.5s ease-in-out;
         }
 
         .user-count {
@@ -113,7 +115,6 @@
             margin-top: 20px;
             font-size: 18px;
             color: #333;
-            animation: fadeIn 4s ease-in-out;
         }
 
         @media (max-width: 600px) {
@@ -136,7 +137,7 @@
 </head>
 <body>
 
-<div class="login-container">
+<div class="login-container" id="login-container">
     <h2 id="form-title">Login Page</h2>
     <form id="auth-form">
         <input type="email" id="email" placeholder="Enter your email" required><br>
@@ -156,22 +157,30 @@
   const resetLink = document.getElementById("reset-link");
   const formTitle = document.getElementById("form-title");
   const authButton = document.getElementById("auth-button");
+  const loginContainer = document.getElementById("login-container");
   const userCountDiv = document.getElementById("user-count");
 
   let isLogin = true;
 
   toggleLink.addEventListener("click", () => {
-    isLogin = !isLogin;
-    if (isLogin) {
-      formTitle.textContent = "Login Page";
-      authButton.textContent = "Login";
-      toggleLink.textContent = "Don't have an account? Sign up";
-    } else {
-      formTitle.textContent = "Sign Up Page";
-      authButton.textContent = "Sign Up";
-      toggleLink.textContent = "Already have an account? Login";
-    }
-    errorMessageDiv.textContent = "";
+    loginContainer.classList.add('fade-out');
+
+    setTimeout(() => {
+      isLogin = !isLogin;
+      if (isLogin) {
+        formTitle.textContent = "Login Page";
+        authButton.textContent = "Login";
+        toggleLink.textContent = "Don't have an account? Sign up";
+      } else {
+        formTitle.textContent = "Sign Up Page";
+        authButton.textContent = "Sign Up";
+        toggleLink.textContent = "Already have an account? Login";
+      }
+      errorMessageDiv.textContent = "";
+
+      loginContainer.classList.remove('fade-out');
+      loginContainer.classList.add('fade-in');
+    }, 500); // Match the duration of the fadeOut animation
   });
 
   resetLink.addEventListener("click", () => {

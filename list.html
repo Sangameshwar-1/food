@@ -30,8 +30,7 @@
 
     input {
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: 1px solid #ccc-radius: 4px;
     }
 
     .scrollable-container {
@@ -180,11 +179,16 @@
     const database = firebase.database();
 
     async function fetchAllowedEmails() {
-      const response = await fetch('allowed_users.json');
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
+      try {
+        const response = await fetch('/path/to/allowed_users.json'); // Update the path as necessary
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching allowed users:', error);
+        throw error;
       }
-      return response.json();
     }
 
     window.onload = function() {
@@ -199,7 +203,6 @@
               fetchDonors();
             }
           } catch (error) {
-            console.error('Error fetching allowed users:', error);
             alert('Error fetching allowed users. Please try again later.');
           }
         } else {
@@ -263,7 +266,7 @@
         distances.forEach(item => {
           const listItem = document.createElement('li');
           listItem.classList.add('donor-item');
-          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`;
+          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div></span>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
             listItem.classList.toggle('highlight');
           });

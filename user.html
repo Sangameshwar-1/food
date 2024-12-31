@@ -111,7 +111,17 @@
     <h1>Donor Management System</h1>
     <form id="donorForm">
       <input type="text" id="name" placeholder="Name" required>
-      <input type="text" id="bloodType" placeholder="Blood Type" required>
+      <select id="bloodType" required>
+        <option value="" disabled selected>Select Blood Type</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+      </select>
       <input type="text" id="contact" placeholder="Contact Number" required>
       <input type="text" id="address" placeholder="Address" required>
       <input type="text" id="district" placeholder="District" required>

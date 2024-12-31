@@ -1,258 +1,355 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
-        authDomain: "blood-7b054.firebaseapp.com",
-        databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
-        projectId: "blood-7b054",
-        storageBucket: "blood-7b054.firebasestorage.app",
-        messagingSenderId: "926378767902",
-        appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
-        measurementId: "G-HTGC1SJYH6"
-      };
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
 
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-      const database = firebase.database();
-    </script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    .container {
+      width: 80%;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        .login-container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-        }
+    h1,
+    h2 {
+      text-align: center;
+      color: #333;
+    }
 
-        h2 {
-            text-align: center;
-            color: #333;
-        }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+    .scrollable-container {
+      max-height: 400px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    .scrollable-container::-webkit-scrollbar {
+      display: none;
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
 
-        .error-message {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-        }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
 
-        .toggle-link {
-            color: #007bff;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-        }
+    .search-bar {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-        .reset-link {
-            color: #007bff;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-        }
+    .note1 {
+      text-align: center;
+      color: red;
+    }
 
-        .user-count {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
-        }
+    .address {
+      display: none;
+      color: #555;
+      font-style: italic;
+    }
 
-        @media (max-width: 600px) {
-            .login-container {
-                padding: 20px;
-            }
+    .highlight .address {
+      display: block;
+      background-color: yellow;
+    }
 
-            input[type="email"],
-            input[type="password"],
-            button {
-                padding: 8px;
-                font-size: 14px;
-            }
+    .donor-item:nth-child(odd) {
+      background-color: #ffffff;
+    }
 
-            h2 {
-                font-size: 24px;
-            }
-        }
-    </style>
+    .donor-item:nth-child(even) {
+      background-color: #f0f0f0;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      padding: 10px 20px;
+      margin: 5px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      background: #ccc;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      margin-top: 20px;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="container">
+    <h1>Donor Management System</h1>
 
-<div class="login-container">
-    <h2 id="form-title">Login Page</h2>
-    <form id="auth-form">
-        <input type="email" id="email" placeholder="Enter your email" required><br>
-        <input type="password" id="password" placeholder="Enter your password" required><br>
-        <button type="submit" id="auth-button">Login</button>
-    </form>
-    <div class="error-message" id="error-message"></div>
-    <div class="reset-link" id="reset-link">Forgot Password?</div>
-    <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
-    <div class="user-count" id="user-count"></div>
-</div>
+    <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
+    <div id="note1" class="note1">
+      <p>Search by name or Blood group</p>
+    </div>
+    <h2>Donors List</h2>
+    <div id="note1" class="note1">
+      <p>Click on the Name to view the Address</p>
+    </div>
+    <div class="scrollable-container">
+      <ul id="donorsList"></ul>
+    </div>
+    <div class="pagination">
+      <button id="prevButton" onclick="prevPage()">Previous</button>
+      <button id="nextButton" onclick="nextPage()">Next</button>
+    </div>
+    <h2>Distance to Recipient</h2>
+    <div id="note1" class="note1">
+      <p>Finding the distance between the district of donor and recipient</p>
+    </div>
+    <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's district">
+    <button onclick="fetchDistances()">Calculate Distances</button>
+    <div class="scrollable-container">
+      <ul id="distancesList"></ul>
+    </div>
+  </div>
 
-<script>
-  const authForm = document.getElementById("auth-form");
-  const errorMessageDiv = document.getElementById("error-message");
-  const toggleLink = document.getElementById("toggle-link");
-  const resetLink = document.getElementById("reset-link");
-  const formTitle = document.getElementById("form-title");
-  const authButton = document.getElementById("auth-button");
-  const userCountDiv = document.getElementById("user-count");
+  <footer>
+    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <p>Contact: salesangameshwar1@gmail.com</p>
+    <p>Development Support: Dr.Vamshi Medical Institute Vikarabad</p>
+    <p>Contact: support@example.com</p>
+  </footer>
 
-  let isLogin = true;
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
-  toggleLink.addEventListener("click", () => {
-    isLogin = !isLogin;
-    if (isLogin) {
-      formTitle.textContent = "Login Page";
-      authButton.textContent = "Login";
-      toggleLink.textContent = "Don't have an account? Sign up";
-    } else {
-      formTitle.textContent = "Sign Up Page";
-      authButton.textContent = "Sign Up";
-      toggleLink.textContent = "Already have an account? Login";
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+      authDomain: "blood-7b054.firebaseapp.com",
+      databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+      projectId: "blood-7b054",
+      storageBucket: "blood-7b054.firebasestorage.app",
+      messagingSenderId: "926378767902",
+      appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+      measurementId: "G-HTGC1SJYH6"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    async function fetchAllowedEmails() {
+      try {
+        const response = await fetch('allowed_users.json'); // Ensure this path is correct and the file is accessible
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching allowed users;
+      }
     }
-    errorMessageDiv.textContent = "";
-  });
 
-  resetLink.addEventListener("click", () => {
-    const email = prompt("Please enter your email address:");
-    if (email) {
-        auth.sendPasswordResetEmail(email)
-            .then(() => {
-                alert("Password reset email sent!");
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-                errorMessageDiv.textContent = "Error sending password reset email: " + errorMessage;
-                errorMessageDiv.style.display = "block";
-            });
-    } else {
-        alert("Please enter a valid email address.");
-    }
-  });
-
-  // Fetch user's IP address and store it in Firebase
-  fetch('https://api.ipify.org/?format=json')
-    .then(response => response.json())
-    .then(data => {
-      const userIP = data.ip;
-      const timestamp = new Date().toISOString();
-
-      // Check if IP already exists in the database
-      const ipRef = database.ref('loginAttempts').orderByChild('ip').equalTo(userIP);
-      ipRef.once('value', snapshot => {
-        if (snapshot.exists()) {
-          // Update the timestamp if IP exists
-          const key = Object.keys(snapshot.val())[0];
-          database.ref('loginAttempts/' + key).update({ timestamp: timestamp });
+    window.onload = function() {
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            const allowedEmails = await fetchAllowedEmails();
+            if (!allowedEmails.includes(user.email)) {
+              // User is not allowed, redirect to user.html
+              window.location.href = 'user.html';
+            } else {
+              fetchDonors();
+            }
+          } catch (error) {
+            alert('Error fetching allowed users. Please try again later.');
+          }
         } else {
-          // Store new IP with timestamp
-          database.ref('loginAttempts').push({
-            ip: userIP,
-            timestamp: timestamp
-          });
+          // User is not authenticated, redirect to index.html
+          window.location.href = 'index.html';
         }
       });
+    };
 
-      // Fetch and display the number of unique IPs
-      database.ref('loginAttempts').once('value', snapshot => {
-        const uniqueIPs = snapshot.numChildren();
-        userCountDiv.textContent = `Number of unique users: ${uniqueIPs}`;
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching IP address:", error);
-    });
+    const apiKey = '5b3ce3597851110001cf6248707eb42f8c9c4160961e9baecd37b843'; // Replace with your OpenRouteService API key
 
-  authForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    if (isLogin) {
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log("Logged in as:", user.email);
-          alert("Login successful!");
-          // Redirect after alert to prevent double alert
-          window.location.href = "user.html"; // Example redirection after successful login
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorCode, errorMessage);
-          errorMessageDiv.textContent = "Login failed: " + errorMessage;
-        });
-    } else {
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log("Account created for:", user.email);
-          alert("Account creation successful!");
-          // Redirect after alert to prevent double alert
-          window.location.href = "user.html"; // Example redirection after successful account creation
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log(errorCode, errorMessage);
-          errorMessageDiv.textContent = "Account creation failed: " + errorMessage;
-        });
+    async function getCoordinates(place) {
+      const geocodeUrl = `https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(place)}`;
+      const response = await fetch(geocodeUrl);
+      const data = await response.json();
+      if (data.features && data.features.length > 0) {
+        const [lon, lat] = data.features[0].geometry.coordinates;
+        console.log(`Coordinates for ${place}: ${lat}, ${lon}`);
+        return { lat, lon };
+      } else {
+        throw new Error(`Unable to find coordinates for ${place}`);
+      }
     }
-  });
-</script>
 
+    async function calculateDistance(startCoords, endCoords) {
+      const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
+      const response = await fetch(directionsUrl);
+      const data = await response.json();
+      if (data.features && data.features[0]) {
+        const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to kilometers
+        console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
+        return distance.toFixed(2);
+      } else {
+        throw new Error('Unable to calculate distance');
+      }
+    }
+
+    async function fetchDistances() {
+      const recipientAddress = document.getElementById('recipientAddress').value;
+      if (!recipientAddress) {
+        alert('Please enter the recipient\'s address.');
+        return;
+      }
+
+      try {
+        const recipientCoords = await getCoordinates(recipientAddress);
+        const distancesList = document.getElementById('distancesList');
+        distancesList.innerHTML = ''; // Clear the distances list before appending new items
+
+        const distances = [];
+
+        for (const id in donors) {
+          const donor = donors[id];
+          const donorCoords = await getCoordinates(donor.district);
+          const distance = await calculateDistance(donorCoords, recipientCoords);
+          distances.push({ donor, distance });
+        }
+
+        distances.sort((a, b) => a.distance - b.distance);
+
+        distances.forEach(item => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div></span>`;
+          listItem.querySelector('.donor-name').addEventListener('click', () => {
+            listItem.classList.toggle('highlight');
+          });
+          distancesList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error calculating distances:', error);
+      }
+    }
+
+    let donors = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
+    async function fetchDonors() {
+      try {
+        const snapshot = await database.ref('donors').once('value');
+        donors = snapshot.val() || {};
+        displayDonors();
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+      }
+    }
+
+    function displayDonors() {
+      const donorsList = document.getElementById('donorsList');
+      donorsList.innerHTML = '';
+
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+
+      const currentDonors = Object.values(donors).slice(start, end);
+
+      currentDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
+        });
+        donorsList.appendChild(listItem);
+      });
+
+      document.getElementById('prevButton').disabled = currentPage === 1;
+      document.getElementById('nextButton').disabled = end >= Object.values(donors).length;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        displayDonors();
+      }
+    }
+
+    function nextPage() {
+      if ((currentPage * pageSize) < Object.values(donors).length) {
+        currentPage++;
+        displayDonors();
+      }
+    }
+
+    // Filter donors based on search input
+    function filterDonors() {
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const donorsList = document.getElementById('donorsList');
+      donorsList.innerHTML = '';
+
+      const filteredDonors = Object.values(donors).filter(donor =>
+        donor.name.toLowerCase().includes(searchQuery) ||
+        donor.bloodType.toLowerCase().includes(searchQuery)
+      );
+
+      filteredDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
+        });
+        donorsList.appendChild(listItem);
+      });
+    }
+  </script>
 </body>
+
 </html>

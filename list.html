@@ -180,7 +180,7 @@
 
     async function fetchAllowedEmails() {
       try {
-        const response = await fetch('/path/to/allowed_users.json'); // Update the path as necessary
+        const response = await fetch('allowed_users.json'); // Update the path as necessary
         if (!response.ok) {
           throw new Error('Network response was not ok ' + response.statusText);
         }

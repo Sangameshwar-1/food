@@ -166,28 +166,19 @@
   resetLink.addEventListener("click", () => {
     const email = prompt("Please enter your email address:");
     if (email) {
-      auth.fetchSignInMethodsForEmail(email)
-        .then((signInMethods) => {
-          if (signInMethods.length > 0) {
-            auth.sendPasswordResetEmail(email)
-              .then(() => {
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
                 alert("Password reset email sent!");
-              })
-              .catch((error) => {
+            })
+            .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
                 errorMessageDiv.textContent = "Error sending password reset email: " + errorMessage;
-              });
-          } else {
-            alert("No user found with this email address.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching sign-in methods:", error.message);
-          errorMessageDiv.textContent = "Error fetching sign-in methods: " + error.message;
-          errorMessageDiv.style.display = "block";
-        });
+                errorMessageDiv.style.display = "block";
+            });
+    } else {
+        alert("Please enter a valid email address.");
     }
   });
 

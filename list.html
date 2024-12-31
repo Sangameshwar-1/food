@@ -30,7 +30,8 @@
 
     input {
       padding: 10px;
-      border: 1px solid #ccc-radius: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
     .scrollable-container {
@@ -180,7 +181,7 @@
 
     async function fetchAllowedEmails() {
       try {
-        const response = await fetch('allowed_users.json'); // Update the path as necessary
+        const response = await fetch('allowed_users.json'); // Ensure this path is correct and the file is accessible
         if (!response.ok) {
           throw new Error('Network response was not ok ' + response.statusText);
         }

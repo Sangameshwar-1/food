@@ -43,6 +43,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            flex-direction: column;
         }
 
         .login-container {
@@ -53,6 +54,7 @@
             width: 100%;
             max-width: 400px;
             animation: fadeIn 0.5s ease-in-out;
+            border: 2px solid #4CAF50; /* Added border color */
         }
 
         .fade-in {
@@ -76,6 +78,12 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            transition: border-color 0.3s; /* Added transition effect */
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #4CAF50; /* Change border color on focus */
         }
 
         button {
@@ -108,6 +116,12 @@
             text-align: center;
             display: block;
             margin-top: 10px;
+            transition: color 0.3s; /* Added transition effect */
+        }
+
+        .toggle-link:hover,
+        .reset-link:hover {
+            color: #0056b3; /* Change text color on hover */
         }
 
         .user-count {
@@ -115,6 +129,16 @@
             margin-top: 20px;
             font-size: 18px;
             color: #333;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+            background-color: #f0f4f7;
+            padding: 10px;
+            width: 100%;
+            border-top: 1px solid #ccc;
         }
 
         @media (max-width: 600px) {
@@ -149,6 +173,13 @@
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
     <div class="user-count" id="user-count"></div>
 </div>
+
+<footer>
+    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <p>Contact: salesangameshwar1@gmail.com</p>
+    <p>Development Support: Dr.Vamshi Medical Institute Vikarabad</p>
+    <p>Contact: support@example.com</p>
+</footer>
 
 <script>
   const authForm = document.getElementById("auth-form");

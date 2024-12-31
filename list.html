@@ -105,6 +105,32 @@
       background: #ccc;
     }
 
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
     footer {
       text-align: center;
       padding: 20px;
@@ -138,6 +164,10 @@
       <button id="prevButton" onclick="prevPage()">Previous</button>
       <button id="nextButton" onclick="nextPage()">Next</button>
     </div>
+    <div class="loading" id="donorsLoading">
+      <div class="loader"></div>
+      <p>Loading donors...</p>
+    </div>
     <h2>Distance to Recipient</h2>
     <div id="note1" class="note1">
       <p>Finding the distance between the district of donor and recipient</p>
@@ -146,6 +176,10 @@
     <button onclick="fetchDistances()">Calculate Distances</button>
     <div class="scrollable-container">
       <ul id="distancesList"></ul>
+    </div>
+    <div class="loading" id="distancesLoading">
+      <div class="loader"></div>
+      <p>Calculating distances...</p>
     </div>
   </div>
 
@@ -254,6 +288,7 @@
       }
 
       try {
+        document.getElementById('distancesLoading').style.display = 'block';
         const recipientCoords = await getCoordinates(recipientAddress);
         const distancesList = document.getElementById('distancesList');
         distancesList.innerHTML = ''; // Clear the distances list before appending new items
@@ -272,7 +307,7 @@
         distances.forEach(item => {
           const listItem = document.createElement('li');
           listItem.classList.add('donor-item');
-          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div></span>`;
+          listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`;
           listItem.querySelector('.donor-name').addEventListener('click', () => {
             listItem.classList.toggle('highlight');
           });
@@ -280,6 +315,8 @@
         });
       } catch (error) {
         console.error('Error calculating distances:', error);
+      } finally {
+        document.getElementById('distancesLoading').style.display = 'none';
       }
     }
 
@@ -289,11 +326,14 @@
 
     async function fetchDonors() {
       try {
+        document.getElementById('donorsLoading').style.display = 'block';
         const snapshot = await database.ref('donors').once('value');
         donors = snapshot.val() || {};
         displayDonors();
       } catch (error) {
         console.error('Error fetching donors:', error);
+      } finally {
+        document.getElementById('donorsLoading').style.display = 'none';
       }
     }
 

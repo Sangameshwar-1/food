@@ -148,12 +148,30 @@
     footer p {
       margin: 5px 0;
     }
+
+    .back-button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .back-button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
     <h1>Donor Management System</h1>
+    <a href="user.html" class="back-button">Back to User Page</a>
 
     <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
     <div id="note1" class="note1">

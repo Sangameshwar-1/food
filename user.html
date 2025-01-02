@@ -128,9 +128,14 @@
       <input type="text" id="address" placeholder="Address" required>
 <!--       <input type="text" id="district" placeholder="District" required>
  -->
-      <select id="district">
-        <option value="" disabled selected><input type="text" id="search-bar" placeholder="Search for a district..."></option>
-        <option value=""></option>
+      <select id="state" required>
+        <option value="" disabled selected>Select State</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option>
+        <!-- Add other states here -->
+      </select>
+      <select id="district" required>
+        <option value="" disabled selected>Select District</option>
       </select>
       
       <button type="submit">Add Donor</button>
@@ -151,73 +156,77 @@
     <p>Contact: support@example.com</p>
   </footer>
   <script>
-        const districts = [
-            "Adilabad",
-            "Bhadradri Kothagudem",
-            "Hyderabad",
-            "Jagtial",
-            "Jangaon",
-            "Jayashankar Bhupalpally",
-            "Jogulamba Gadwal",
-            "Kamareddy",
-            "Karimnagar",
-            "Khammam",
-            "Kumuram Bheem Asifabad",
-            "Mahabubabad",
-            "Mahabubnagar",
-            "Mancherial",
-            "Medak",
-            "Medchal–Malkajgiri",
-            "Mulugu",
-            "Nagarkurnool",
-            "Nalgonda",
-            "Narayanpet",
-            "Nirmal",
-            "Nizamabad",
-            "Peddapalli",
-            "Rajanna Sircilla",
-            "Rangareddy",
-            "Sangareddy",
-            "Siddipet",
-            "Suryapet",
-            "Vikarabad",
-            "Wanaparthy",
-            "Warangal Rural",
-            "Warangal Urban",
-            "Yadadri Bhuvanagiri"
-        ];
+    const statesAndDistricts = {
+      "Telangana": [
+        "Adilabad",
+        "Bhadradri Kothagudem",
+        "Hyderabad",
+        "Jagtial",
+        "Jangaon",
+        "Jayashankar Bhupalpally",
+        "Jogulamba Gadwal",
+        "Kamareddy",
+        "Karimnagar",
+        "Khammam",
+        "Kumuram Bheem Asifabad",
+        "Mahabubabad",
+        "Mahabubnagar",
+        "Mancherial",
+        "Medak",
+        "Medchal–Malkajgiri",
+        "Mulugu",
+        "Nagarkurnool",
+        "Nalgonda",
+        "Narayanpet",
+        "Nirmal",
+        "Nizamabad",
+        "Peddapalli",
+        "Rajanna Sircilla",
+        "Rangareddy",
+        "Sangareddy",
+        "Siddipet",
+        "Suryapet",
+        "Vikarabad",
+        "Wanaparthy",
+        "Warangal Rural",
+        "Warangal Urban",
+        "Yadadri Bhuvanagiri"
+      ],
+      "Andhra Pradesh": [
+        "Anantapur",
+        "Chittoor",
+        "East Godavari",
+        "Guntur",
+        "Krishna",
+        "Kurnool",
+        "Prakasam",
+        "Nellore",
+        "Srikakulam",
+        "Visakhapatnam",
+        "Vizianagaram",
+        "West Godavari",
+        "YSR Kadapa"
+      ],
+      // Add other states and their districts here
+    };
 
-        const selectElement = document.getElementById("district");
-        const searchBar = document.getElementById("search-bar");
+    const stateSelect = document.getElementById("state");
+    const districtSelect = document.getElementById("district");
 
-        // Function to populate the dropdown
-        function populateDistricts(filteredDistricts) {
-            selectElement.innerHTML = '<option value="">--Select a District--</option>'; // Reset options
-            filteredDistricts.forEach(district => {
-                const option = document.createElement("option");
-                option.value = district;
-                option.textContent = district;
-                selectElement.appendChild(option);
-            });
-        }
+    stateSelect.addEventListener("change", function () {
+      const selectedState = stateSelect.value;
+      const districts = statesAndDistricts[selectedState] || [];
 
-        // Initially populate with all districts
-        populateDistricts(districts);
+      // Reset district dropdown
+      districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
 
-        // Search for districts dynamically
-        searchBar.addEventListener("input", function() {
-            const searchText = searchBar.value.toLowerCase();
-            const filteredDistricts = districts.filter(district =>
-                district.toLowerCase().includes(searchText)
-            );
-            populateDistricts(filteredDistricts);
-        });
-
-        // Allow selecting a district from the dropdown
-        selectElement.addEventListener("change", function() {
-            searchBar.value = selectElement.value;
-        });
-    </script>
+      districts.forEach(district => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+      });
+    });
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>

@@ -126,7 +126,13 @@
       </select>
       <input type="text" id="contact" placeholder="Contact Number" required>
       <input type="text" id="address" placeholder="Address" required>
-      <input type="text" id="district" placeholder="District" required>
+<!--       <input type="text" id="district" placeholder="District" required>
+ -->
+      <select id="district">
+        <option value="" disabled selected>Search District</option>
+        <option value=""><input type="text" id="search-bar" placeholder="Search for a district..."></option>
+      </select>
+      
       <button type="submit">Add Donor</button>
     </form>
     <p style="color:red;">**Make sure <b>The RH factor and the district be correct.</b></p>
@@ -144,6 +150,74 @@
     <p>Development Support by: Dr.Vamshi Govt Medical Institute Vikarabad</p>
     <p>Contact: support@example.com</p>
   </footer>
+  <script>
+        const districts = [
+            "Adilabad",
+            "Bhadradri Kothagudem",
+            "Hyderabad",
+            "Jagtial",
+            "Jangaon",
+            "Jayashankar Bhupalpally",
+            "Jogulamba Gadwal",
+            "Kamareddy",
+            "Karimnagar",
+            "Khammam",
+            "Kumuram Bheem Asifabad",
+            "Mahabubabad",
+            "Mahabubnagar",
+            "Mancherial",
+            "Medak",
+            "Medchal–Malkajgiri",
+            "Mulugu",
+            "Nagarkurnool",
+            "Nalgonda",
+            "Narayanpet",
+            "Nirmal",
+            "Nizamabad",
+            "Peddapalli",
+            "Rajanna Sircilla",
+            "Rangareddy",
+            "Sangareddy",
+            "Siddipet",
+            "Suryapet",
+            "Vikarabad",
+            "Wanaparthy",
+            "Warangal Rural",
+            "Warangal Urban",
+            "Yadadri Bhuvanagiri"
+        ];
+
+        const selectElement = document.getElementById("district");
+        const searchBar = document.getElementById("search-bar");
+
+        // Function to populate the dropdown
+        function populateDistricts(filteredDistricts) {
+            selectElement.innerHTML = '<option value="">--Select a District--</option>'; // Reset options
+            filteredDistricts.forEach(district => {
+                const option = document.createElement("option");
+                option.value = district;
+                option.textContent = district;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // Initially populate with all districts
+        populateDistricts(districts);
+
+        // Search for districts dynamically
+        searchBar.addEventListener("input", function() {
+            const searchText = searchBar.value.toLowerCase();
+            const filteredDistricts = districts.filter(district =>
+                district.toLowerCase().includes(searchText)
+            );
+            populateDistricts(filteredDistricts);
+        });
+
+        // Allow selecting a district from the dropdown
+        selectElement.addEventListener("change", function() {
+            searchBar.value = selectElement.value;
+        });
+    </script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>

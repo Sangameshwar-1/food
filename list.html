@@ -434,33 +434,30 @@
         const authToken = 'fcf794f0f34da2789817fb551fdd6047';   // Replace with your Twilio Auth Token
         const twilioNumber = '+12564148264';    // Replace with your Twilio Phone Number
         const encodedCreds = btoa(`${accountSid}:${authToken}`);
-        for(const li of phoneNumbers){
-            console.log(li);
-        }
+      
         try {
           for (const to of phoneNumbers) {
-            if(to==="8247341184"){
-                const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
-                await axios.post(
-                  `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-                  new URLSearchParams({
-                    To: updatedTo,
-                    From: twilioNumber,
-                    Body: message,
-                  }),
-                  {
-                    headers: {
-                      Authorization: `Basic ${encodedCreds}`,
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                  }
-                );
-                console.log("Message sent to:", updatedTo);
-              
+            if (to === '8247341184') {
+              const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
+              await axios.post(
+                `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+                new URLSearchParams({
+                  To: updatedTo,
+                  From: twilioNumber,
+                  Body: message,
+                }),
+                {
+                  headers: {
+                    Authorization: `Basic ${encodedCreds}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                }
+              );
+              console.log("Message sent to:", updatedTo);
               alert('Messages sent successfully!');
+            } else {
+              console.log("Message not sent:", to);
             }
-          else{
-            console.log("Message not sent:", to);
           }
         } catch (error) {
           console.error('Failed to send message:', error);

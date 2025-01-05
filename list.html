@@ -365,58 +365,14 @@
         const snapshot = await database.ref('donors').once('value');
         donors = snapshot.val() || {};
         displayDonors();
-        extractPhoneNumbers(); // Extract phone numbers after fetching donors
+         
       } catch (error) {
         console.error('Error fetching donors:', error);
       } finally {
         document.getElementById('donorsLoading').style.display = 'none';
       }
     }
-    function extractPhoneNumbers() {
-        phoneNumbers = Object.values(donors).map(donor => donor.contact);
-    }
-    async function sendMessage() {
-        const message = document.getElementById('message').value;
-        if (!message) {
-          alert('Please enter a message.');
-          return;
-        }
-      
-        const accountSid = 'AC5b36278bf5318b209bdd73b1cb9db625'; // Replace with your Twilio Account SID
-        const authToken = 'fcf794f0f34da2789817fb551fdd6047';   // Replace with your Twilio Auth Token
-        const twilioNumber = '+12564148264';
-        const encodedCreds = btoa(`${accountSid}:${authToken}`);
-      
-        try {
-          for (const to of phoneNumbers) {
-            if (to === '8247341184') {
-              const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
-              await axios.post(
-                `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-                new URLSearchParams({
-                  To: updatedTo,
-                  From: twilioNumber,
-                  Body: message,
-                }),
-                {
-                  headers: {
-                    Authorization: `Basic ${encodedCreds}`,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                }
-              );
-              console.log("Message sent to:", updatedTo);
-              alert('Message sent successfully!');
-              return; // Exit after sending to the first matching number
-            }
-          }
-          console.log("No matching number found to send the message.");
-        } catch (error) {
-          console.error('Failed to send message:', error);
-          alert('Failed to send messages: ' + error.response.data.message);
-        }
-      }
-
+    
     function displayDonors() {
       const donorsList = document.getElementById('donorsList');
       donorsList.innerHTML = '';
@@ -470,10 +426,56 @@
         listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
         listItem.querySelector('.donor-name').addEventListener('click', () => {
           listItem.classList.toggle('highlight');
+          extractPhoneNumbers();
         });
         donorsList.appendChild(listItem);
       });
     }
+    function extractPhoneNumbers() {
+        phoneNumbers = Object.values(donors).map(donor => donor.contact);
+    }
+    async function sendMessage() {
+        const message = document.getElementById('message').value;
+        if (!message) {
+          alert('Please enter a message.');
+          return;
+        }
+      
+        const accountSid = 'AC5b36278bf5318b209bdd73b1cb9db625'; // Replace with your Twilio Account SID
+        const authToken = 'fcf794f0f34da2789817fb551fdd6047';   // Replace with your Twilio Auth Token
+        const twilioNumber = '+12564148264';
+        const encodedCreds = btoa(`${accountSid}:${authToken}`);
+      
+        try {
+          for (const to of phoneNumbers) {
+            if (to === '8247341184') {
+              const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
+              await axios.post(
+                `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+                new URLSearchParams({
+                  To: updatedTo,
+                  From: twilioNumber,
+                  Body: message,
+                }),
+                {
+                  headers: {
+                    Authorization: `Basic ${encodedCreds}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                }
+              );
+              console.log("Message sent to:", updatedTo);
+              alert('Message sent successfully!');
+              return; // Exit after sending to the first matching number
+            }
+          }
+          console.log("No matching number found to send the message.");
+        } catch (error) {
+          console.error('Failed to send message:', error);
+          alert('Failed to send messages: ' + error.response.data.message);
+        }
+      }
+
   </script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>

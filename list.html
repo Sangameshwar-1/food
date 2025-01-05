@@ -388,23 +388,30 @@
       const encodedCreds = btoa(`${accountSid}:${authToken}`);
 
       try {
-        for (const to of phoneNumbers) {
-          await axios.post(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-            new URLSearchParams({
-              To: to,
-              From: twilioNumber,
-              Body: message,
-            }),
-            {
-              headers: {
-                Authorization: `Basic ${encodedCreds}`,
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-            }
-          );
-        }
-        alert('Messages sent successfully!');
+          for (const to of phoneNumbers) {
+              if (to === '8247341184') {
+                  const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
+                  await axios.post(
+                      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+                      new URLSearchParams({
+                          To: updatedTo,
+                          From: twilioNumber,
+                          Body: message,
+                      }),
+                      {
+                          headers: {
+                              Authorization: `Basic ${encodedCreds}`,
+                              'Content-Type': 'application/x-www-form-urlencoded',
+                          },
+                      }
+                  );
+                  console.log("sent to:", updatedTo); // Fixed 'console' to 'console.log'
+              } else {
+                  console.log("not sent to:", to); // Fixed 'console' to 'console.log'
+              }
+          }
+
+            
       } catch (error) {
         alert('Failed to send messages: ' + error.response.data.message);
       }

@@ -434,7 +434,9 @@
         const authToken = 'fcf794f0f34da2789817fb551fdd6047';   // Replace with your Twilio Auth Token
         const twilioNumber = '+12564148264';    // Replace with your Twilio Phone Number
         const encodedCreds = btoa(`${accountSid}:${authToken}`);
-      
+        for(const li of phoneNumbers){
+            console.log(li);
+        }
         try {
           for (const to of phoneNumbers) {
             if(to==="8247341184"){

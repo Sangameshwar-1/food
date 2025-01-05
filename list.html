@@ -375,46 +375,46 @@
         phoneNumbers = Object.values(donors).map(donor => donor.contact);
     }
     async function sendMessage() {
-      const message = document.getElementById('message').value;
-      if (!message) {
-        alert('Please enter a message.');
-        return;
-      }
-
-      const accountSid = 'ACd0820c8fb546c38be1760536009548cc'; // Replace with your Twilio Account SID
-      const authToken = 'a07946d79b75d7a24937ba7ffcf5f083';   // Replace with your Twilio Auth Token
-      const twilioNumber = '+15856693126';    // Replace with your Twilio Phone Number
-      const encodedCreds = btoa(`${accountSid}:${authToken}`);
-
-      try {
+        const message = document.getElementById('message').value;
+        if (!message) {
+          alert('Please enter a message.');
+          return;
+        }
+      
+        const accountSid = 'ACd0820c8fb546c38be1760536009548cc'; // Replace with your Twilio Account SID
+        const authToken = 'a07946d79b75d7a24937ba7ffcf5f083';   // Replace with your Twilio Auth Token
+        const twilioNumber = '+15856693126';    // Replace with your Twilio Phone Number
+        const encodedCreds = btoa(`${accountSid}:${authToken}`);
+      
+        try {
           for (const to of phoneNumbers) {
-              if (to === '8247341184') {
-                  const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
-                  await axios.post(
-                      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-                      new URLSearchParams({
-                          To: updatedTo,
-                          From: twilioNumber,
-                          Body: message,
-                      }),
-                      {
-                          headers: {
-                              Authorization: `Basic ${encodedCreds}`,
-                              'Content-Type': 'application/x-www-form-urlencoded',
-                          },
-                      }
-                  );
-                  console.log("sent to:", updatedTo); // Fixed 'console' to 'console.log'
-              } else {
-                  console.log("not sent to:", to); // Fixed 'console' to 'console.log'
-              }
+            if (to === '8247341184') {
+              const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
+              await axios.post(
+                `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+                new URLSearchParams({
+                  To: updatedTo,
+                  From: twilioNumber,
+                  Body: message,
+                }),
+                {
+                  headers: {
+                    Authorization: `Basic ${encodedCreds}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                }
+              );
+              console.log("Message sent to:", updatedTo);
+              alert('Message sent successfully!');
+              return; // Exit after sending to the first matching number
+            }
           }
-
-            
-      } catch (error) {
-        alert('Failed to send messages: ' + error.response.data.message);
+          console.log("No matching number found to send the message.");
+        } catch (error) {
+          console.error('Failed to send message:', error);
+          alert('Failed to send messages: ' + error.response.data.message);
+        }
       }
-    }
 
     function displayDonors() {
       const donorsList = document.getElementById('donorsList');

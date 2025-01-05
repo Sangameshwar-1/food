@@ -360,81 +360,70 @@
     const pageSize = 10;
 
     async function fetchDonors() {
-      try {
-        document.getElementById('donorsLoading').style.display = 'block';
-        const snapshot = await database.ref('donors').once('value');
-        donors = snapshot.val() || {};
-        displayDonors();
-         
-      } catch (error) {
-        console.error('Error fetching donors:', error);
-      } finally {
-        document.getElementById('donorsLoading').style.display = 'none';
+        try {
+          document.getElementById('donorsLoading').style.display = 'block';
+          const snapshot = await database.ref('donors').once('value');
+          donors = snapshot.val() || {};
+          displayDonors();
+          extractPhoneNumbers(Object.values(donors)); // Extract phone numbers after fetching donors
+        } catch (error) {
+          console.error('Error fetching donors:', error);
+        } finally {
+          document.getElementById('donorsLoading').style.display = 'none';
+        }
       }
-    }
-    
-    function displayDonors() {
-      const donorsList = document.getElementById('donorsList');
-      donorsList.innerHTML = '';
-
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-
-      const currentDonors = Object.values(donors).slice(start, end);
-
-      currentDonors.forEach(donor => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('donor-item');
-        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
-        listItem.querySelector('.donor-name').addEventListener('click', () => {
-          listItem.classList.toggle('highlight');
+      
+      function extractPhoneNumbers(donorsList) {
+        phoneNumbers = donorsList.map(donor => donor.contact);
+      }
+      
+      function displayDonors() {
+        const donorsList = document.getElementById('donorsList');
+        donorsList.innerHTML = '';
+      
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+      
+        const currentDonors = Object.values(donors).slice(start, end);
+      
+        currentDonors.forEach(donor => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+          listItem.querySelector('.donor-name').addEventListener('click', () => {
+            listItem.classList.toggle('highlight');
+          });
+          donorsList.appendChild(listItem);
         });
-        donorsList.appendChild(listItem);
-      });
-
-      document.getElementById('prevButton').disabled = currentPage === 1;
-      document.getElementById('nextButton').disabled = end >= Object.values(donors).length;
-    }
-
-    function prevPage() {
-      if (currentPage > 1) {
-        currentPage--;
-        displayDonors();
+      
+        document.getElementById('prevButton').disabled = currentPage === 1;
+        document.getElementById('nextButton').disabled = end >= Object.values(donors).length;
       }
-    }
-
-    function nextPage() {
-      if ((currentPage * pageSize) < Object.values(donors).length) {
-        currentPage++;
-        displayDonors();
-      }
-    }
-
-    function filterDonors() {
-      const searchQuery = document.getElementById('search').value.toLowerCase();
-      const donorsList = document.getElementById('donorsList');
-      donorsList.innerHTML = '';
-
-      const filteredDonors = Object.values(donors).filter(donor =>
-        donor.name.toLowerCase().includes(searchQuery) ||
-        donor.bloodType.toLowerCase().includes(searchQuery)
-      );
-
-      filteredDonors.forEach(donor => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('donor-item');
-        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
-        listItem.querySelector('.donor-name').addEventListener('click', () => {
-          listItem.classList.toggle('highlight');
-          extractPhoneNumbers();
+      
+      function filterDonors() {
+        const searchQuery = document.getElementById('search').value.toLowerCase();
+        const donorsList = document.getElementById('donorsList');
+        donorsList.innerHTML = '';
+      
+        const filteredDonors = Object.values(donors).filter(donor =>
+          donor.name.toLowerCase().includes(searchQuery) ||
+          donor.bloodType.toLowerCase().includes(searchQuery)
+        );
+      
+        filteredDonors.forEach(donor => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('donor-item');
+          listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+          listItem.querySelector('.donor-name').addEventListener('click', () => {
+            listItem.classList.toggle('highlight');
+          });
+          donorsList.appendChild(listItem);
         });
-        donorsList.appendChild(listItem);
-      });
-    }
-    function extractPhoneNumbers() {
-        phoneNumbers = Object.values(donors).map(donor => donor.contact);
-    }
-    async function sendMessage() {
+      
+        extractPhoneNumbers(filteredDonors); // Update phone numbers with the filtered list
+      }
+      
+      async function sendMessage() {
         const message = document.getElementById('message').value;
         if (!message) {
           alert('Please enter a message.');
@@ -443,33 +432,29 @@
       
         const accountSid = 'AC5b36278bf5318b209bdd73b1cb9db625'; // Replace with your Twilio Account SID
         const authToken = 'fcf794f0f34da2789817fb551fdd6047';   // Replace with your Twilio Auth Token
-        const twilioNumber = '+12564148264';
+        const twilioNumber = '+12564148264';    // Replace with your Twilio Phone Number
         const encodedCreds = btoa(`${accountSid}:${authToken}`);
       
         try {
           for (const to of phoneNumbers) {
-            if (to === '8247341184') {
-              const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
-              await axios.post(
-                `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-                new URLSearchParams({
-                  To: updatedTo,
-                  From: twilioNumber,
-                  Body: message,
-                }),
-                {
-                  headers: {
-                    Authorization: `Basic ${encodedCreds}`,
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                }
-              );
-              console.log("Message sent to:", updatedTo);
-              alert('Message sent successfully!');
-              return; // Exit after sending to the first matching number
-            }
+            const updatedTo = "+91" + to; // Updated to avoid mutating the original `to`
+            await axios.post(
+              `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+              new URLSearchParams({
+                To: updatedTo,
+                From: twilioNumber,
+                Body: message,
+              }),
+              {
+                headers: {
+                  Authorization: `Basic ${encodedCreds}`,
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+              }
+            );
+            console.log("Message sent to:", updatedTo);
           }
-          console.log("No matching number found to send the message.");
+          alert('Messages sent successfully!');
         } catch (error) {
           console.error('Failed to send message:', error);
           alert('Failed to send messages: ' + error.response.data.message);

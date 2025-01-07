@@ -188,6 +188,9 @@
       <button id="prevButton" onclick="prevPage()">Previous</button>
       <button id="nextButton" onclick="nextPage()">Next</button>
     </div>
+    <div>
+        <button id="sendAlertButton">Send Alert</button>
+    </div>
     <div class="loading" id="donorsLoading">
       <div class="loader"></div>
       <p>Loading donors...</p>
@@ -401,12 +404,12 @@
         displayDonors();
       }
     }
-
+    let filter_phone=[]
     function filterDonors() {
       const searchQuery = document.getElementById('search').value.toLowerCase();
       const donorsList = document.getElementById('donorsList');
       donorsList.innerHTML = '';
-
+      filter_phone=[]
       const filteredDonors = Object.values(donors).filter(donor =>
         donor.name.toLowerCase().includes(searchQuery) ||
         donor.bloodType.toLowerCase().includes(searchQuery)
@@ -416,12 +419,48 @@
         const listItem = document.createElement('li');
         listItem.classList.add('donor-item');
         listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+        filter_phone.push('${donor.contact}')
         listItem.querySelector('.donor-name').addEventListener('click', () => {
           listItem.classList.toggle('highlight');
         });
         donorsList.appendChild(listItem);
       });
     }
+
+    //twilio
+  
+    
+    const accountSid = 'ACd0820c8fb546c38be1760536009548cc'; // Your Account SID from www.twilio.com/console
+    const authToken = 'a07946d79b75d7a24937ba7ffcf5f083';  // Your Auth Token from www.twilio.com/console
+    const twilio_number='+15856693126' ;
+    const client = require('twilio')(accountSid, authToken);
+    function sendsms() {
+      for (let i = 0; i < filter_phone.length; i++) {
+        let num = filter_phone[i];
+        if (num === '8247341184') {
+          num = '+91' + num;
+          const from = twilioNumber;
+          const to = num;
+          const body = 'Hello from Twilio!';
+    
+          client.messages
+            .create({
+              body: body,
+              from: from,
+              to: to
+            })
+            .then(message => console.log(message.sid))
+            .catch(err => console.error(err));
+        } else {
+          console.log('Message not sent');
+        }
+      }
+    }
+    document.getElementById('sendAlertButton').addEventListener('click', function() {
+      sendsms();
+      alert('SMS has been sent!');
+    });
+        
   </script>
 </body>
 

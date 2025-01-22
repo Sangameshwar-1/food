@@ -71,6 +71,20 @@
       return date.toLocaleString();
     }
 
+    // view list
+    document.getElementById('viewDonorsButton').addEventListener('click', () => {
+      window.location.href = 'list.html';
+    });
+
+    // logout
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
+    });
+
     // Add donor
     document.getElementById('donorForm').addEventListener('submit', async (event) => {
       event.preventDefault();

@@ -14,7 +14,7 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
-
+`   
     window.onload = function() {
       auth.onAuthStateChanged((user) => {
         if (user) {

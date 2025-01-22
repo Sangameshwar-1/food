@@ -1,3 +1,18 @@
+const firebaseConfig = {
+        apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+        authDomain: "blood-7b054.firebaseapp.com",
+        databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+        projectId: "blood-7b054",
+        storageBucket: "blood-7b054.firebasestorage.app",
+        messagingSenderId: "926378767902",
+        appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+        measurementId: "G-HTGC1SJYH6"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const database = firebase.database();
 const authForm = document.getElementById("auth-form");
   const errorMessageDiv = document.getElementById("error-message");
   const toggleLink = document.getElementById("toggle-link");

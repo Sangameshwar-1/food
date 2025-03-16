@@ -35,6 +35,17 @@ const authButton = document.getElementById("auth-button");
 const loginContainer = document.getElementById("login-container");
 const userCountDiv = document.getElementById("user-count");
 
+//user-info
+            
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
+                } else {
+                    document.getElementById("user-info").innerText = "Not logged in";
+                }
+            });
+
+
 //>>>>>>>>
 /*
     M in js : 

@@ -1,192 +1,245 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Login | Sangameshwar</title>
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
 
-    <style>
-        /* Smooth fade-in effect */
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
+    .container {
+      width: 80%;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+     .user-info {
+    position: absolute; /* Absolute positioning relative to the page */
+    top: 10px; /* Distance from the top */
+    left: 10px; /* Distance from the left */
+    padding: 5px 10px; /* Add some padding */
+    background-color: lightgray; /* Light background for visibility */
+    border-radius: 5px; /* Rounded corners */
+    font-family: Arial, sans-serif;
+  }
 
-        /* Global Styles */
-        html, body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: "Poppins", sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-        }
+    h1,
+    h2 {
+      text-align: center;
+      color: #333;
+    }
 
-        /* Login Container */
-        .login-container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in-out;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        h2 {
-            color: white;
-            font-size: 26px;
-            margin-bottom: 15px;
-        }
+    input,
+    select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1.2em; /* Increased font size for larger appearance */
+    }
 
-        /* Input Fields */
-        .input-container {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            margin: 12px 0;
-            padding: 10px;
-        }
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
 
-        .input-container input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            padding-left: 10px;
-        }
+    button:hover {
+      background: #0056b3;
+    }
 
-        .input-container i {
-            color: rgba(255, 255, 255, 0.7);
-        }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
 
-        /* Placeholder Color */
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
+    li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
 
-        /* Button */
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #fdbb2d;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+    .view-donors-button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
 
-        button:hover {
-            background: #ffcc70;
-            transform: scale(1.05);
-        }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      margin-top: 20px;
+    }
 
-        /* Links */
-        .toggle-link, .reset-link {
-            color: white;
-            font-size: 14px;
-            margin-top: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+    footer p {
+      margin: 5px 0;
+    }
 
-        .toggle-link:hover, .reset-link:hover {
-            text-decoration: underline;
-            color: #ffcc70;
-        }
+    @media (max-width: 600px) {
+      .container {
+        width: 90%;
+        padding: 10px;
+      }
 
-        /* Error Message */
-        .error-message {
-            color: #ff4d4d;
-            font-size: 14px;
-            margin-top: 8px;
-        }
+      h1,
+      h2 {
+        font-size: 1.5em;
+      }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            color: white;
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            background: rgba(0, 0, 0, 0.5);
-            margin-top: auto;
-        }
+      input {
+        font-size: 1em;
+      }
 
-        @media (max-width: 600px) {
-            .login-container {
-                padding: 25px;
-            }
-
-            h2 {
-                font-size: 22px;
-            }
-
-            input, button {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-    </style>
-
-    <!-- FontAwesome for Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
+      li {
+        font-size: 0.9em;
+      }
+    }
+  </style>
 </head>
+
 <body>
-
-<div class="login-container" id="login-container">
-    <h2 id="form-title">Welcome Back</h2>
-    <form id="auth-form">
+  <div class="user-info" id="user-info">Not logged in</div>
+  <div class="container">
+    <h1>Donor Management System</h1>
+    <form id="donorForm">
+      <input type="text" id="name" placeholder="Name" required>
+      <select id="bloodType" required>
+        <option value="" disabled selected>Select Blood Type</option>
+        <option value="A+">A+</option>
+        <option value="A-">A-</option>
+        <option value="B+">B+</option>
+        <option value="B-">B-</option>
+        <option value="AB+">AB+</option>
+        <option value="AB-">AB-</option>
+        <option value="O+">O+</option>
+        <option value="O-">O-</option>
+      </select>
+      <input type="text" id="contact" placeholder="Contact Number" required>
+      <input type="text" id="address" placeholder="Address" required>
+       <input type="text" id="district" placeholder="District" required>
+ 
+<!--       <select id="state" required>
+        <option value="" disabled selected>Select State</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option> 
         
-        <!-- Email Field -->
-        <div class="input-container">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="email" placeholder="Enter Email" required>
-        </div>
-
-        <!-- Password Field -->
-        <div class="input-container">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="password" placeholder="Enter Password" required>
-        </div>
-
-        <!-- Login Button -->
-        <button type="submit" id="auth-button">Sign In</button>
+      </select>
+      <select id="district" required>
+        <option value="" disabled selected>Select District</option>
+      </select> -->
+      
+      <button type="submit">Add Donor</button>
     </form>
+    <p style="color:red;">**Make sure <b>The RH factor and the district be correct.</b></p>
+  </div>
+  <div class="view-donors-button-container">
+    <button id="viewDonorsButton">View Donors</button>
+  </div>
+  <div class="view-donors-button-container">
+    <button id="logoutButton">Logout</button>
+  </div>
 
-    <div class="error-message" id="error-message"></div>
+  <footer>
+    <p>Development Support by : Dr.Vamshi Govt Medical Institute Vikarabad</p>
+    <p>Contact: vamshi@gmail.com</p>
+     <p>Developed by: Sangameshwar IIIT HYD</p>
+    <p>Contact: salesangameshwar1@gmail.com</p>
+  </footer>
+<!--   <script>
+    const statesAndDistricts = {
+      "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Prakasam", "Nellore", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+      "Arunachal Pradesh": ["Tawang", "West Kameng", "East Kameng", "Papum Pare", "Lower Subansiri", "Upper Subansiri", "West Siang", "East Siang", "Siang", "Upper Siang", "Lower Siang", "Namsai", "Changlang", "Tirap", "Longding"],
+      "Assam": ["Baksa", "Barpeta", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dibrugarh", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+      "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+      "Goa": ["North Goa", "South Goa"],
+      "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udepur", "Dahod", "Dang", "Gir Somnath", "Jamnagar", "Junagadh", "Kutch", "Kheda", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
+      "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Narnaul", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Sirsa", "Sonipat", "Yamunanagar"],
+      "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kullu", "Mandi", "Shimla", "Solan", "Sirmaur", "Una"],
+      "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "Garhwa", "Giridih", "Godda", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahibganj", "Saraikela Kharsawan", "Simdega", "West Singhbhum"],
+      "Karnataka": ["Bengaluru Urban", "Belagavi", "Bellary", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Hubli", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
+      "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+      "Madhya Pradesh": ["Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Khandwa", "Khargone", "Mandsaur", "Morena", "Narsinghpur", "Neemuch", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shivpuri", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+      "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nasik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+      "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Peren", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+      "Meghalaya": ["East Garo Hills", "East Khasi Hills", "Jaintia Hills", "Ri Bhoi", "South Garo Hills", "South Khasi Hills", "West Garo Hills", "West Khasi Hills"],
+      "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Serchhip"],
+      "Nagaland": ["Dimapur", "Kohima", "Mokokchung", "Mon", "Peren", "Phek", "Tuensang", "Wokha", "Zunheboto"],
+      "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"],
+      "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Firozpur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Mansa", "Moga", "Muktsar", "Nawanshahr", "Patiala", "Rupnagar", "S.A.S. Nagar", "Sangrur", "Tarn Taran"],
+      "Rajasthan": ["Ajmer", "Alwar", "Banswara", "Baran", "Barmer", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kota", "Nagaur", "Pali", "Rajsamand", "Sawai Madhopur", "Sikar", "Sirohi", "Tonk", "Udaipur"],
+      "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
+      "Tamil Nadu": ["Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Nagapattinam", "Namakkal", "Perambalur", "Pudukkottai", "Ramanathapuram", "Salem", "Sivaganga", "Tiruchirappalli", "Tirunelveli", "Tiruppur", "Vellore", "Viluppuram", "Virudhunagar"],
+      "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal–Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal Rural", "Warangal Urban", "Yadadri Bhuvanagiri"],
+      "Tripura": ["Dhalai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+      "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+      "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kushinagar", "Lakhimpur Kheri", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Raebareli", "Rampur", "Saharanpur", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+      "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Burdwan", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Purba Bardhaman", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
+    };
+    
+    const states = Object.keys(statesAndDistricts);
+    const stateSelect = document.getElementById("state");
+    const districtSelect = document.getElementById("district");
+    
+    // Populate state dropdown on document ready
+    $(document).ready(function() {
+      states.forEach(state => {
+        const option = document.createElement("option");
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+      });
+    
+      $('#state').select2();
+      $('#district').select2();
+    });
+    
+    // Add event listener to populate district dropdown based on selected state
+    stateSelect.addEventListener("change", function () {
+      const selectedState = stateSelect.value;
+      const districts = statesAndDistricts[selectedState] || [];
+    
+      // Reset district dropdown
+      districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+    
+      districts.forEach(district => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+      });
+    
+      // Reinitialize Select2 for district dropdown
+      $('#district').select2();
+    });
+  </script>
+ -->
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
-    <!-- Forgot Password & Signup Links -->
-    <div class="reset-link" id="reset-link">Forgot Password?</div>
-    <div class="toggle-link" id="toggle-link">New User? Create an account</div>
-</div>
+  <script src="userjs.js"></script>
+  
 
-<!-- Footer -->
-<footer>
-    <p>© 2025 Sangameshwar | IIIT Hyderabad</p>
-    <p>Contact: <a href="mailto:salesangameshwar1@gmail.com" style="color: #ffcc70;">salesangameshwar1@gmail.com</a></p>
-    <p>Developed with ❤️ | Dr.Vamshi Medical Institute, Vikarabad</p>
-</footer>
-
-<script src="indexjs.js"></script>
-
-</body>
 </html>

@@ -201,7 +201,7 @@
           distances.forEach(item => { // Loop through the distances list
             const listItem = document.createElement('li'); // Create a list item
             listItem.classList.add('donor-item'); 
-            listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="district">${item.donor.district}</div>`; // Display the donor's name, blood type, contact, address and distance for each donor according to the distance
+            listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} - ${item.donor.contact} - ${item.distance} km <div class="address">${item.donor.address}</div>`; // Display the donor's name, blood type, contact, address and distance for each donor according to the distance
             listItem.querySelector('.donor-name').addEventListener('click', () => { // Add an event listener to the donor's name to highlight the donor and distance and address
               listItem.classList.toggle('highlight'); // Toggle the highlight class
             });

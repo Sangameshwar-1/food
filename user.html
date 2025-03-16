@@ -239,17 +239,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
   <script src="userjs.js"></script>
-  <script>
-  const auth = firebase.auth();
-            
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
-                } else {
-                    document.getElementById("user-info").innerText = "Not logged in";
-                }
-            });
-</body>
-  </script>
+  
 
 </html>

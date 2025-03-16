@@ -328,48 +328,48 @@
       });
     }
 
-    //twilio
+  //   //twilio
   
    
-   async function sendsms() {
-    // const accountSid = 'ACd0820c8fb546c38be1760536009548cc'; // Your Account SID from www.twilio.com/console
-      const authToken = 'a07946d79b75d7a24937ba7ffcf5f083';  // Your Auth Token from www.twilio.com/console
-      const twilio_number='+15856693126' ;
-    const filter_phone = ['8247341184']; // Example phone numbers array
+  //  async function sendsms() {
+  //   // const accountSid = 'ACd0820c8fb546c38be1760536009548cc'; // Your Account SID from www.twilio.com/console
+  //     const authToken = 'a07946d79b75d7a24937ba7ffcf5f083';  // Your Auth Token from www.twilio.com/console
+  //     const twilio_number='+15856693126' ;
+  //   const filter_phone = ['8247341184']; // Example phone numbers array
 
-    for (let i = 0; i < filter_phone.length; i++) {
-      let num = filter_phone[i];
-      if (num === '8247341184') {
-        num = '+91' + num;
-        const from = twilio_number;
-        const to = num;
-        const body = 'Hello from Twilio!';
+  //   for (let i = 0; i < filter_phone.length; i++) {
+  //     let num = filter_phone[i];
+  //     if (num === '8247341184') {
+  //       num = '+91' + num;
+  //       const from = twilio_number;
+  //       const to = num;
+  //       const body = 'Hello from Twilio!';
 
-        try {
-          const response = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + accountSid + '/Messages.json', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken),
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-              Body: body,
-              From: from,
-              To: to
-            })
-          });
-          const data = await response.json();
-          console.log(data.sid);
-        } catch (err) {
-          console.error(err);
-        }
-      } else {
-        console.log('Message not sent');
-      }
-    }
-  }
+  //       try {
+  //         const response = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + accountSid + '/Messages.json', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Authorization': 'Basic ' + btoa(accountSid + ':' + authToken),
+  //             'Content-Type': 'application/x-www-form-urlencoded'
+  //           },
+  //           body: new URLSearchParams({
+  //             Body: body,
+  //             From: from,
+  //             To: to
+  //           })
+  //         });
+  //         const data = await response.json();
+  //         console.log(data.sid);
+  //       } catch (err) {
+  //         console.error(err);
+  //       }
+  //     } else {
+  //       console.log('Message not sent');
+  //     }
+  //   }
+  // }
 
-  document.getElementById('sendAlertButton').addEventListener('click', function() {
-    sendsms();
-    alert('SMS has been sent!');
-  });
+  // document.getElementById('sendAlertButton').addEventListener('click', function() {
+  //   sendsms();
+  //   alert('SMS has been sent!');
+  // });

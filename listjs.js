@@ -347,13 +347,7 @@
         });
     }
     
-    // Fetch donors by distance and enable the send button once done
-    fetchDonorsByDistance().then(() => {
-        sendButton.disabled = false;
-    }).catch((error) => {
-        console.error('Error fetching donors by distance:', error);
-        // Optionally, handle the error (e.g., show a message to the user)
-    });
+
         
   // email
   document.getElementById('sendAlertButton').addEventListener('click', async function() {

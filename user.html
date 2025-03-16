@@ -22,6 +22,15 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+     .user-info {
+    position: absolute; /* Absolute positioning relative to the page */
+    top: 10px; /* Distance from the top */
+    left: 10px; /* Distance from the left */
+    padding: 5px 10px; /* Add some padding */
+    background-color: lightgray; /* Light background for visibility */
+    border-radius: 5px; /* Rounded corners */
+    font-family: Arial, sans-serif;
+  }
 
     h1,
     h2 {
@@ -109,6 +118,7 @@
 </head>
 
 <body>
+  <div class="user-info" id="user-info">Not logged in</div>
   <div class="container">
     <h1>Donor Management System</h1>
     <form id="donorForm">
@@ -229,6 +239,17 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 
   <script src="userjs.js"></script>
+  <script>
+  const auth = firebase.auth();
+            
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
+                } else {
+                    document.getElementById("user-info").innerText = "Not logged in";
+                }
+            });
 </body>
+  </script>
 
 </html>

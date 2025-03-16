@@ -307,30 +307,30 @@
     }
     //>>>>>>>>
 
-    //>>>>>>>>
-    //HOld
-    let filter_phone=[]
-    function filterDonors() {
-      const searchQuery = document.getElementById('search').value.toLowerCase();
-      const donorsList = document.getElementById('donorsList');
-      donorsList.innerHTML = '';
-      filter_phone=[]
-      const filteredDonors = Object.values(donors).filter(donor =>
-        donor.name.toLowerCase().includes(searchQuery) ||
-        donor.bloodType.toLowerCase().includes(searchQuery)
-      );
+    // //>>>>>>>>
+    // //HOld
+    // let filter_phone=[]
+    // function filterDonors() {
+    //   const searchQuery = document.getElementById('search').value.toLowerCase();
+    //   const donorsList = document.getElementById('donorsList');
+    //   donorsList.innerHTML = '';
+    //   filter_phone=[]
+    //   const filteredDonors = Object.values(donors).filter(donor =>
+    //     donor.name.toLowerCase().includes(searchQuery) ||
+    //     donor.bloodType.toLowerCase().includes(searchQuery)
+    //   );
 
-      filteredDonors.forEach(donor => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('donor-item');
-        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
-        filter_phone.push('${donor.contact}')
-        listItem.querySelector('.donor-name').addEventListener('click', () => {
-          listItem.classList.toggle('highlight');
-        });
-        donorsList.appendChild(listItem);
-      });
-    }
+    //   filteredDonors.forEach(donor => {
+    //     const listItem = document.createElement('li');
+    //     listItem.classList.add('donor-item');
+    //     listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`;
+    //     filter_phone.push('${donor.contact}')
+    //     listItem.querySelector('.donor-name').addEventListener('click', () => {
+    //       listItem.classList.toggle('highlight');
+    //     });
+    //     donorsList.appendChild(listItem);
+    //   });
+    // }
 
         
   // email

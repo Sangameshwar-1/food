@@ -214,7 +214,7 @@
       } finally {
         document.getElementById('distancesLoading').style.display = 'none'; // Hide the loading spinner when the distances are calculated
         sendAlertButton.disabled = false;
-         document.getElementById("myButton").style.backgroundColor = "red";
+         document.getElementById("sendAlertButton").style.backgroundColor = "red";
       }
     }
     //>>>>>>>>

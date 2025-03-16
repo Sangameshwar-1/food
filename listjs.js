@@ -169,6 +169,8 @@
     */
     async function fetchDistances() {
       const recipientAddress = document.getElementById('recipientAddress').value; // Get the recipient's address
+      let sendAlertButton = document.getElementById("sendAlertButton");
+      sendAlertButton.disabled = true;
       if (!recipientAddress) {
         alert('Please enter the recipient\'s address.');
         return;
@@ -211,6 +213,7 @@
         document.getElementById('distanceError').style.display = 'block';
       } finally {
         document.getElementById('distancesLoading').style.display = 'none'; // Hide the loading spinner when the distances are calculated
+        sendAlertButton.disabled = false;
       }
     }
     //>>>>>>>>

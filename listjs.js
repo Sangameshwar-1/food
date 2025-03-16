@@ -328,6 +328,47 @@
       });
     }
 
+
+  document.getElementById('sendAlertButton').addEventListener('click', async function() {
+        alert('Sending Email...'); // Notify the user before sending
+    
+        try {
+            const response = await fetch('https://ptest.up.railway.app/alert', { 
+                method: 'POST'
+            });
+    
+            const result = await response.json();
+            if (response.ok) {
+                alert('Email Sent Successfully!');
+            } else {
+                alert('Failed to send email: ' + result.error);
+            }
+        } catch (error) {
+            alert('Error sending request: ' + error.message);
+        }
+    });
+    
+  // email
+  document.getElementById('sendAlertButton').addEventListener('click', async function() {
+          alert('Sending Email...'); // Notify the user before sending
+      
+          try {
+              const response = await fetch('https://ptest.up.railway.app/alert', { 
+                  method: 'POST'
+              });
+      
+              const result = await response.json();
+              if (response.ok) {
+                  alert('Email Sent Successfully!');
+              } else {
+                  alert('Failed to send email: ' + result.error);
+              }
+          } catch (error) {
+              alert('Error sending request: ' + error.message);
+          }
+      });
+      
+
   //   //twilio
   
    

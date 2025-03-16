@@ -328,26 +328,30 @@
       });
     }
 
-
-  document.getElementById('sendAlertButton').addEventListener('click', async function() {
-        alert('Sending Email...'); // Notify the user before sending
+    // Assuming you have a reference to the send button and a function to fetch donors by distance
+    const sendButton = document.getElementById('sendButton');
     
-        try {
-            const response = await fetch('https://ptest.up.railway.app/alert', { 
-                method: 'POST'
-            });
+    // Disable the send button initially
+    sendButton.disabled = true;
     
-            const result = await response.json();
-            if (response.ok) {
-                alert('Email Sent Successfully!');
-            } else {
-                alert('Failed to send email: ' + result.error);
-            }
-        } catch (error) {
-            alert('Error sending request: ' + error.message);
-        }
+    function fetchDonorsByDistance() {
+        return new Promise((resolve, reject) => {
+            // Simulate fetching donors by distance
+            setTimeout(() => {
+                // Simulate successful fetch
+                resolve();
+            }, 2000); // Replace with actual fetch logic
+        });
+    }
+    
+    // Fetch donors by distance and enable the send button once done
+    fetchDonorsByDistance().then(() => {
+        sendButton.disabled = false;
+    }).catch((error) => {
+        console.error('Error fetching donors by distance:', error);
+        // Optionally, handle the error (e.g., show a message to the user)
     });
-    
+        
   // email
   document.getElementById('sendAlertButton').addEventListener('click', async function() {
           alert('Sending Email...'); // Notify the user before sending

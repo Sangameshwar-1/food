@@ -14,6 +14,14 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
+   // user-info
+   auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
+                } else {
+                    document.getElementById("user-info").innerText = "Not logged in";
+                }
+            });
 
     //>>>>>>>>
     /*

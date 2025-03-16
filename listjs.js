@@ -331,23 +331,6 @@
       });
     }
 
-    // Assuming you have a reference to the send button and a function to fetch donors by distance
-    const sendButton = document.getElementById('sendButton');
-    
-    // Disable the send button initially
-    sendButton.disabled = true;
-    
-    function fetchDonorsByDistance() {
-        return new Promise((resolve, reject) => {
-            // Simulate fetching donors by distance
-            setTimeout(() => {
-                // Simulate successful fetch
-                resolve();
-            }, 2000); // Replace with actual fetch logic
-        });
-    }
-    
-
         
   // email
   document.getElementById('sendAlertButton').addEventListener('click', async function() {

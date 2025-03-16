@@ -199,9 +199,7 @@
       <button id="prevButton" onclick="prevPage()">Previous</button>
       <button id="nextButton" onclick="nextPage()">Next</button>
     </div>
-    <div>
-        <button id="sendAlertButton">Send Alert</button>
-    </div>
+   
     <div class="loading" id="donorsLoading">
       <div class="loader"></div>
       <p>Loading donors...</p>
@@ -212,6 +210,9 @@
     </div>
     <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's district">
     <button onclick="fetchDistances()">Calculate Distances</button>
+    <div>
+        <button id="sendAlertButton">Send Alert</button>
+    </div>
     <div class="scrollable-container">
       <ul id="distancesList"></ul>
     </div>
@@ -234,28 +235,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
   <script src="https://cdn.twilio.com/sdk/js/client/v1.13/twilio.min.js"></script>
   <script src="listjs.js" ></script>
-  <script>
-       document.getElementById('sendAlertButton').addEventListener('click', async function() {
-        alert('Sending Email...'); // Notify the user before sending
-    
-        try {
-            const response = await fetch('https://ptest.up.railway.app/alert', { 
-                method: 'POST'
-            });
-    
-            const result = await response.json();
-            if (response.ok) {
-                alert('Email Sent Successfully!');
-            } else {
-                alert('Failed to send email: ' + result.error);
-            }
-        } catch (error) {
-            alert('Error sending request: ' + error.message);
-        }
-    });
-    
 
-  </script>
 </body>
 
 </html>

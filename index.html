@@ -9,137 +9,121 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
     <style>
+        /* Smooth fade-in effect */
         @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f7;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
+            justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
             flex-direction: column;
         }
 
         .login-container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
+            text-align: center;
             animation: fadeIn 0.5s ease-in-out;
-            border: 2px solid #4CAF50; /* Added border color */
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .fade-out {
-            animation: fadeOut 0.5s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         h2 {
-            text-align: center;
-            color: #333;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
         }
 
-        input[type="email"],
-        input[type="password"] {
+        input[type="email"], input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            transition: border-color 0.3s; /* Added transition effect */
+            padding: 12px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+            font-size: 16px;
+            text-align: center;
         }
 
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            border-color: #4CAF50; /* Change border color on focus */
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input:focus {
+            border: 2px solid #fdbb2d;
+            box-shadow: 0 0 10px #fdbb2d;
         }
 
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
+            padding: 12px;
+            background: #fdbb2d;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: 0.3s;
+            font-weight: bold;
         }
 
         button:hover {
-            background-color: #45a049;
+            background: #ffcc70;
+            transform: scale(1.05);
+        }
+
+        .toggle-link, .reset-link {
+            color: white;
+            font-size: 14px;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-link:hover, .reset-link:hover {
+            text-decoration: underline;
+            color: #ffcc70;
         }
 
         .error-message {
-            color: red;
+            color: #ff4d4d;
             font-size: 14px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .toggle-link,
-        .reset-link {
-            color: #007bff;
-            cursor: pointer;
-            text-align: center;
-            display: block;
-            margin-top: 10px;
-            transition: color 0.3s; /* Added transition effect */
-        }
-
-        .toggle-link:hover,
-        .reset-link:hover {
-            color: #0056b3; /* Change text color on hover */
-        }
-
-        .user-count {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            color: #333;
+            margin-top: 8px;
         }
 
         footer {
             text-align: center;
-            color: #fff;
-            background-color: #333;
-            padding: 10px;
-            width: 100%;
-            border-top: 1px solid #ccc;
-            position: absolute;
-            bottom: 0;
+            color: white;
+            margin-top: 20px;
+            font-size: 14px;
         }
 
         @media (max-width: 600px) {
             .login-container {
-                padding: 20px;
-            }
-
-            input[type="email"],
-            input[type="password"],
-            button {
-                padding: 8px;
-                font-size: 14px;
+                padding: 25px;
             }
 
             h2 {
-                font-size: 24px;
+                font-size: 22px;
+            }
+
+            input, button {
+                font-size: 14px;
+                padding: 10px;
             }
         }
     </style>
@@ -147,23 +131,21 @@
 <body>
 
 <div class="login-container" id="login-container">
-    <h2 id="form-title">Login Page</h2>
+    <h2 id="form-title">Login</h2>
     <form id="auth-form">
-        <input type="email" id="email" placeholder="Enter your email" required><br>
-        <input type="password" id="password" placeholder="Enter your password" required><br>
+        <input type="email" id="email" placeholder="Enter Email" required>
+        <input type="password" id="password" placeholder="Enter Password" required>
         <button type="submit" id="auth-button">Login</button>
     </form>
     <div class="error-message" id="error-message"></div>
     <div class="reset-link" id="reset-link">Forgot Password?</div>
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
-    <div class="user-count" id="user-count"></div>
 </div>
 
 <footer>
-    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <p>Developed by: Sangameshwar, IIIT Hyderabad</p>
     <p>Contact: salesangameshwar1@gmail.com</p>
-    <p>Development Support: Dr.Vamshi Medical Institute Vikarabad</p>
-    <p>Contact: support@example.com</p>
+    <p>Development Support: Dr.Vamshi Medical Institute, Vikarabad</p>
 </footer>
 
 <script src="indexjs.js"></script>

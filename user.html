@@ -9,119 +9,129 @@
 
   <title>Donor Management</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      width: 80%;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-     .user-info {
-    position: absolute; /* Absolute positioning relative to the page */
-    top: 10px; /* Distance from the top */
-    left: 10px; /* Distance from the left */
-    padding: 5px 10px; /* Add some padding */
-    background-color: lightgray; /* Light background for visibility */
-    border-radius: 5px; /* Rounded corners */
-    font-family: Arial, sans-serif;
-  }
-
-    h1,
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    input,
-    select {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 1.2em; /* Increased font size for larger appearance */
-    }
-
-    button {
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-    }
-
-    .view-donors-button-container {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      background-color: #333;
-      color: white;
-      margin-top: 20px;
-    }
-
-    footer p {
-      margin: 5px 0;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        width: 90%;
-        padding: 10px;
-      }
-
-      h1,
-      h2 {
-        font-size: 1.5em;
-      }
-
-      input {
-        font-size: 1em;
-      }
-
-      li {
-        font-size: 0.9em;
-      }
-    }
+    /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navigation Bar */
+        nav {
+            background-color: #343a40;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        
+        nav ul li {
+            margin-right: 20px;
+        }
+        
+        nav ul li a, nav ul li button {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        nav ul li a:hover, nav ul li button:hover {
+            background-color: #495057;
+        }
+        
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
   </style>
 </head>
 
 <body>
-  <div class="user-info" id="user-info">Not logged in</div>
+    <header>
+
+        <nav>
+            <ul>
+                <li>
+                    <li class="user-info" id="user-info">
+                        Not logged in
+                    </li>
+                    <li>
+                        <a href="game.html">Play the Game</a>
+                    </li>
+                    <li class="view-donors-button-container">
+                        <button id="viewDonorsButton">View Donors</button>
+                    </li>
+                    <li class="view-donors-button-container">    
+                        <button id="logoutButton">Logout</button>
+                    </li>
+                </ul>
+            </nav>
+    </header>
   <div class="container">
     <h1>Donor Management System</h1>
     <form id="donorForm">
@@ -151,35 +161,16 @@
         <option value="" disabled selected>Select District</option>
       </select> -->
       
-      <button type="submit">Add Donor</button>
+      <button type="submit" class="adddonor">Add Donor</button>
     </form>
-    <p style="color:red;">**Make sure <b>The RH factor and the district be correct.</b></p>
+    <p style="color:red;text-align: center;"><b>** The RH factor and the District must be correct.</b></p>
   </div>
-  <div style="text-align: center; margin-top: 20px;">
-    <a href="game.html" style="
-        display: inline-block;
-        background-color: green;
-        color: white;
-        padding: 12px 20px;
-        text-decoration: none;
-        font-size: 18px;
-        border-radius: 5px;
-        transition: 0.3s;
-    ">Play the Game</a>
-</div>
-
-  <div class="view-donors-button-container">
-    <button id="viewDonorsButton">View Donors</button>
-  </div>
-  <div class="view-donors-button-container">
-    <button id="logoutButton">Logout</button>
-  </div>
-
+  
   <footer>
     <p>Development Support by : Dr.Vamshi Govt Medical Institute Vikarabad</p>
-    <p>Contact: vamshi@gmail.com</p>
+    <a href="mailto:vamshi@gmail.com" class="contact">Contact: vamshi@gmail.com</a>
      <p>Developed by: Sangameshwar IIIT HYD</p>
-    <p>Contact: salesangameshwar1@gmail.com</p>
+    <a href="mailto:salesangameshwar1@gmail.com" class="contact">Contact: salesangameshwar1@gmail.com</a>
   </footer>
 <!--   <script>
     const statesAndDistricts = {

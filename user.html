@@ -9,105 +9,164 @@
 
   <title>Donor Management</title>
   <style>
-    /* General Styling */
+      <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: rgb(219, 226, 219);
+      margin: 0;
+      padding: 0;
+    }
+    nav ul {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        list-style: none;
+        padding: 0;
+    }
+    nav ul li{
+        display: inline;
+        margin-left: 15px;
+    }
+    
+    nav ul li a {
+        padding: 10px 15px;
+      font-size: 18px;
+      background-color: rgb(2, 128, 2);
+      color:white;
+      border: 1px solid #333;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav ul li a:hover {
+        background-color: rgba(2, 128, 2,0.9);
+        border-radius: 5px;
+        transform: scale(1.05);
+        font-weight: bold;
+    }
+    nav ul li button {
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    nav ul li button:hover {
+        text-decoration: none;
+        color: white;
+        transform: scale(1.05);
+        border-radius: 5px;
+    }
+    
+    .container {
+      width: 80%;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+     
+    h1,
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;    
+      align-items: center;
+    }
+
+    input,
+    select {
+      padding: 10px;
+      border: 1px solid ;
+      border-radius: 4px;
+      width:90%;
+      box-sizing: border-box;
+      font-size: 1.15em; /* Increased font size for larger appearance */
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 18px;
+      background:rgb(69, 69, 179);
+      color:white;
+      border: 1px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: rgba(69, 69, 179,0.85);
+      border-radius: 5px;
+      transform: scale(1.05);
+      font-weight: bold;
+    }
+    
+    .adddonor{
+        padding: 10px 20px;
+        justify-items: center;
+    }
+
+    .view-donors-button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    footer {
+        position:absolute;
+        bottom: 20px;
+        right: 0;
+        left: 0;
+      display: flex;
+      justify-content: space-evenly;
+      text-align: center;
+      padding: 20px;
+      background-color: #333;
+      color: white;
+      margin-top: 20px;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
+    .contact{
+        text-decoration: none;
+        margin: 5px 0;
+        color:aliceblue;
+    }
+  
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
+            font-size: 14px;
         }
         
-        /* Navigation Bar */
-        nav {
-            background-color: #343a40;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
+        .container {
+            width: 90%;
+            margin: auto;
         }
         
         nav ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
             display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         nav ul li {
-            margin-right: 20px;
-        }
-        
-        nav ul li a, nav ul li button {
-            text-decoration: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        nav ul li a:hover, nav ul li button:hover {
-            background-color: #495057;
-        }
-        
-        /* Container */
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        
-        /* Form Styling */
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        
-        input, select {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        
-        button {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background-color: #0056b3;
-        }
-        
-        /* Footer */
-        footer {
             text-align: center;
-            padding: 10px;
-            background-color: #343a40;
-            color: white;
-            position: relative;
-            bottom: 0;
-            width: 100%;
+            padding: 10px 0;
         }
+    }
+
+    
   </style>
 </head>
 

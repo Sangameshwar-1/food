@@ -26,12 +26,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./ # Adjust this path if necessary
+        working-directory: ./food # Adjust this path if necessary
 
       - name: Build the project
         run: npm run build
-        working-directory: ./ # Adjust this path if necessary
+        working-directory: ./food # Adjust this path if necessary
 
       - name: Deploy to Firebase
         run: firebase deploy --token ${{ secrets.FIREBASE_TOKEN }}
-        working-directory: ./ # Adjust this path if necessary
+        working-directory: ./food # Adjust this path if necessary

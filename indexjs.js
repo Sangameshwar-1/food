@@ -1,13 +1,13 @@
 //firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_REACT_APP_API_KEY || process.env.REACT_APP_API_KEY,
-  authDomain: import.meta.env.VITE_REACT_APP_AUTH_DOMAIN || process.env.REACT_APP_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_REACT_APP_DATABASE_URL || process.env.REACT_APP_DATABASE_URL,
-  projectId: import.meta.env.VITE_REACT_APP_PROJECT_ID || process.env.REACT_APP_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_REACT_APP_STORAGE_BUCKET || process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_REACT_APP_MESSAGING_SENDER_ID || process.env.REACT_APP_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_REACT_APP_APP_ID || process.env.REACT_APP_APP_ID,
-  measurementId: import.meta.env.VITE_REACT_APP_MEASUREMENT_ID || process.env.REACT_APP_MEASUREMENT_ID
+  apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+        authDomain: "blood-7b054.firebaseapp.com",
+        databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+        projectId: "blood-7b054",
+        storageBucket: "blood-7b054.firebasestorage.app",
+        messagingSenderId: "926378767902",
+        appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+        measurementId: "G-HTGC1SJYH6"
 };
 /*
   1. app // Initialize Firebase

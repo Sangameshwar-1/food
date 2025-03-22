@@ -226,7 +226,7 @@
     */
     let donors = []; // Initialize the donors array
     let currentPage = 1; // Initialize the currentPage to 1
-    const pageSize = 10;  // Initialize the pageSize to 10
+    const pageSize = 7;  // Initialize the pageSize to 10
     /*
       M in js:
 

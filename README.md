@@ -1,11 +1,11 @@
 
-Blood Donation Web
+**Blood Donation Web**
 
-Introduction
+**Introduction**
 
 Blood Donation Web is a platform designed to connect blood donors with recipients in need. The website facilitates blood donation by allowing users to register as donors, request blood, and locate nearby blood banks.
 
-Features
+**Features**
 
 User Registration & Login: Secure authentication for donors and recipients.
 

@@ -189,7 +189,7 @@
           const donorCoords = await getCoordinates(donor.district); // Get the coordinates of the donor's address for each donor store in donorCoords
           const distance = await calculateDistance(donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
           distances.push({ donor, distance }); // Push the donor and distance to the distances list (i.e append the donor and distance to the list)
-        )
+        }
         distances.sort((a, b) => Math.abs(a.distance - b.distance)); // sort the distances list based on the distance
 
         if (distances.length === 0) { // Check if the length of distances is 0

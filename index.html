@@ -143,6 +143,33 @@
     <div class="reset-link" id="reset-link">Forgot Password?</div>
     <div class="toggle-link" id="toggle-link">Don't have an account? Sign up</div>
 </div>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Firebase Phone Auth</title>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+    <h2>Firebase Phone Authentication</h2>
+    
+    <label>Phone Number:</label>
+    <input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX">
+    <div id="recaptcha-container"></div>
+    <button onclick="sendOTP()">Send OTP</button>
+
+    <br><br>
+
+    <label>Enter OTP:</label>
+    <input type="text" id="otp" placeholder="123456">
+    <button onclick="verifyOTP()">Verify OTP</button>
+
+    <h3 id="status"></h3>
+
+    <script src="indexjs.js"></script>
+
+
 
 <footer>
      <p>Development Support: Dr.Vamshi Medical Institute, Vikarabad</p>

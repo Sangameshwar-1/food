@@ -44,40 +44,7 @@ const userCountDiv = document.getElementById("user-count");
                     document.getElementById("user-info").innerText = "Not logged in";
                 }
             });
-// Initialize Recaptcha
-window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'normal',
-    'callback': function(response) {
-        console.log("Recaptcha verified");
-    }
-});
 
-function sendOTP() {
-    let phoneNumber = document.getElementById("phoneNumber").value;
-    let appVerifier = window.recaptchaVerifier;
-
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then((confirmationResult) => {
-            window.confirmationResult = confirmationResult;
-            document.getElementById("status").innerText = "OTP Sent!";
-        })
-        .catch((error) => {
-            document.getElementById("status").innerText = "Error: " + error.message;
-        });
-}
-
-function verifyOTP() {
-    let otp = document.getElementById("otp").value;
-    
-    window.confirmationResult.confirm(otp)
-        .then((result) => {
-            let user = result.user;
-            document.getElementById("status").innerText = "Login Successful! Phone: " + user.phoneNumber;
-        })
-        .catch((error) => {
-            document.getElementById("status").innerText = "Error: " + error.message;
-        });
-}
 
 
 

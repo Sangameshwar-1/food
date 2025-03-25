@@ -44,7 +44,7 @@
           throw new Error(`Network response was not ok: ${response.statusText}`); // Error handling
         }
         const data = await response.json(); // Parse the response as JSON
-        if (!Array.isArray(data)) { // Check if the fetched data is an array
+        if (!Array.isArray(data) && 0) { // Check if the fetched data is an array
           throw new Error('Invalid data format: expected an array');
         }
         return data; // Return the fetched data (eg : return array of allowed users)

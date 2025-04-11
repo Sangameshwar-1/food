@@ -1,86 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="favicon.png">
-
+  <link rel="icon" type="image/png" href="favicon.png">
   <title>Donor Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    /* General Styles */
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f7fc;
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #1e1e2f, #2f4f4f);
+      color: #e0e0e0;
+    }
+
+    .toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 100px; /* Reduced width */
+        padding: 10px; /* Adjusted padding */
+        font-size: 16px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        z-index: 1000;
+    }
+
+    .toggle:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .user-info {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 8px 15px;
+      background: #007bff;
+      color: white;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .dark-mode .user-info {
+      background: #00a1d6;
     }
 
     .container {
       width: 90%;
       max-width: 800px;
-      margin: 50px auto;
-      padding: 20px;
+      margin: 80px auto 40px;
+      padding: 30px;
       background: #ffffff;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease;
+    }
+
+    .dark-mode .container {
+      background: #252537;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
     h1, h2 {
       text-align: center;
       color: #333;
+      margin-bottom: 20px;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode h1,
+    .dark-mode h2 {
+      color: #e0e0e0;
     }
 
     .search-bar,
-    input[type="text"],
-    button {
+    input[type="text"] {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
+      border: 2px solid #dfe6e9;
       border-radius: 8px;
-      border: 1px solid #ccc;
       font-size: 16px;
-      transition: 0.3s;
+      color: #333;
+      background: #f9f9f9;
+      transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+    }
+
+    .dark-mode .search-bar,
+    .dark-mode input[type="text"] {
+      color: #e0e0e0;
+      background: #3a3a4a;
+      border-color: #555;
+    }
+
+    .search-bar::placeholder,
+    input[type="text"]::placeholder {
+      color: #777;
+    }
+
+    .dark-mode .search-bar::placeholder,
+    .dark-mode input[type="text"]::placeholder {
+      color: #aaa;
     }
 
     .search-bar:focus,
     input[type="text"]:focus {
       border-color: #007bff;
       outline: none;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
     }
 
-    button {
-      background-color: #007bff;
+    button,
+    .back-button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: #007bff;
       color: white;
-      font-weight: bold;
+      font-weight: 500;
       border: none;
+      border-radius: 25px;
+      font-size: 16px;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    button:hover,
+    .back-button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
     }
 
-    /* User Info */
-    .user-info {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      padding: 8px 15px;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      font-size: 14px;
+    #sendAlertButton {
+      background: #28a745;
     }
 
-    /* Scrollable List */
+    #sendAlertButton:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+
+    #sendAlertButton:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .back-button {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      text-align: center;
+      text-decoration: none;
+    }
+
     .scrollable-container {
       max-height: 350px;
       overflow-y: auto;
-      border: 1px solid #ddd;
+      border: 2px solid #dfe6e9;
       padding: 10px;
       border-radius: 8px;
-      background: #fff;
+      background: #f9f9f9;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .dark-mode .scrollable-container {
+      background: #3a3a4a;
+      border-color: #555;
     }
 
     ul {
@@ -90,25 +195,42 @@
 
     .donor-item {
       padding: 15px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #dfe6e9;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: 0.3s;
+      transition: background 0.3s ease;
+    }
+
+    .dark-mode .donor-item {
+      border-bottom-color: #555;
     }
 
     .donor-item:nth-child(odd) {
-      background-color: #f9f9f9;
+      background: #f1f3f5;
+    }
+
+    .dark-mode .donor-item:nth-child(odd) {
+      background: #323247;
     }
 
     .donor-item:hover {
-      background-color: #e9f5ff;
+      background: #e9f5ff;
+    }
+
+    .dark-mode .donor-item:hover {
+      background: #3f4b5b;
     }
 
     .donor-name {
       font-weight: bold;
       cursor: pointer;
       color: #007bff;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode .donor-name {
+      color: #00a1d6;
     }
 
     .donor-name:hover {
@@ -121,33 +243,39 @@
       color: #555;
     }
 
-    .highlight .address {
-      display: block;
-      background-color: yellow;
+    .dark-mode .address {
+      color: #aaa;
     }
 
-    /* Pagination */
+    .highlight .address {
+      display: block;
+      background: #fff3cd;
+    }
+
+    .dark-mode .highlight .address {
+      background: #5c4b2e;
+    }
+
     .pagination {
       text-align: center;
       margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
 
     .pagination button {
       width: auto;
       padding: 10px 20px;
-      margin: 5px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      font-size: 15px;
     }
 
     .pagination button:disabled {
-      background: #ccc;
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    /* Loader */
     .loading {
       display: none;
       text-align: center;
@@ -155,13 +283,18 @@
     }
 
     .loader {
-      border: 6px solid #f3f3f3;
+      border: 6px solid #dfe6e9;
+      border-top: 6px solid #007bff;
       border-radius: 50%;
-      border-top: 6px solid #3498db;
       width: 40px;
       height: 40px;
       animation: spin 1s linear infinite;
       margin: auto;
+    }
+
+    .dark-mode .loader {
+      border-color: #555;
+      border-top-color: #00a1d6;
     }
 
     @keyframes spin {
@@ -169,35 +302,198 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Footer */
+    .error-message {
+      text-align: center;
+      color: #dc3545;
+      margin-top: 15px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode .error-message {
+      color: #ff6b6b;
+    }
+
     footer {
-      text-align: center;
+      background: #ffffff;
+      color: #333;
       padding: 20px;
-      background-color: #333;
-      color: white;
-      margin-top: 20px;
-    }
-
-    .back-button {
-      display: block;
-      width: 200px;
-      margin: 20px auto;
-      padding: 12px;
       text-align: center;
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 16px;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    .back-button:hover {
-      background: #0056b3;
+    .dark-mode footer {
+      background: #252537;
+      color: #e0e0e0;
+    }
+
+    footer p {
+      margin: 8px 0;
+      font-size: 0.95em;
+    }
+
+    footer a {
+      display: inline-block;
+      margin: 5px 10px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    footer a.linkedin {
+      color: #0077b5;
+    }
+
+    footer a.whatsapp {
+      color: #25d366;
+    }
+
+    footer a:hover {
+      transform: scale(1.1);
+    }
+
+    footer a.linkedin:hover {
+      color: #005983;
+    }
+
+    footer a.whatsapp:hover {
+      color: #1ebe57;
+    }
+
+    footer i {
+      margin-right: 8px;
+    }
+
+    .hint {
+      text-align: center;
+      color: #777;
+      margin: 10px 0;
+      font-size: 0.9em;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode .hint {
+      color: #aaa;
+    }
+
+    .warning {
+      text-align: center;
+      color: #dc3545;
+      font-weight: bold;
+      margin: 10px 0;
+      font-size: 0.95em;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode .warning {
+      color: #ff6b6b;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .toggle {
+        top: 15px;
+        right: 15px;
+        padding: 8px 15px;
+        font-size: 14px;
+      }
+
+      .user-info {
+        top: 60px;
+        left: 15px;
+        font-size: 13px;
+      }
+
+      .container {
+        width: 95%;
+        padding: 20px;
+        margin: 100px auto 20px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+      }
+
+      .search-bar,
+      input[type="text"],
+      button,
+      .back-button {
+        padding: 10px;
+        font-size: 15px;
+      }
+
+      .back-button {
+        width: 180px;
+      }
+
+      .scrollable-container {
+        max-height: 300px;
+      }
+
+      .pagination button {
+        padding: 8px 15px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .toggle {
+        padding: 7px 12px;
+        font-size: 13px;
+      }
+
+      .user-info {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      h2 {
+        font-size: 1.2em;
+      }
+
+      .search-bar,
+      input[type="text"],
+      button,
+      .back-button {
+        font-size: 14px;
+      }
+
+      .back-button {
+        width: 160px;
+      }
+
+      .donor-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .hint,
+      .warning,
+      .error-message {
+        font-size: 0.85em;
+      }
+
+      footer p,
+      footer a {
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
+<body class="dark-mode">
+  <button class="toggle" onclick="toggleDark()">Light Mode</button>
 
-<body>
   <div class="user-info" id="user-info">Not logged in</div>
 
   <div class="container">
@@ -205,10 +501,10 @@
     <a href="user.html" class="back-button">Back to User Page</a>
 
     <input type="text" id="search" class="search-bar" placeholder="Search Donors" oninput="filterDonors()">
-    <p style="text-align:center; color:gray;">Search by Name or Blood Group</p>
+    <p class="hint">Search by Name or Blood Group</p>
 
     <h2>Donors List</h2>
-    <p style="text-align:center; color:red;">Click on a Name to view the Address</p>
+    <p class="warning">Click on a Name to view the Address</p>
     <div class="scrollable-container">
       <ul id="donorsList"></ul>
     </div>
@@ -224,12 +520,12 @@
     </div>
 
     <h2>Distance to Recipient</h2>
-    <p style="text-align:center; color:gray;">Finding the distance between the district of donor and recipient</p>
+    <p class="hint">Finding the distance between the district of donor and recipient</p>
     
     <input type="text" id="recipientAddress" class="search-bar" placeholder="Enter recipient's district">
     <button onclick="fetchDistances()">Calculate Distances</button>
     <div>
-      <button id="sendAlertButton" style="background-color: grey" disabled>Send Alert</button>
+      <button id="sendAlertButton" disabled>Send Alert</button>
     </div>
     
     <div class="scrollable-container">
@@ -241,23 +537,29 @@
       <p>Calculating distances...</p>
     </div>
 
-    <div class="error-message" id="distanceError" style="display:none; text-align:center; color:red;">
+    <div class="error-message" id="distanceError" style="display:none;">
       No donor found or district may be wrong.
     </div>
   </div>
 
   <footer>
     <p>Development Support by: Dr. Vamshi, Govt Medical Institute Vikarabad</p>
-    <p>Contact: vamshi@gmail.com</p>
-     <p>Developed by: Sangameshwar IIIT HYD</p>
-    <p>Contact: salesangameshwar1@gmail.com</p>
+    <a href="mailto:vamshi@gmail.com" class="linkedin"><i class="fas fa-envelope"></i>Contact: vamshi@gmail.com</a>
+    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <a href="mailto:salesangameshwar1@gmail.com" class="whatsapp"><i class="fas fa-envelope"></i>Contact: salesangameshwar1@gmail.com</a>
   </footer>
 
+  <script>
+    function toggleDark() {
+      document.body.classList.toggle('dark-mode');
+      const toggleBtn = document.querySelector('.toggle');
+      toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+    }
+  </script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
   <script src="https://cdn.twilio.com/sdk/js/client/v1.13/twilio.min.js"></script>
   <script src="listjs.js"></script>
-
 </body>
 </html>

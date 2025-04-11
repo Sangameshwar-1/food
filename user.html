@@ -1,196 +1,357 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="favicon.png">
-
+  <link rel="icon" type="image/png" href="favicon.png">
   <title>Donor Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-      <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: rgb(219, 226, 219);
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #1e1e2f, #2f4f4f);
+      color: #e0e0e0;
+    }
+
+    .toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      z-index: 1000;
+    }
+
+    .toggle:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    nav {
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: background 0.3s ease;
+    }
+
+    .dark-mode nav {
+      background: #252537;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    }
+
     nav ul {
-        position: absolute;
-        top: 5px;
-        right: 10px;
-        list-style: none;
-        padding: 0;
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
     }
-    nav ul li{
-        display: inline;
-        margin-left: 15px;
+
+    nav ul li {
+      display: inline-block;
     }
-    
-    nav ul li a {
-        padding: 10px 15px;
-      font-size: 18px;
-      background-color: rgb(2, 128, 2);
-      color:white;
-      border: 1px solid #333;
-      border-radius: 10px;
+
+    nav ul li.user-info {
+      font-weight: 500;
+      padding: 12px 20px;
+      color: #333;
+    }
+
+    .dark-mode nav ul li.user-info {
+      color: #e0e0e0;
+    }
+
+    nav ul li a,
+    nav ul li button {
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
       text-decoration: none;
       cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    nav ul li a:hover {
-        background-color: rgba(2, 128, 2,0.9);
-        border-radius: 5px;
-        transform: scale(1.05);
-        font-weight: bold;
-    }
-    nav ul li button {
-        text-decoration: none;
-        font-weight: bold;
-    }
-
+    nav ul li a:hover,
     nav ul li button:hover {
-        text-decoration: none;
-        color: white;
-        transform: scale(1.05);
-        border-radius: 5px;
+      background: #0056b3;
+      transform: scale(1.05);
     }
-    
+
     .container {
-      width: 80%;
-      max-width: 500px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease;
     }
-     
-    h1,
-    h2 {
+
+    .dark-mode .container {
+      background: #252537;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
       text-align: center;
       color: #333;
+      margin-bottom: 25px;
+      font-size: 2em;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode h1 {
+      color: #e0e0e0;
     }
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 10px;    
+      gap: 15px;
       align-items: center;
     }
 
     input,
     select {
-      padding: 10px;
-      border: 1px solid ;
-      border-radius: 4px;
-      width:90%;
-      box-sizing: border-box;
-      font-size: 1.15em; /* Increased font size for larger appearance */
+      padding: 12px;
+      border: 2px solid #dfe6e9;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 1em;
+      color: #333;
+      background: #f9f9f9;
+      transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
     }
 
-    button {
-      padding: 10px 15px;
-      font-size: 18px;
-      background:rgb(69, 69, 179);
-      color:white;
-      border: 1px solid #333;
-      border-radius: 10px;
+    .dark-mode input,
+    .dark-mode select {
+      color: #e0e0e0;
+      background: #3a3a4a;
+      border-color: #555;
+    }
+
+    input::placeholder,
+    select:invalid {
+      color: #777;
+    }
+
+    .dark-mode input::placeholder,
+    .dark-mode select:invalid {
+      color: #aaa;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    }
+
+    button.adddonor {
+      padding: 14px 30px;
+      font-size: 1.1em;
+      font-weight: 500;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 25px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
-    button:hover {
-      background: rgba(69, 69, 179,0.85);
-      border-radius: 5px;
+    button.adddonor:hover {
+      background: #218838;
       transform: scale(1.05);
-      font-weight: bold;
-    }
-    
-    .adddonor{
-        padding: 10px 20px;
-        justify-items: center;
     }
 
-    .view-donors-button-container {
+    .warning {
+      color: #dc3545;
       text-align: center;
-      margin-top: 20px;
+      font-weight: bold;
+      margin-top: 15px;
+      font-size: 0.95em;
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode .warning {
+      color: #ff6b6b;
     }
 
     footer {
-        position:absolute;
-        bottom: 20px;
-        right: 0;
-        left: 0;
-      display: flex;
-      justify-content: space-evenly;
-      text-align: center;
+      background: #ffffff;
+      color: #333;
       padding: 20px;
-      background-color: #333;
-      color: white;
-      margin-top: 20px;
+      text-align: center;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .dark-mode footer {
+      background: #252537;
+      color: #e0e0e0;
     }
 
     footer p {
-      margin: 5px 0;
+      margin: 8px 0;
+      font-size: 0.95em;
     }
-    .contact{
-        text-decoration: none;
-        margin: 5px 0;
-        color:aliceblue;
+
+    footer a {
+      display: inline-block;
+      margin: 5px 10px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease, transform 0.2s ease;
     }
-  
-    
+
+    footer a.linkedin {
+      color: #0077b5;
+    }
+
+    footer a.whatsapp {
+      color: #25d366;
+    }
+
+    footer a:hover {
+      transform: scale(1.1);
+    }
+
+    footer a.linkedin:hover {
+      color: #005983;
+    }
+
+    footer a.whatsapp:hover {
+      color: #1ebe57;
+    }
+
+    footer i {
+      margin-right: 8px;
+    }
+
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
-        body {
-            font-size: 14px;
-        }
-        
-        .container {
-            width: 90%;
-            margin: auto;
-        }
-        
-        nav ul {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        nav ul li {
-            width: 100%;
-            text-align: center;
-            padding: 10px 0;
-        }
+      .toggle {
+        top: 15px;
+        right: 15px;
+        padding: 8px 15px;
+        font-size: 14px;
+      }
+
+      nav {
+        padding: 15px;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav ul li a,
+      nav ul li button {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+      }
+
+      nav ul li.user-info {
+        width: auto;
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      .container {
+        width: 95%;
+        padding: 20px;
+        margin: 20px auto;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      input,
+      select {
+        padding: 10px;
+        font-size: 0.95em;
+      }
+
+      button.adddonor {
+        padding: 12px 25px;
+        font-size: 1em;
+      }
     }
 
-    
+    @media (max-width: 480px) {
+      .toggle {
+        padding: 7px 12px;
+        font-size: 13px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      input,
+      select {
+        font-size: 0.9em;
+      }
+
+      button.adddonor {
+        padding: 10px 20px;
+        font-size: 0.95em;
+      }
+
+      .warning {
+        font-size: 0.9em;
+      }
+
+      footer p,
+      footer a {
+        font-size: 0.9em;
+      }
+    }
   </style>
 </head>
+<body class="dark-mode">
+  <button class="toggle" onclick="toggleDark()">Light Mode</button>
 
-<body>
-    <header>
+  <header>
+    <nav>
+      <ul>
+        <li class="user-info" id="user-info">Not logged in</li>
+        <li><a href="game.html">Play the Game</a></li>
+        <li><button id="viewDonorsButton">View Donors</button></li>
+        <li><button id="logoutButton">Logout</button></li>
+      </ul>
+    </nav>
+  </header>
 
-        <nav>
-            <ul>
-                <li>
-                    <li class="user-info" id="user-info">
-                        Not logged in
-                    </li>
-                    <li>
-                        <a href="game.html">Play the Game</a>
-                    </li>
-                    <li class="view-donors-button-container">
-                        <button id="viewDonorsButton">View Donors</button>
-                    </li>
-                    <li class="view-donors-button-container">    
-                        <button id="logoutButton">Logout</button>
-                    </li>
-                </ul>
-            </nav>
-    </header>
   <div class="container">
     <h1>Donor Management System</h1>
     <form id="donorForm">
@@ -208,103 +369,29 @@
       </select>
       <input type="text" id="contact" placeholder="Contact Number" required>
       <input type="text" id="address" placeholder="Address" required>
-       <input type="text" id="district" placeholder="District" required>
- 
-<!--       <select id="state" required>
-        <option value="" disabled selected>Select State</option>
-        <option value="Telangana">Telangana</option>
-        <option value="Andhra Pradesh">Andhra Pradesh</option> 
-        
-      </select>
-      <select id="district" required>
-        <option value="" disabled selected>Select District</option>
-      </select> -->
-      
+      <input type="text" id="district" placeholder="District" required>
       <button type="submit" class="adddonor">Add Donor</button>
     </form>
-    <p style="color:red;text-align: center;"><b>** The RH factor and the District must be correct.</b></p>
+    <p class="warning">** The RH factor and the District must be correct.</p>
   </div>
-  
+
   <footer>
-    <p>Development Support by : Dr.Vamshi Govt Medical Institute Vikarabad</p>
-    <a href="mailto:vamshi@gmail.com" class="contact">Contact: vamshi@gmail.com</a>
-     <p>Developed by: Sangameshwar IIIT HYD</p>
-    <a href="mailto:salesangameshwar1@gmail.com" class="contact">Contact: salesangameshwar1@gmail.com</a>
+    <p>Development Support by: Dr.Vamshi Govt Medical Institute Vikarabad</p>
+    <a href="mailto:vamshi@gmail.com" class="linkedin"><i class="fas fa-envelope"></i>Contact: vamshi@gmail.com</a>
+    <p>Developed by: Sangameshwar IIIT HYD</p>
+    <a href="mailto:salesangameshwar1@gmail.com" class="whatsapp"><i class="fas fa-envelope"></i>Contact: salesangameshwar1@gmail.com</a>
   </footer>
-<!--   <script>
-    const statesAndDistricts = {
-      "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Prakasam", "Nellore", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
-      "Arunachal Pradesh": ["Tawang", "West Kameng", "East Kameng", "Papum Pare", "Lower Subansiri", "Upper Subansiri", "West Siang", "East Siang", "Siang", "Upper Siang", "Lower Siang", "Namsai", "Changlang", "Tirap", "Longding"],
-      "Assam": ["Baksa", "Barpeta", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dibrugarh", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "Tinsukia", "Udalguri", "West Karbi Anglong"],
-      "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
-      "Goa": ["North Goa", "South Goa"],
-      "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udepur", "Dahod", "Dang", "Gir Somnath", "Jamnagar", "Junagadh", "Kutch", "Kheda", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
-      "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Narnaul", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Sirsa", "Sonipat", "Yamunanagar"],
-      "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kullu", "Mandi", "Shimla", "Solan", "Sirmaur", "Una"],
-      "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "Garhwa", "Giridih", "Godda", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahibganj", "Saraikela Kharsawan", "Simdega", "West Singhbhum"],
-      "Karnataka": ["Bengaluru Urban", "Belagavi", "Bellary", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Hubli", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
-      "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
-      "Madhya Pradesh": ["Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Hoshangabad", "Indore", "Jabalpur", "Jhabua", "Khandwa", "Khargone", "Mandsaur", "Morena", "Narsinghpur", "Neemuch", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shivpuri", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
-      "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nasik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
-      "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Peren", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
-      "Meghalaya": ["East Garo Hills", "East Khasi Hills", "Jaintia Hills", "Ri Bhoi", "South Garo Hills", "South Khasi Hills", "West Garo Hills", "West Khasi Hills"],
-      "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Serchhip"],
-      "Nagaland": ["Dimapur", "Kohima", "Mokokchung", "Mon", "Peren", "Phek", "Tuensang", "Wokha", "Zunheboto"],
-      "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"],
-      "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Firozpur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Mansa", "Moga", "Muktsar", "Nawanshahr", "Patiala", "Rupnagar", "S.A.S. Nagar", "Sangrur", "Tarn Taran"],
-      "Rajasthan": ["Ajmer", "Alwar", "Banswara", "Baran", "Barmer", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Dholpur", "Dungarpur", "Hanumangarh", "Jaipur", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Karauli", "Kota", "Nagaur", "Pali", "Rajsamand", "Sawai Madhopur", "Sikar", "Sirohi", "Tonk", "Udaipur"],
-      "Sikkim": ["East Sikkim", "North Sikkim", "South Sikkim", "West Sikkim"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Nagapattinam", "Namakkal", "Perambalur", "Pudukkottai", "Ramanathapuram", "Salem", "Sivaganga", "Tiruchirappalli", "Tirunelveli", "Tiruppur", "Vellore", "Viluppuram", "Virudhunagar"],
-      "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hyderabad", "Jagtial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Kumuram Bheem Asifabad", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal–Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Rangareddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal Rural", "Warangal Urban", "Yadadri Bhuvanagiri"],
-      "Tripura": ["Dhalai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
-      "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
-      "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kushinagar", "Lakhimpur Kheri", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Raebareli", "Rampur", "Saharanpur", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
-      "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Burdwan", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Purba Bardhaman", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
-    };
-    
-    const states = Object.keys(statesAndDistricts);
-    const stateSelect = document.getElementById("state");
-    const districtSelect = document.getElementById("district");
-    
-    // Populate state dropdown on document ready
-    $(document).ready(function() {
-      states.forEach(state => {
-        const option = document.createElement("option");
-        option.value = state;
-        option.textContent = state;
-        stateSelect.appendChild(option);
-      });
-    
-      $('#state').select2();
-      $('#district').select2();
-    });
-    
-    // Add event listener to populate district dropdown based on selected state
-    stateSelect.addEventListener("change", function () {
-      const selectedState = stateSelect.value;
-      const districts = statesAndDistricts[selectedState] || [];
-    
-      // Reset district dropdown
-      districtSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
-    
-      districts.forEach(district => {
-        const option = document.createElement("option");
-        option.value = district;
-        option.textContent = district;
-        districtSelect.appendChild(option);
-      });
-    
-      // Reinitialize Select2 for district dropdown
-      $('#district').select2();
-    });
+
+  <script>
+    function toggleDark() {
+      document.body.classList.toggle('dark-mode');
+      const toggleBtn = document.querySelector('.toggle');
+      toggleBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+    }
   </script>
- -->
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-
   <script src="userjs.js"></script>
-  
-
+</body>
 </html>

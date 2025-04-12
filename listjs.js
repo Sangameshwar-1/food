@@ -162,7 +162,7 @@
       if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
         const distance = data.features[0].properties.segments[0].distance / 1000; // Calculate the distance between two places
         console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
-        L.marker([endCoords.lat,endCoords.lon])
+        L.marker([startCoords.lat,startCoords.lon])
           .addTo(map)
           .bindPopup(`<b>D</b>`)
           .openPopup(); // Optional: open popup on load

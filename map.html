@@ -67,7 +67,9 @@
     navigator.geolocation.getCurrentPosition(
       function(position) {
         const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+        const lng = position.coords.longitude;\
+        console.log(lat);
+        console.log(lng);
         const userMarker = L.marker([lat, lng]).addTo(map);
         userMarker.bindPopup("📍 You are here!").openPopup();
         map.setView([lat, lng], 14);

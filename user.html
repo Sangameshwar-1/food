@@ -83,17 +83,18 @@
 
     nav ul li a,
     nav ul li button {
-        padding: 12px 25px;
-        font-size: 16px;
-        font-weight: 500;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        width: 150px; /* Adjust the width as needed */
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 500;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      width: 150px; /* Adjust the width as needed */
+      text-align: center;
     }
 
     nav ul li a:hover,
@@ -183,6 +184,8 @@
       border-radius: 25px;
       cursor: pointer;
       transition: background 0.3s ease, transform 0.2s ease;
+      width: 100%; /* Align buttons to take full width */
+      text-align: center;
     }
 
     button.adddonor:hover {
@@ -370,8 +373,8 @@
       </select>
       <input type="text" id="contact" placeholder="Contact Number" required>
       <input type="text" id="address" placeholder="Address" required>
-      <button onclick="getCoords()" required>Get My Coordinates</button>
-      <p id="output"></p>
+      <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+      <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
       <input type="text" id="district" placeholder="District" required>
       <button type="submit" class="adddonor">Add Donor</button>
     </form>

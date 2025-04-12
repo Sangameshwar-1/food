@@ -69,6 +69,32 @@
         8. .exists() // Check if the snapshot exists
         9. .forEach() // Loop through the snapshot
     */
+  // Add rating
+  document.getElementById('rateForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const rating = document.getElementById('rating').value;
+    const feedback = document.getElementById('feedback').value;
+
+    if (!rating) {
+      alert('Please select a rating.');
+      return;
+    }
+
+    try {
+      // Push rating and feedback to Firebase
+      await database.ref('ratings').push({
+        rating: parseInt(rating),
+        feedback: feedback || '',
+        timestamp: formatDate(new Date())
+      });
+
+      alert('Thank you for your feedback!');
+      document.getElementById('rateForm').reset();
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+    }
+  });
     function getAndPushIP() {
       fetch('https://ipinfo.io/json')  // Using ipinfo.io
         .then(response => response.json())

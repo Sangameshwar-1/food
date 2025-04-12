@@ -348,7 +348,7 @@
   <header>
     <nav>
       <ul>
-        <li class="user-info" id="user-info" style="background: linear-gradient(to right, #1E90FF, #0000CD); padding: 10px; border-radius: 5px; color: white;">Not logged in</li>
+        <li class="user-info" id="user-info" style="background: linear-gradient(to right, #1E90FF, #0000CD); padding: 10px; border-radius: 5px; color: white; width: auto;">Not logged in</li>
         <li><a href="game.html">Play the Game</a></li>
         <li><button id="viewDonorsButton">View Donors</button></li>
         <li><button id="logoutButton">Logout</button></li>
@@ -358,6 +358,7 @@
 
   <div class="container">
     <h1>Donor Management System</h1>
+
     <form id="donorForm">
       <input type="text" id="name" placeholder="Name" required>
       <select id="bloodType" required>
@@ -378,8 +379,42 @@
       <input type="text" id="district" placeholder="District" required>
       <button type="submit" class="adddonor">Add Donor</button>
     </form>
+    <div class="scrolling-text" style="background-color:white; color: black; font-weight: bold; overflow: hidden; white-space: nowrap;margin-top:1;">
+      <h3 style="color: red; display: inline;">**</h3>
+      <h3 style="display: inline;">Rate this web below</h3>
+      <h3 style="color: red; display: inline;">**</h3>
+    </div>
     <p class="warning">** The RH factor and the District must be correct.</p>
+    <style>
+      .scrolling-text {
+        animation: scroll-left 10s linear infinite;
+      }
+      @keyframes scroll-left {
+        0% {
+          transform: translateX(100%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
   </div>
+  <div class="container">
+    <h1>Rate This web</h1>
+    <form id="rateForm">
+      <label for="rating">Rate (1 to 5):</label>
+      <select id="rating" required>
+        <option value="" disabled selected>Select Rating</option>
+        <option value="1">1 - Poor</option>
+        <option value="2">2 - Fair</option>
+        <option value="3">3 - Good</option>
+        <option value="4">4 - Very Good</option>
+        <option value="5">5 - Excellent</option>
+      </select>
+      <textarea id="feedback" placeholder="Leave your feedback here..." rows="4" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #dfe6e9; margin-top: 10px;"></textarea>
+      <button type="submit" class="adddonor">Submit Rating</button>
+    </form>
+  </div></select></form></div>
 
   <footer>
     <p>Development Support by: Dr.Vamshi Govt Medical Institute Vikarabad</p>

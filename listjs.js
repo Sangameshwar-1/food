@@ -154,7 +154,7 @@
           // Calculate the distance between two places like start and end using car driving mode
           eg : https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key}&start={start}&end={end}  // start and end are the coordinates of the places
     */
-    async function calculateDistance(startCoords, endCoords) {
+    async function calculateDistance(name,startCoords, endCoords) {
       const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
       const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
       if (!response.ok) throw new Error('Failed to calculate distance');
@@ -164,7 +164,7 @@
         console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
         L.marker([startCoords.lat,startCoords.lon])
           .addTo(map)
-          .bindPopup(`<b>D</b>`)
+          .bindPopup(`<b>${name}</b>`)
           .openPopup(); // Optional: open popup on load
         return distance.toFixed(2); // Return the distance eg : 2 decimal places
       } else {
@@ -198,7 +198,7 @@
         for (const id in donors) { // Loop through the donors address to calculate the distance
           const donor = donors[id]; // Get the donor's address
           const donorCoords = await getCoordinates(donor.district); // Get the coordinates of the donor's address for each donor store in donorCoords
-          const distance = await calculateDistance(donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
+          const distance = await calculateDistance(donor.name,donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
       
           distances.push({ donor, distance }); // Push the donor and distance to the distances list (i.e append the donor and distance to the list)
         }

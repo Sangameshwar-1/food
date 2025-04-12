@@ -164,7 +164,9 @@
           bloodType,
           contact,
           address,
-          district
+          district,
+          lat,
+          lng
         });
 
         alert('Donor added successfully!');
@@ -182,7 +184,23 @@
       }
     });
     //>>>>>>>>>
-
+    let lat, lng;
+    function getCoords() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            document.getElementById("output").textContent =
+              "Latitude: " + lat + ", Longitude: " + lng;
+          }, function(error) {
+            document.getElementById("output").textContent =
+              "Error: " + error.message;
+          });
+        } else {
+          document.getElementById("output").textContent =
+            "Geolocation is not supported by this browser.";
+        }
+      }
 
     //>>>>>>>>>
     // Redirect to list.html on button click

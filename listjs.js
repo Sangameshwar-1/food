@@ -180,24 +180,37 @@
       const distance = haversine(startCoords.lon,startCoords.lat,endCoords.lon,endCoords.lat);
       //if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
       if (typeof distance === 'number' && !isNaN(distance)) {
-    // Log and show marker
-          console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
-      
-          // Create marker with popup (can customize popup for distance = 0)
-          const popupText = (distance === 0)
-            ? `<b>${name}</b><br>You are here.`
-            : `<b>${name}</b><br>Distance: ${distance.toFixed(2)} km`;
-      
-          L.marker([startCoords.lat, startCoords.lon])
-            .addTo(map)
-            .bindPopup(popupText)
-            .openPopup();
-      
-          return distance.toFixed(2);
-        } 
-        else {
-          throw new Error('Unable to calculate distance');
+        // Log the distance in the console
+        console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
+    
+        // Generate the new text to append to the existing label
+        const newText = (distance === 0)
+          ? `<b>${name}</b>: You are here.<br>`
+          : `<b>${name}</b>: ${distance.toFixed(2)} km<br>`;
+    
+        // Construct a unique key based on the coordinates of the marker
+        const key = `${startCoords.lat},${startCoords.lon}`;
+    
+        // Initialize the labelTextMap for this marker if not already done
+        if (!labelTextMap[key]) {
+          labelTextMap[key] = '';
         }
+    
+        // Append the new text to the existing popup content
+        labelTextMap[key] += newText;
+    
+        // Create a marker with the updated accumulated popup text
+        L.marker([startCoords.lat, startCoords.lon])
+          .addTo(map)
+          .bindPopup(labelTextMap[key])
+          .openPopup();
+    
+        // Return the distance with two decimal places
+        return distance.toFixed(2);
+      } else {
+        // Throw an error if distance calculation fails
+        throw new Error('Unable to calculate distance');
+      }
     }
     //>>>>>>>>
 

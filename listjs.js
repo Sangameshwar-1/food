@@ -126,7 +126,14 @@
       }
     }
     //>>>>>>>>
+    //>>>>>>>>>>
+   const map = L.map('map').setView([20.5937, 78.9629], 5); // Center on India
 
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+//>>>>>>>>>>
     //>>>>>>>>
     /*
       M in maps api:
@@ -155,6 +162,10 @@
       if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
         const distance = data.features[0].properties.segments[0].distance / 1000; // Calculate the distance between two places
         console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
+        L.marker([endCoords.lat,endCoords.lon])
+          .addTo(map)
+          .bindPopup(`<b>D</b>`)
+          .openPopup(); // Optional: open popup on load
         return distance.toFixed(2); // Return the distance eg : 2 decimal places
       } else {
         throw new Error('Unable to calculate distance');
@@ -188,6 +199,7 @@
           const donor = donors[id]; // Get the donor's address
           const donorCoords = await getCoordinates(donor.district); // Get the coordinates of the donor's address for each donor store in donorCoords
           const distance = await calculateDistance(donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
+      
           distances.push({ donor, distance }); // Push the donor and distance to the distances list (i.e append the donor and distance to the list)
         }
         distances.sort((a, b) => a.distance - b.distance); // sort the distances list based on the distance

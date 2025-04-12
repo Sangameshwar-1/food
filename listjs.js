@@ -171,6 +171,7 @@
           // Calculate the distance between two places like start and end using car driving mode
           eg : https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key}&start={start}&end={end}  // start and end are the coordinates of the places
     */
+     const labelTextMap = {};
     async function calculateDistance(name,startCoords, endCoords) {
       //const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
       

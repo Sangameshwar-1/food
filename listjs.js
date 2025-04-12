@@ -179,17 +179,25 @@
       //const data = await response.json(); // Parse the response as JSON
       const distance = haversine(startCoords.lon,startCoords.lat,endCoords.lon,endCoords.lat);
       //if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
-      if(distance!=null){
-        //const distance = data.features[0].properties.segments[0].distance / 1000; // Calculate the distance between two places
-        console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
-        L.marker([startCoords.lat,startCoords.lon])
-          .addTo(map)
-          .bindPopup(`<b>${name}</b>`)
-          .openPopup(); // Optional: open popup on load
-        return distance.toFixed(2); // Return the distance eg : 2 decimal places
-      } else {
-        throw new Error('Unable to calculate distance');
-      }
+      if (typeof distance === 'number' && !isNaN(distance)) {
+    // Log and show marker
+          console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
+      
+          // Create marker with popup (can customize popup for distance = 0)
+          const popupText = (distance === 0)
+            ? `<b>${name}</b><br>You are here.`
+            : `<b>${name}</b><br>Distance: ${distance.toFixed(2)} km`;
+      
+          L.marker([startCoords.lat, startCoords.lon])
+            .addTo(map)
+            .bindPopup(popupText)
+            .openPopup();
+      
+          return distance.toFixed(2);
+        } 
+        else {
+          throw new Error('Unable to calculate distance');
+        }
     }
     //>>>>>>>>
 

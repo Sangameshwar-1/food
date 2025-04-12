@@ -134,6 +134,23 @@
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 //>>>>>>>>>>
+
+
+    //>>>>>>
+    function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in km
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; // Distance in km
+    }
     //>>>>>>>>
     /*
       M in maps api:
@@ -155,12 +172,15 @@
           eg : https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key}&start={start}&end={end}  // start and end are the coordinates of the places
     */
     async function calculateDistance(name,startCoords, endCoords) {
-      const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
-      const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
-      if (!response.ok) throw new Error('Failed to calculate distance');
-      const data = await response.json(); // Parse the response as JSON
-      if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
-        const distance = data.features[0].properties.segments[0].distance / 1000; // Calculate the distance between two places
+      //const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
+      
+      //const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
+      //if (!response.ok) throw new Error('Failed to calculate distance');
+      //const data = await response.json(); // Parse the response as JSON
+      const distance = haversine(startCoords.lon,startCoords.lat,endCoords.lon,endCoords.lat);
+      //if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
+      if(distance){
+        //const distance = data.features[0].properties.segments[0].distance / 1000; // Calculate the distance between two places
         console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
         L.marker([startCoords.lat,startCoords.lon])
           .addTo(map)

@@ -1,42 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Free Map</title>
+  <title>Map with Search & User Location</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Leaflet-Geosearch CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
 
   <style>
     #map {
-      height: 500px;
+      height: 90vh;
       width: 100%;
-      border: 2px solid #444;
-      border-radius: 8px;
+      margin: 0 auto;
+      border-radius: 10px;
+    }
+    body {
+      font-family: sans-serif;
+      padding: 10px;
     }
   </style>
 </head>
 <body>
 
-<h2>My Location Map (Free, No API Key!)</h2>
+<h2>🌍 Free Map with User Location & Search</h2>
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-  // Set initial map view [latitude, longitude], zoom level
-  var map = L.map('map').setView([17.385044, 78.486671], 13); // Hyderabad as default
 
-  // Load tiles from OpenStreetMap
+<!-- GeoSearch (Nominatim) -->
+<script src="https://unpkg.com/leaflet-geosearch/dist/bundle.min.js"></script>
+
+<script>
+  // Create the map
+  const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India initially
+
+  // Add OSM tiles
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  // Add a marker
-  var marker = L.marker([17.385044, 78.486671]).addTo(map)
-    .bindPopup('<b>Hyderabad</b><br>My Location.')
-    .openPopup();
+  // Search control using Nominatim
+  const search = new window.GeoSearch.GeoSearchControl({
+    provider: new window.GeoSearch.OpenStreetMapProvider(),
+    style: 'bar',
+    autoComplete: true,
+    autoCompleteDelay: 300,
+    showMarker: true,
+    retainZoomLevel: false,
+    animateZoom: true,
+    marker: {
+      icon: new L.Icon.Default(),
+      draggable: false,
+    },
+    maxMarkers: 1,
+    retainZoomLevel: false,
+  });
+
+  map.addControl(search);
+
+  // Try to get user's location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const userMarker = L.marker([lat, lng]).addTo(map);
+        userMarker.bindPopup("📍 You are here!").openPopup();
+        map.setView([lat, lng], 14);
+      },
+      function(error) {
+        alert("⚠️ Unable to fetch your location.");
+        console.log(error);
+      }
+    );
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
 </script>
 
 </body>

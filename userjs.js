@@ -227,6 +227,37 @@
             "Geolocation is not supported by this browser.";
         }
       }
+    //>>>>>>>>
+    
+      document.getElementById('volunteerForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const name = document.getElementById('volunteerName').value;
+        const email = document.getElementById('volunteerEmail').value;
+        const contact = document.getElementById('volunteerContact').value;
+        const skills = document.getElementById('volunteerSkills').value;
+
+        try {
+          // Push volunteer data to Firebase
+          await database.ref('volunteers').push({
+                name,
+                email,
+                contact,
+                address: document.getElementById('volunteerAddress').value,
+                district: document.getElementById('volunteerDistrict').value,
+                skills,
+                lat,
+                lng,
+                timestamp: formatDate(new Date())
+                });    
+          alert('Volunteer registered successfully!');
+          document.getElementById('volunteerForm').reset();
+        } catch (error) {
+          console.error('Error registering volunteer:', error);
+        }
+      });
+    //>>>>>>>>>
+
 
     //>>>>>>>>>
     // Redirect to list.html on button click

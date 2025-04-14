@@ -537,6 +537,10 @@
     <h2>Donors List</h2>
     <p class="warning">Click on a Name to view the Address</p>
     <div class="scrollable-container">
+      <div class="loading" id="donorsLoading">
+        <div class="loader"></div>
+        <p>Loading donors...</p>
+      </div>
       <ul id="donorsList"></ul>
     </div>
 
@@ -545,10 +549,7 @@
       <button id="nextButton" onclick="nextPage()">Next</button>
     </div>
 
-    <div class="loading" id="donorsLoading">
-      <div class="loader"></div>
-      <p>Loading donors...</p>
-    </div>
+    
 
     <h2>Distance to Recipient</h2>
     <p class="hint">Finding the distance between the district of donor and recipient</p>
@@ -561,12 +562,13 @@
     
     <div class="scrollable-container">
       <ul id="distancesList"></ul>
+      <div class="loading" id="distancesLoading">
+        <div class="loader"></div>
+        <p>Calculating distances...</p>
+      </div>
     </div>
 
-    <div class="loading" id="distancesLoading">
-      <div class="loader"></div>
-      <p>Calculating distances...</p>
-    </div>
+  
 
     <div class="error-message" id="distanceError" style="display:none;">
       No donor found or district may be wrong.

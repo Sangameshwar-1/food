@@ -392,27 +392,30 @@
       container.style.opacity = 0;
       setTimeout(() => {
         container.innerHTML = `
-          <form id="donorForm">
-          <button class="adddonor" onclick="goBack()">Go Back</button>
-          <input type="text" id="name" placeholder="Name" required>
-          <select id="bloodType" required>
-            <option value="" disabled selected>Select Blood Type</option>
-            <option value="A+">A+ve</option>
-            <option value="A-">A-ve</option>
-            <option value="B+">B+ve</option>
-            <option value="B-">B-ve</option>
-            <option value="AB+">AB+ve</option>
-            <option value="AB-">AB-ve</option>
-            <option value="O+">O+ve</option>
-            <option value="O-">O-ve</option>
-          </select>
-          <input type="text" id="contact" placeholder="Contact Number" required>
-          <input type="text" id="address" placeholder="Address" required>
-          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-          <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
-          <input type="text" id="district" placeholder="District" required>
-          <button type="submit" class="adddonor">Add Donor</button>
-          </form>
+          <!-- Inside your container div where the donor form appears -->
+<form id="donorForm">
+  <button class="adddonor" onclick="goBack()">Go Back</button>
+  <input type="text" id="name" placeholder="Name" required>
+  <select id="bloodType" required>
+    <option value="" disabled selected>Select Blood Type</option>
+    <option value="A+">A+ve</option>
+    <option value="A-">A-ve</option>
+    <option value="B+">B+ve</option>
+    <option value="B-">B-ve</option>
+    <option value="AB+">AB+ve</option>
+    <option value="AB-">AB-ve</option>
+    <option value="O+">O+ve</option>
+    <option value="O-">O-ve</option>
+  </select>
+  <input type="text" id="contact" placeholder="Contact Number" required>
+  <input type="date" id="dob" placeholder="Date of Birth" required>
+  <input type="number" id="weight" placeholder="Weight (kg)" min="40" max="150" required>
+  <input type="text" id="address" placeholder="Address" required>
+  <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+  <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
+  <input type="text" id="district" placeholder="District" required>
+  <button type="submit" class="adddonor">Submit Donor Info</button>
+</form>
           <div class="scrolling-text" style="background-color:white; color: black; font-weight: bold; overflow: hidden; white-space: nowrap;margin-top:1;">
           <h3 style="color: red; display: inline;">**</h3>
           <h3 style="display: inline;">Rate this web below</h3>

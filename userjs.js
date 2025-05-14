@@ -69,32 +69,6 @@
         8. .exists() // Check if the snapshot exists
         9. .forEach() // Loop through the snapshot
     */
-  // Add rating
-  document.getElementById('rateForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const rating = document.getElementById('rating').value;
-    const feedback = document.getElementById('feedback').value;
-
-    if (!rating) {
-      alert('Please select a rating.');
-      return;
-    }
-
-    try {
-      // Push rating and feedback to Firebase
-      await database.ref('ratings').push({
-        rating: parseInt(rating),
-        feedback: feedback || '',
-        timestamp: formatDate(new Date())
-      });
-
-      alert('Thank you for your feedback!');
-      document.getElementById('rateForm').reset();
-    } catch (error) {
-      console.error('Error submitting rating:', error);
-    }
-  });
     function getAndPushIP() {
       fetch('https://ipinfo.io/json')  // Using ipinfo.io
         .then(response => response.json())
@@ -174,163 +148,76 @@
 
     */
     // Add donor
-    // ... (keep all existing firebaseConfig and initialization code) ...
-
-// Add donor form with update functionality
-document.getElementById('donorForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-
-  const name = document.getElementById('name').value;
-  const bloodType = document.getElementById('bloodType').value;
-  const contact = document.getElementById('contact').value;
-  const address = document.getElementById('address').value;
-  const district = document.getElementById('district').value;
-  const dob = document.getElementById('dob').value; // New field
-  const weight = document.getElementById('weight').value; // New field
-
-  try {
-    // First check if donor with this contact already exists
-    const donorsRef = database.ref('donors');
-    const snapshot = await donorsRef.orderByChild('contact').equalTo(contact).once('value');
+   document.getElementById('donorForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
     
-    if (snapshot.exists()) {
-      // Donor exists - update their record
-      const updateData = {
-        name,
-        bloodType,
-        address,
-        district,
-        dob,
-        weight,
-        lat,
-        lng,
-        lastUpdated: formatDate(new Date())
-      };
-      
-      // Get the key of the existing donor
-      let donorKey;
-      snapshot.forEach((childSnapshot) => {
-        donorKey = childSnapshot.key;
-      });
-      
-      await donorsRef.child(donorKey).update(updateData);
-      alert('Donor information updated successfully!');
-    } else {
-      // New donor - create full record
-      await donorsRef.push({
-        name,
-        bloodType,
-        contact,
-        address,
-        district,
-        dob,
-        weight,
-        lat,
-        lng,
-        dateAdded: formatDate(new Date()),
-        lastUpdated: formatDate(new Date())
-      });
-      alert('New donor added successfully!');
-      
-      // Upload to Google Spreadsheet only for new donors
-      uploadToSpreadsheet({
-        Name: name,
-        "Mobile No": contact,
-        Address: address,
-        Group: bloodType,
-        District: district,
-        "Date of Birth": dob,
-        Weight: weight
-      });
-    }
+      const name = document.getElementById('name').value;
+      const dob = document.getElementById('dob').value;
+      const weight = document.getElementById('weight').value;
+      const bloodType = document.getElementById('bloodType').value;
+      const contact = document.getElementById('contact').value;
+      const address = document.getElementById('address').value;
+      const district = document.getElementById('district').value;
     
-    document.getElementById('donorForm').reset();
-  } catch (error) {
-    console.error('Error processing donor:', error);
-    alert('An error occurred. Please try again.');
-  }
-});
-
-// Update the navigateToDonor function to include new fields
-function navigateToDonor() {
-  const container = document.querySelector('.container');
-  container.style.opacity = 0;
-  setTimeout(() => {
-    container.innerHTML = `
-      <form id="donorForm">
-        <button class="adddonor" onclick="goBack()">Go Back</button>
-        <input type="text" id="name" placeholder="Name" required>
-        <select id="bloodType" required>
-          <option value="" disabled selected>Select Blood Type</option>
-          <option value="A+">A+ve</option>
-          <option value="A-">A-ve</option>
-          <option value="B+">B+ve</option>
-          <option value="B-">B-ve</option>
-          <option value="AB+">AB+ve</option>
-          <option value="AB-">AB-ve</option>
-          <option value="O+">O+ve</option>
-          <option value="O-">O-ve</option>
-        </select>
-        <input type="text" id="contact" placeholder="Contact Number" required>
-        <input type="date" id="dob" placeholder="Date of Birth" required>
-        <input type="number" id="weight" placeholder="Weight (kg)" min="40" max="150" required>
-        <input type="text" id="address" placeholder="Address" required>
-        <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-        <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
-        <input type="text" id="district" placeholder="District" required>
-        <button type="submit" class="adddonor">Submit Donor Info</button>
-      </form>
-      <div class="scrolling-text" style="background-color:white; color: black; font-weight: bold; overflow: hidden; white-space: nowrap;margin-top:1;">
-        <h3 style="color: red; display: inline;">**</h3>
-        <h3 style="display: inline;">Rate this web below</h3>
-        <h3 style="color: red; display: inline;">**</h3>
-      </div>
-      <p class="warning">** The RH factor and the District must be correct.</p>
-      <style>
-        .scrolling-text {
-          animation: scroll-left 10s linear infinite;
-        }
-        @keyframes scroll-left {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-      </style>
-    `;
-    container.style.opacity = 1;
+      // Basic validation (optional)
+      if (weight < 40) {
+        alert('Minimum weight for donation is 40kg');
+        return;
+      }
     
-    // Add event listener to check for existing donor when contact is entered
-    document.getElementById('contact').addEventListener('blur', async function() {
-      const contact = this.value;
-      if (contact) {
-        const snapshot = await database.ref('donors').orderByChild('contact').equalTo(contact).once('value');
-        if (snapshot.exists()) {
-          snapshot.forEach((childSnapshot) => {
-            const donor = childSnapshot.val();
-            // Auto-fill the form with existing data
-            document.getElementById('name').value = donor.name || '';
-            document.getElementById('bloodType').value = donor.bloodType || '';
-            document.getElementById('address').value = donor.address || '';
-            document.getElementById('district').value = donor.district || '';
-            document.getElementById('dob').value = donor.dob || '';
-            document.getElementById('weight').value = donor.weight || '';
-            
-            if (donor.lat && donor.lng) {
-              lat = donor.lat;
-              lng = donor.lng;
-              document.getElementById("output").textContent = 
-                `Using existing location: Latitude: ${lat}, Longitude: ${lng}`;
-            }
-          });
-          alert('Existing donor found. You can update the information.');
-        }
+      try {
+        // Add donor details to Firebase
+        await database.ref('donors').push({
+          name,
+          dob,
+          weight,
+          bloodType,
+          contact,
+          address,
+          district,
+          lat,
+          lng,
+          timestamp: new Date().toISOString() // Adding timestamp for record keeping
+        });
+    
+        alert('Donor added successfully!');
+        document.getElementById('donorForm').reset();
+        
+        // Upload data to Google Spreadsheet
+        uploadToSpreadsheet({
+          Name: name,
+          "Date of Birth": dob,
+          "Weight (kg)": weight,
+          "Mobile No": contact,
+          Address: address,
+          "Blood Group": bloodType,
+          District: district,
+          "Coordinates": `${lat}, ${lng}`,
+          "Date Added": new Date().toLocaleString()
+        });
+      } catch (error) {
+        console.error('Error adding donor:', error);
+        alert('Error adding donor. Please try again.');
       }
     });
-  }, 300);
-}
-
-// ... (keep all other existing code) ...
     //>>>>>>>>>
-
+    let lat, lng;
+    function getCoords() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            document.getElementById("output").textContent =
+              "Latitude: " + lat + ", Longitude: " + lng;
+          }, function(error) {
+            document.getElementById("output").textContent =
+              "Error: " + error.message;
+          });
+        } else {
+          document.getElementById("output").textContent =
+            "Geolocation is not supported by this browser.";
+        }
+      }
 
     //>>>>>>>>>
     // Redirect to list.html on button click

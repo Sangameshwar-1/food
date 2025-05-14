@@ -322,25 +322,48 @@
     function displayDonors() {
       const donorsList = document.getElementById('donorsList');
       donorsList.innerHTML = '';
-
+    
       const start = (currentPage - 1) * pageSize;
       const end = start + pageSize;
-
-      const currentDonors = Object.values(donors).slice(start, end); // Slice the donors array based on the start and end
-
-      currentDonors.forEach(donor => { // Loop through the donors array display the donor's name, blood type, contact and address
-        const listItem = document.createElement('li'); // Create a list item
-        listItem.classList.add('donor-item'); // Add the donor-item class to the list
-        listItem.innerHTML = `<span class="donor-name">${donor.name}</span> - ${donor.bloodType} - ${donor.contact} <div class="address">${donor.address}</div>`; // Display the donor's name, blood type, contact and address
-        //>
-        listItem.querySelector('.donor-name').addEventListener('click', () => { // Add an event listener to the donor's name to highlight the donor
-          listItem.classList.toggle('highlight'); // Toggle the highlight class
+    
+      const currentDonors = Object.values(donors).slice(start, end);
+    
+      currentDonors.forEach(donor => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        
+        // Calculate age if date of birth exists
+        let ageDisplay = '';
+        if (donor.dob) {
+          const birthDate = new Date(donor.dob);
+          const ageDiffMs = Date.now() - birthDate.getTime();
+          const ageDate = new Date(ageDiffMs);
+          const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+          ageDisplay = `<span class="highlight-text">Age: ${age}</span> | `;
+        }
+        
+        // Display weight if it exists
+        const weightDisplay = donor.weight ? `<span class="highlight-text">Weight: ${donor.weight}kg</span> | ` : '';
+        
+        listItem.innerHTML = `
+          <span class="donor-name">${donor.name}</span> | 
+          ${ageDisplay}
+          ${weightDisplay}
+          <strong>${donor.bloodType}</strong> | 
+          ${donor.contact} | 
+          <div class="address">${donor.address}</div>
+          <div class="district">${donor.district || 'N/A'}</div>
+        `;
+    
+        // Add click event to highlight the donor
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
         });
-        //>
-
-        donorsList.appendChild(listItem); // Append the list item to the donorsList (i.e id of the list of innerHTML)
+    
+        donorsList.appendChild(listItem);
       });
-
+    
+      // Update pagination buttons
       document.getElementById('prevButton').disabled = currentPage === 1;
       document.getElementById('nextButton').disabled = end >= Object.values(donors).length;
     }

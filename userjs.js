@@ -148,58 +148,68 @@
 
     */
     // Add donor
-   document.getElementById('donorForm').addEventListener('submit', async (event) => {
+  // Replace the direct event listener with this:
+document.addEventListener('DOMContentLoaded', function() {
+  // Use event delegation for the donor form
+  document.body.addEventListener('submit', function(event) {
+    if (event.target.id === 'donorForm') {
       event.preventDefault();
-    
-      const name = document.getElementById('name').value;
-      const dob = document.getElementById('dob').value;
-      const weight = document.getElementById('weight').value;
-      const bloodType = document.getElementById('bloodType').value;
-      const contact = document.getElementById('contact').value;
-      const address = document.getElementById('address').value;
-      const district = document.getElementById('district').value;
-    
-      // Basic validation (optional)
-      if (weight < 40) {
-        alert('Minimum weight for donation is 40kg');
-        return;
-      }
-    
-      try {
-        // Add donor details to Firebase
-        await database.ref('donors').push({
-          name,
-          dob,
-          weight,
-          bloodType,
-          contact,
-          address,
-          district,
-          lat,
-          lng,
-          timestamp: new Date().toISOString() // Adding timestamp for record keeping
-        });
-    
-        alert('Donor added successfully!');
-        document.getElementById('donorForm').reset();
-        
-        // Upload data to Google Spreadsheet
-        uploadToSpreadsheet({
-          Name: name,
-          "Date of Birth": dob,
-          "Weight (kg)": weight,
-          "Mobile No": contact,
-          Address: address,
-          "Blood Group": bloodType,
-          District: district,
-          "Coordinates": `${lat}, ${lng}`,
-          "Date Added": new Date().toLocaleString()
-        });
-      } catch (error) {
-        console.error('Error adding donor:', error);
-        alert('Error adding donor. Please try again.');
-      }
+      handleDonorFormSubmit(event);
+    }
+  });
+});
+
+async function handleDonorFormSubmit(event) {
+  const form = event.target;
+  const name = form.querySelector('#name').value;
+  const dob = form.querySelector('#dob').value;
+  const weight = form.querySelector('#weight').value;
+  const bloodType = form.querySelector('#bloodType').value;
+  const contact = form.querySelector('#contact').value;
+  const address = form.querySelector('#address').value;
+  const district = form.querySelector('#district').value;
+
+  // Basic validation
+  if (weight < 40) {
+    alert('Minimum weight for donation is 40kg');
+    return;
+  }
+
+  try {
+    // Add donor details to Firebase
+    await database.ref('donors').push({
+      name,
+      dob,
+      weight,
+      bloodType,
+      contact,
+      address,
+      district,
+      lat,
+      lng,
+      timestamp: new Date().toISOString()
     });
+
+    alert('Donor added successfully!');
+    form.reset();
+    
+    // Upload data to Google Spreadsheet
+    uploadToSpreadsheet({
+      Name: name,
+      "Date of Birth": dob,
+      "Weight (kg)": weight,
+      "Mobile No": contact,
+      Address: address,
+      "Blood Group": bloodType,
+      District: district,
+      "Coordinates": `${lat}, ${lng}`,
+      "Date Added": new Date().toLocaleString()
+    });
+  } catch (error) {
+    console.error('Error adding donor:', error);
+    alert('Error adding donor. Please try again.');
+  }
+}
     //>>>>>>>>>
     let lat, lng;
     function getCoords() {

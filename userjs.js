@@ -19,31 +19,27 @@ const database = firebase.database();
 let lat, lng;
 let existdonor;
 window.onload = function() {
-    // Check authentication state when page loads
     auth.onAuthStateChanged(async (user) => {
         if (user) {
-            // User is logged in
             document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
             
             try {
-                // Check if user is authorized
                 const allowedEmails = await fetchAllowedEmails();
                 if (!allowedEmails.includes(user.email)) {
-                    // Hide View Donors button for unauthorized users
                     document.getElementById('viewDonorsButton').style.display = 'none';
                 } else {
-                    // Enable View Donors button for authorized users
                     document.getElementById('viewDonorsButton').style.display = 'inline-block';
                 }
                 
-                // Track IP address
                 getAndPushIP();
-                existdonor=checkExistingDonor(user.email);
-                if (existdonor) {
-                    // User is an existing donor
+                
+                // Properly handle the promise
+                const isExistingDonor = await checkExistingDonor(user.email);
+                if (isExistingDonor) {
+                    // This should be handled in the checkExistingDonor function
+                    // Or you can redirect here if needed
                     navigateToDonor();
-                }
-                else{
+                } else {
                     navigateToeditdonor();
                 }
             } catch (error) {
@@ -51,7 +47,6 @@ window.onload = function() {
                 alert('Error during initialization. Please try again.');
             }
         } else {
-            // User is not logged in, redirect to login page
             window.location.href = 'index.html';
         }
     });
@@ -64,11 +59,6 @@ async function checkExistingDonor(email) {
         const snapshot = await donorsRef.orderByChild('email').equalTo(email).once('value');
         
         if (snapshot.exists()) {
-            // Donor exists - redirect to update page with their data
-            snapshot.forEach((childSnapshot) => {
-                const donorKey = childSnapshot.key;
-                window.location.href = `update.html?donorId=${donorKey}`;
-            });
             return true; // Donor exists
         }
         return false; // Donor does not exist
@@ -99,7 +89,7 @@ function navigateToDonor() {
     setTimeout(() => {
         container.innerHTML = `
             <form id="donorForm">
-                <button class="adddonor" onclick="goBack()">Go Back</button>
+                <button type="button" class="adddonor" onclick="goBack()">Go Back</button>
                 <input type="text" id="name" placeholder="Name" required>
                 <input type="date" id="dob" placeholder="Date of Birth" required>
                 <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
@@ -129,6 +119,20 @@ function navigateToDonor() {
             <p class="warning">** The RH factor and the District must be correct.</p>
         `;
         container.style.opacity = 1;
+        
+        // Add event listener for form submission
+        document.getElementById('donorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const dob = document.getElementById('dob').value;
+            const weight = document.getElementById('weight').value;
+            const bloodType = document.getElementById('bloodType').value;
+            const contact = document.getElementById('contact').value;
+            const address = document.getElementById('address').value;
+            const district = document.getElementById('district').value;
+            
+            await submitToFirebase(name, dob, weight, bloodType, contact, address, district);
+        });
     }, 300);
 }
 // navigate to edit donor
@@ -425,3 +429,14 @@ async function submitVolunteerToFirebase(name, email, contact, address, district
         alert('Failed to submit volunteer data. Please try again.');
     }
 }
+
+
+
+// logout 
+document.getElementById('logoutButton').addEventListener('click', () => {
+    auth.signOut().then(() => {
+        window.location.href = 'index.html';
+    }).catch((error) => {
+        console.error('Error signing out:', error);
+    });
+});

@@ -77,7 +77,7 @@
                 button.addEventListener('click', () => {
                     window.location.href = 'list.html';
                 });
-                document.getElementById('user-info').appendChild(button);
+                document.getElementById('listj').appendChild(button);
                 }
             } else {
                 console.log('Access denied - email not in allowed list');
@@ -177,13 +177,7 @@
         3. .signOut() // Sign out the user ; eg: auth.signOut()
     */
     // logout
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      }).catch((error) => {
-        console.error('Error signing out:', error);
-      });
-    });
+    // (Removed duplicate logout event listener to avoid conflicts)
     //>>>>>>>>>
 
     //>>>>>>>>>
@@ -289,13 +283,27 @@ async function handleDonorFormSubmit(event) {
           2. .signOut() // Sign out the user ; eg: auth.signOut()
     */
     // Logout functionality
-    document.getElementById('logoutButton').addEventListener('click', () => {
-      auth.signOut().then(() => {
+    // Wait for page to fully load
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // Get the logout button
+  const logoutButton = document.getElementById('logoutButton');
+  
+  // Add click event
+  logoutButton.addEventListener('click', function() {
+    // Sign out from Firebase
+    firebase.auth().signOut()
+      .then(function() {
+        // Redirect after successful logout
         window.location.href = 'index.html';
-      }).catch((error) => {
-        console.error('Error signing out:', error);
+      })
+      .catch(function(error) {
+        // Show error if logout fails
+        console.error('Logout error:', error);
+        alert('Logout failed. Please try again.');
       });
-    });
+  });
+});
     //>>>>>>>>>
 
 

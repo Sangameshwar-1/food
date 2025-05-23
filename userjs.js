@@ -82,8 +82,12 @@
                 button.addEventListener('click', () => {
                     window.location.href = 'list.html';
                 });
-                document.getElementById('listj').appendChild(button);
-                }
+                const listjElem = document.getElementById('listj');
+                if (listjElem) {
+                    listjElem.appendChild(button);
+                } else {
+                    console.error('Element with id "listj" not found.');
+                }    }
             } else {
                 console.log('Access denied - email not in allowed list');
                 // Optionally: redirect to unauthorized page
@@ -167,12 +171,7 @@
     }
     //>>>>>>>>>
 
-    //>>>>>>>>>
-    // view list
-    document.getElementById('viewDonorsButton').addEventListener('click', () => {
-      window.location.href = 'list.html'; // Redirect to list.html
-    });
-    //>>>>>>>>>
+ 
 
     //>>>>>>>>>
     /*
@@ -294,20 +293,26 @@ document.addEventListener('DOMContentLoaded', function() {
   // Get the logout button
   const logoutButton = document.getElementById('logoutButton');
   
-  // Add click event
-  logoutButton.addEventListener('click', function() {
-    // Sign out from Firebase
-    firebase.auth().signOut()
-      .then(function() {
-        // Redirect after successful logout
-        window.location.href = 'index.html';
-      })
-      .catch(function(error) {
-        // Show error if logout fails
-        console.error('Logout error:', error);
-        alert('Logout failed. Please try again.');
-      });
-  });
+  // Add click event only if the button exists
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      console.log('Logout button clicked');
+      // Sign out from Firebase
+      firebase.auth().signOut()
+        .then(function() {
+          // Redirect after successful logout
+          console.log('User logged out successfully');
+          window.location.href = 'index.html';
+        })
+        .catch(function(error) {
+          // Show error if logout fails
+          console.error('Logout error:', error);
+          alert('Logout failed. Please try again.');
+        });
+    });
+  } else {
+    console.warn('Logout button not found in the DOM.');
+  }
 });
     //>>>>>>>>>
 

@@ -64,80 +64,86 @@
     // 
     window.onload = function() {
       auth.onAuthStateChanged(async (user) => {
-        if (user) { // User is authenticated checked by auth.onAuthStateChanged()
-          // User is authenticated
-            const userInfoElem = document.getElementById("user-info");
-            if (userInfoElem) {
-              userInfoElem.innerText = "Logged in as: " + user.email;
-              usermail=user.email ;
-               const existingSubmission = await checkExistingSubmission(user.uid);
-                if (existingSubmission) {
-                    alert('You have already submitted the form. Thank you!');
-                    const addDonorBtn = document.querySelector('.adddonor');
-                    if (addDonorBtn) {
-                        isdonorformsubmitted = true;
-                        addDonorBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            navtodisplay();
-                        });
-                    }
-                    return;
-                }
-                else{
-                    const addDonorBtn = document.querySelector('.adddonor');
-                    if (addDonorBtn) {
-                        addDonorBtn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            navigateToDonor();
-                        });
-                    }
-                }
+        if (user) {
+          const userInfoElem = document.getElementById("user-info");
+          if (userInfoElem) {
+            userInfoElem.innerText = "Logged in as: " + user.email;
+            usermail = user.email;
+            const existingSubmission = await checkExistingSubmission(user.uid);
+            if (existingSubmission) {
+              alert('You have already submitted the form. Thank you!');
+              const addDonorBtn = document.querySelector('.adddonor');
+              if (addDonorBtn) {
+                isdonorformsubmitted = true;
+                addDonorBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  navtodisplay();
+                });
+              }
+            } else {
+              const addDonorBtn = document.querySelector('.adddonor');
+              if (addDonorBtn) {
+                addDonorBtn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  navigateToDonor();
+                });
+              }
             }
-            
-          getAndPushIP(); //function call to Get and push the IP address to Firebase
-         
-            console.log('User logged in:', user.email);
-            try {
+          }
+
+          getAndPushIP();
+
+          console.log('User logged in:', user.email);
+          try {
             const allowedEmails = await fetchAllowedEmails();
             console.log('Checking access for:', user.email);
             console.log('Allowed emails:', allowedEmails);
-            // Check if the user's email is in the allowed list 
+
             if (allowedEmails.length === 0) {
-                console.error('Allowed emails list is empty');
-                alert('No allowed emails found. Please contact support.');
-                return;
+              console.error('Allowed emails list is empty');
+              alert('No allowed emails found. Please contact support.');
+              return;
             }
             if (allowedEmails.includes(user.email)) {
-                
-                isuserallowed=true ;
-                // Create button if it doesn't exist
-                if (!document.getElementById('viewDonorsButton')) {
-                const button = document.createElement('button');
+              isuserallowed = true;
+              // Always ensure the button is present and not duplicated
+              let button = document.getElementById('viewDonorsButton');
+              if (!button) {
+                button = document.createElement('button');
                 button.textContent = 'View Donors';
                 button.id = 'viewDonorsButton';
+                button.className = 'adddonor';
                 button.addEventListener('click', () => {
-                    window.location.href = 'list.html';
+                  window.location.href = 'list.html';
                 });
                 const listjElem = document.getElementById('listj');
                 if (listjElem) {
-                    listjElem.appendChild(button);
+                  listjElem.appendChild(button);
                 } else {
-                    console.error('Element with id "listj" not found.');
-                }    }
+                  console.error('Element with id "listj" not found.');
+                }
+              } else {
+                // If button exists, ensure it is visible
+                button.style.display = '';
+              }
             } else {
-                console.log('Access denied - email not in allowed list');
-                // Optionally: redirect to unauthorized page
-                // window.location.href = 'unauthorized.html';
+              // Hide the button if user is not allowed
+              const button = document.getElementById('viewDonorsButton');
+              if (button) button.style.display = 'none';
+              console.log('Access denied - email not in allowed list');
             }
-            } catch (error) {
+          } catch (error) {
             console.error('Error checking access:', error);
             alert('Error verifying access. Please try again.');
-            }
+          }
         } else {
-            console.log('No user logged in');
-            document.getElementById("user-info").innerText = "Not logged in";
+          console.log('No user logged in');
+          document.getElementById("user-info").innerText = "Not logged in";
+          // Hide the button if not logged in
+          const button = document.getElementById('viewDonorsButton');
+          if (button) button.style.display = 'none';
         }
-        });
+      });
     };
     
     //  PUSH IP

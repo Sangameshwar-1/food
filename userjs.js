@@ -14,7 +14,25 @@
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
- 
+    
+    // fecth
+     async function fetchAllowedEmails() {
+      try {
+        const response = await fetch('allowed_users.json'); // Fetch the allowed users from allowed_users.json(i.e path of file)
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`); // Error handling
+        }
+        const data = await response.json(); // Parse the response as JSON
+        if (!Array.isArray(data)) { // Check if the fetched data is an array
+          throw new Error('Invalid data format: expected an array');
+        }
+        return data; // Return the fetched data (eg : return array of allowed users)
+      } catch (error) {
+        console.error('Error fetching allowed users:', error);
+        alert(`Error fetching allowed users: ${error.message}`);
+        throw error;
+      }
+    }
  // user-info           
             auth.onAuthStateChanged(async user => {
                 if (user) {

@@ -16,51 +16,38 @@
     const database = firebase.database();
     
     // fecth
-     async function fetchAllowedEmails() {
-      try {
-        // Use a relative path if the file is in the same directory as your HTML file
-        const response = await fetch('allowed_users.json');
-        if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.statusText}`);
-        }
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid data format: expected an array');
-        }
-        return data;
-      } catch (error) {
-        console.error('Error fetching allowed users:', error);
-        alert(`Error fetching allowed users: ${error.message}`);
-        return []; // Return an empty array to prevent further errors
-      }
+    async function fetchAllowedEmails() {
+  try {
+    const response = await fetch('allowed_users.json');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.status}`);
     }
- // user-info           
-            auth.onAuthStateChanged(async user => {
-                if (user) {
-                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
-                    try {
-                        const allowedEmails = await fetchAllowedEmails(); // fetch the allowed users from allowed_users.json function call
-                        if (!allowedEmails.includes(user.email)) { // Check if the user's email is in the allowed users list
-                            window.location.href = 'user.html'; // Redirect to user.html if the user's email is not in the allowed users list
-                        } else {
-                            // Create a button dynamically and append it to the user-info section
-                            if (!document.getElementById('viewDonorsButton')) {
-                                const button = document.createElement('button');
-                                button.textContent = 'View Donors';
-                                button.id = 'viewDonorsButton';
-                                button.addEventListener('click', () => {
-                                    window.location.href = 'list.html';
-                                });
-                                document.getElementById('user-info').appendChild(button);
-                            }
-                        }
-                    } catch (error) {
-                        alert('Error fetching allowed users. Please try again later.');
-                    }
-                } else {
-                    document.getElementById("user-info").innerText = "Not logged in";
-                }
-            });
+    const data = await response.json();
+    
+    // Debugging: log the fetched data
+    console.log('Fetched allowed emails:', data);
+    
+    if (!Array.isArray(data)) {
+      throw new Error('Data is not an array');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Fetch error:', error);
+    throw error; // Re-throw for the caller to handle
+  }
+}
+
+// Usage in auth state listener
+
+// Utility function to safely add event listeners if element exists
+function safeAddEventListener(id, event, handler) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener(event, handler);
+  }
+}
+
 
 
    //>>>>>>>>
@@ -68,19 +55,57 @@
       M in js :
         1. window.onload // Check if the user is authenticated
         2. fetch() // Fetch the IP address from ipinfo.io
-        3. .then() // Process the fetched IP address
-        4. .catch() // Handle errors
-        5. window.location.href // Redirect to index.html
-
-      M in firebase :
-        1. onAuthStateChanged() // Check if the user is authenticated
-      
-   */
     window.onload = function() {
       auth.onAuthStateChanged((user) => {
         if (user) { // User is authenticated checked by auth.onAuthStateChanged()
           // User is authenticated
           getAndPushIP(); //function call to Get and push the IP address to Firebase
+          auth.onAuthStateChanged(async user => {
+            if (user) {
+                console.log('User logged in:', user.email);
+                try {
+                const allowedEmails = await fetchAllowedEmails();
+                console.log('Checking access for:', user.email);
+                
+                if (allowedEmails.includes(user.email)) {
+                    console.log('Access granted');
+                    // Create button if it doesn't exist
+                    if (!document.getElementById('viewDonorsButton')) {
+                      const button = document.createElement('button');
+                      button.textContent = 'View Donors';
+                      button.id = 'viewDonorsButton';
+                      button.addEventListener('click', () => {
+                          window.location.href = 'list.html';
+                      });
+                      document.getElementById('user-info').appendChild(button);
+                    }
+                } else {
+                    console.log('Access denied - email not in allowed list');
+                    // Optionally: redirect to unauthorized page
+                    // window.location.href = 'unauthorized.html';
+                }
+                } catch (error) {
+                console.error('Error checking access:', error);
+                alert('Error verifying access. Please try again.');
+                }
+            } else {
+                console.log('No user logged in');
+                document.getElementById("user-info").innerText = "Not logged in";
+            }
+          });
+        }
+         else { // User is not authenticated, redirect to index.html
+            window.location.href = 'index.html';
+        }
+      });
+
+      // Safely add event listener for viewDonorsButton if it exists at load
+      safeAddEventListener('viewDonorsButton', 'click', () => {
+        window.location.href = 'list.html';
+      });
+    };
+            }
+            });
         }
          else { // User is not authenticated, redirect to index.html
             window.location.href = 'index.html';

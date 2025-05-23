@@ -272,12 +272,7 @@ async function handleDonorFormSubmit(event) {
         }
       }
 
-    //>>>>>>>>>
-    // Redirect to list.html on button click
-    document.getElementById('viewDonorsButton').addEventListener('click', () => {
-      window.location.href = 'list.html';
-    });
-    //>>>>>>>>>
+    
 
 
     //>>>>>>>>>

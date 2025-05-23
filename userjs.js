@@ -15,47 +15,53 @@
     const auth = firebase.auth();
     const database = firebase.database();
     
-    // fecth
+    // USED VARIABLES 
+    let usermail = '' ;
+    let isuserallowed = false;
+    let isdonorformsubmitted = false;
+    let tempstoreddonorDetails = '';
+
+
+    // fecth allowed users from allowed_users.json
     async function fetchAllowedEmails() {
-  try {
-    const response = await fetch('allowed_users.json');
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.status}`);
+        try {
+            const response = await fetch('allowed_users.json');
+            if (!response.ok) {
+            throw new Error(`Failed to fetch: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            // Debugging: log the fetched data
+            console.log('Fetched allowed emails:', data);
+            
+            if (!Array.isArray(data)) {
+            throw new Error('Data is not an array');
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('Fetch error:', error);
+            // Instead of throwing, return an empty array to avoid breaking the flow
+            return [];
+        }
     }
-    const data = await response.json();
-    
-    // Debugging: log the fetched data
-    console.log('Fetched allowed emails:', data);
-    
-    if (!Array.isArray(data)) {
-      throw new Error('Data is not an array');
+
+
+    async function checkExistingSubmission(userId) {
+        try {
+            const snapshot = await database.ref('donors')
+            .orderByChild('userId')
+            .equalTo(userId)
+            .once('value');
+            
+            return snapshot.exists();
+        } catch (error) {
+            console.error('Error checking submissions:', error);
+            return false; // Assume no submission if error occurs
+        }
     }
-    
-    return data;
-  } catch (error) {
-    console.error('Fetch error:', error);
-    // Instead of throwing, return an empty array to avoid breaking the flow
-    return [];
-  }
-}
 
-// Usage in auth state listener
-
-
-
-   //>>>>>>>>
-   /*
-      M in js :
-        1. window.onload // Check if the user is authenticated
-        2. fetch() // Fetch the IP address from ipinfo.io
-        3. .then() // Process the fetched IP address
-        4. .catch() // Handle errors
-        5. window.location.href // Redirect to index.html
-
-      M in firebase :
-        1. onAuthStateChanged() // Check if the user is authenticated
-      
-   */
+    // 
     window.onload = function() {
       auth.onAuthStateChanged(async (user) => {
         if (user) { // User is authenticated checked by auth.onAuthStateChanged()
@@ -63,6 +69,29 @@
             const userInfoElem = document.getElementById("user-info");
             if (userInfoElem) {
               userInfoElem.innerText = "Logged in as: " + user.email;
+              usermail=user.email ;
+               const existingSubmission = await checkExistingSubmission(user.uid);
+                if (existingSubmission) {
+                    alert('You have already submitted the form. Thank you!');
+                    const addDonorBtn = document.querySelector('.adddonor');
+                    if (addDonorBtn) {
+                        isdonorformsubmitted = true;
+                        addDonorBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            navtodisplay();
+                        });
+                    }
+                    return;
+                }
+                else{
+                    const addDonorBtn = document.querySelector('.adddonor');
+                    if (addDonorBtn) {
+                        addDonorBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            navigateToDonor();
+                        });
+                    }
+                }
             }
             
           getAndPushIP(); //function call to Get and push the IP address to Firebase
@@ -71,9 +100,16 @@
             try {
             const allowedEmails = await fetchAllowedEmails();
             console.log('Checking access for:', user.email);
-            
+            console.log('Allowed emails:', allowedEmails);
+            // Check if the user's email is in the allowed list 
+            if (allowedEmails.length === 0) {
+                console.error('Allowed emails list is empty');
+                alert('No allowed emails found. Please contact support.');
+                return;
+            }
             if (allowedEmails.includes(user.email)) {
-                console.log('Access granted');
+                
+                isuserallowed=true ;
                 // Create button if it doesn't exist
                 if (!document.getElementById('viewDonorsButton')) {
                 const button = document.createElement('button');
@@ -103,26 +139,8 @@
         }
         });
     };
-    //>>>>>>>>>>>
-    //>>>>>>>>>
-    /*
-      M in js :
-        1. fetch() // Fetch the IP address from ipinfo.io
-        2. .then() // Process the fetched IP address
-        3. .catch() // Handle errors
-        4. console.log() // Log the fetched IP
-        5. .ref
-      M in firebase :
-        1. .ref() // Reference to the viewerIPs node ; eg: database.ref('viewerIPs')
-        2. .orderByChild() // Order the IP addresses by the child node 'ip' ; eg: ipRef.orderByChild('ip').equalTo(userIP)
-        3. .once() // Check if the IP address exists in Firebase ; eg: ipRef.orderByChild('ip').equalTo(userIP).once('value', snapshot => {})
-        4. .forEach() // Loop through the IP addresses ; eg: snapshot.forEach(childSnapshot => {})
-        5. .child() // Reference to the child node ; eg: \
-        6. .update() // Update the timestamp of the existing IP address
-        7. .push() // Push the new IP address to Firebase
-        8. .exists() // Check if the snapshot exists
-        9. .forEach() // Loop through the snapshot
-    */
+    
+    //  PUSH IP
     function getAndPushIP() {
       fetch('https://ipinfo.io/json')  // Using ipinfo.io
         .then(response => response.json())
@@ -170,8 +188,132 @@
       return date.toLocaleString();
     }
     //>>>>>>>>>
+   
+    // Display donor details
+    
+    function navtodisplay() {
+        const container = document.querySelector('.container');
+        if (!container) return;
 
- 
+        // Clear and fade out the container
+        container.style.opacity = 0;
+        setTimeout(async () => {
+            // Fetch donor details for the current user
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                container.innerHTML = "<p>You are not logged in.</p>";
+                container.style.opacity = 1;
+                return;
+            }
+
+            try {
+                const snapshot = await database.ref('donors')
+                    .orderByChild('userId')
+                    .equalTo(user.uid)
+                    .once('value');
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = "<p>No donor details found for your account.</p>";
+                } else {
+                    let donorHtml = '';
+                    snapshot.forEach(child => {
+                        const donor = child.val();
+                        tempstoreddonorDetails = donor;
+                        donorHtml += `
+                            <div class="donor-details">
+                                <h3>Your Donor Submission</h3>
+                                <p><strong>Name:</strong> ${donor.name || ''}</p>
+                                <p><strong>Date of Birth:</strong> ${donor.dob || ''}</p>
+                                <p><strong>Weight:</strong> ${donor.weight || ''} kg</p>
+                                <p><strong>Blood Type:</strong> ${donor.bloodType || ''}</p>
+                                <p><strong>Contact:</strong> ${donor.contact || ''}</p>
+                                <p><strong>Address:</strong> ${donor.address || ''}</p>
+                                <p><strong>District:</strong> ${donor.district || ''}</p>
+                                <p><strong>Coordinates:</strong> ${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</p>
+                                <p><strong>Submitted At:</strong> ${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</p>
+                            </div>
+                            <button class="adddonor" onclick="navigateToDonor()">Edit Submission</button>
+                        `;
+                    });
+                    container.innerHTML = donorHtml;
+                }
+            } catch (error) {
+                container.innerHTML = "<p>Error loading donor details. Please try again.</p>";
+                console.error('Error displaying donor details:', error);
+            }
+            container.style.opacity = 1;
+        }, 300);
+    }
+    // donor form
+    function navigateToDonor() {
+      const container = document.querySelector('.container');
+      container.style.opacity = 0;
+      setTimeout(() => {
+        container.innerHTML = `
+          <form id="donorForm">
+          <button class="adddonor" onclick="goBack()">Go Back</button>
+          <input type="text" id="name" placeholder="Name" required>
+          
+          <!-- Date of Birth field -->
+          <input type="date" id="dob" placeholder="Date of Birth" required>
+          
+          <!-- Weight field -->
+          <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
+          
+          <select id="bloodType" required>
+            <option value="" disabled selected>Select Blood Type</option>
+            <option value="A+">A+ve</option>
+            <option value="A-">A-ve</option>
+            <option value="B+">B+ve</option>
+            <option value="B-">B-ve</option>
+            <option value="AB+">AB+ve</option>
+            <option value="AB-">AB-ve</option>
+            <option value="O+">O+ve</option>
+            <option value="O-">O-ve</option>
+          </select>
+          
+          <input type="text" id="contact" placeholder="Contact Number" required>
+          <input type="text" id="address" placeholder="Address" required>
+          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+          <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
+          <input type="text" id="district" placeholder="District" required>
+          <button type="submit" class="adddonor">Add Donor</button>
+        </form>
+          <div class="scrolling-text" style="background-color:white; color: black; font-weight: bold; overflow: hidden; white-space: nowrap;margin-top:1;">
+          <h3 style="color: red; display: inline;">**</h3>
+          <h3 style="display: inline;">Rate this web below</h3>
+          <h3 style="color: red; display: inline;">**</h3>
+          </div>
+          <p class="warning">** The RH factor and the District must be correct.</p>
+          <style>
+          .scrolling-text {
+            animation: scroll-left 10s linear infinite;
+          }
+          @keyframes scroll-left {
+            0% {
+            transform: translateX(100%);
+            }
+            100% {
+            transform: translateX(-100%);
+            }
+          }
+          </style>
+        `;
+        container.style.opacity = 1;
+      }, 300);
+      // Move this block inside the setTimeout callback to ensure elements exist
+      setTimeout(() => {
+        if(tempstoreddonorDetails) {
+          document.getElementById('name').value = tempstoreddonorDetails.name || '';
+          document.getElementById('dob').value = tempstoreddonorDetails.dob || '';
+          document.getElementById('weight').value = tempstoreddonorDetails.weight || '';
+          document.getElementById('bloodType').value = tempstoreddonorDetails.bloodType || '';
+          document.getElementById('contact').value = tempstoreddonorDetails.contact || '';
+          document.getElementById('address').value = tempstoreddonorDetails.address || '';
+          document.getElementById('district').value = tempstoreddonorDetails.district || '';
+        }
+      }, 350);
+    }
 
     //>>>>>>>>>
     /*

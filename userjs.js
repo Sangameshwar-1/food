@@ -20,6 +20,7 @@
     let isuserallowed = false;
     let isdonorformsubmitted = false;
     let tempstoreddonorDetails = '';
+    let currentDonorKey = '';
 
 
     // fecth allowed users from allowed_users.json
@@ -202,61 +203,79 @@
    
     // Display donor details
     
-    let currentDonorKey = '';
+    
 
 // Modified navtodisplay function to store the donor key
   function navtodisplay() {
-      const container = document.querySelector('.container');
-      if (!container) return;
+    const container = document.querySelector('.container');
+    if (!container) return;
 
-      container.style.opacity = 0;
-      setTimeout(async () => {
-          const user = firebase.auth().currentUser;
-          if (!user) {
-              container.innerHTML = "<p>You are not logged in.</p>";
-              container.style.opacity = 1;
-              return;
-          }
+    container.style.opacity = 0;
+    setTimeout(async () => {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        container.innerHTML = `
+          <div class="donor-details">
+            <p style="text-align:center; color:#b00;">You are not logged in.</p>
+          </div>
+        `;
+        container.style.opacity = 1;
+        return;
+      }
 
-          try {
-              const snapshot = await database.ref('donors')
-                  .orderByChild('userId')
-                  .equalTo(user.uid)
-                  .once('value');
+      try {
+        const snapshot = await database.ref('donors')
+          .orderByChild('userId')
+          .equalTo(user.uid)
+          .once('value');
 
-              if (!snapshot.exists()) {
-                  container.innerHTML = "<p>No donor details found for your account.</p>";
-              } else {
-                  let donorHtml = '';
-                  snapshot.forEach(child => {
-                      const donor = child.val();
-                      currentDonorKey = child.key; // Store the key for editing
-                      tempstoreddonorDetails = donor;
-                      donorHtml += `
-                          <div class="donor-details">
-                              <button class="adddonor" onclick="goBack()">Go Back</button>
-                              <h3>Your Donor Submission</h3>
-                              <p><strong>Name:</strong> ${donor.name || ''}</p>
-                              <p><strong>Date of Birth:</strong> ${donor.dob || ''}</p>
-                              <p><strong>Weight:</strong> ${donor.weight || ''} kg</p>
-                              <p><strong>Blood Type:</strong> ${donor.bloodType || ''}</p>
-                              <p><strong>Contact:</strong> ${donor.contact || ''}</p>
-                              <p><strong>Address:</strong> ${donor.address || ''}</p>
-                              <p><strong>District:</strong> ${donor.district || ''}</p>
-                              <p><strong>Coordinates:</strong> ${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</p>
-                              <p><strong>Submitted At:</strong> ${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</p>
-                          </div>
-                          <button class="adddonor" onclick="navigateToDonoredit()">Edit Submission</button>
-                      `;
-                  });
-                  container.innerHTML = donorHtml;
-              }
-          } catch (error) {
-              container.innerHTML = "<p>Error loading donor details. Please try again.</p>";
-              console.error('Error displaying donor details:', error);
-          }
-          container.style.opacity = 1;
-      }, 300);
+        if (!snapshot.exists()) {
+          container.innerHTML = `
+            <div class="donor-details">
+              <button class="adddonor" onclick="goBack()">Go Back</button>
+              <p style="text-align:center; color:#b00;">No donor details found for your account.</p>
+            </div>
+          `;
+        } else {
+          let donorHtml = '';
+          snapshot.forEach(child => {
+            const donor = child.val();
+            currentDonorKey = child.key; // Store the key for editing
+            tempstoreddonorDetails = donor;
+            donorHtml += `
+              <div class="donor-details" style="max-width:400px;margin:30px auto;padding:24px 28px 18px 28px;background:#fff;border-radius:12px;box-shadow:0 2px 16px #0001;">
+                <button class="adddonor" style="margin-bottom:12px;" onclick="goBack()">Go Back</button>
+                <h2 style="text-align:center;color:#d32f2f;margin-bottom:18px;">Your Donor Submission</h2>
+                <table style="width:100%;font-size:1em;color:#222;margin-bottom:16px;">
+                  <tr><td style="font-weight:600;">Name:</td><td>${donor.name || ''}</td></tr>
+                  <tr><td style="font-weight:600;">Date of Birth:</td><td>${donor.dob || ''}</td></tr>
+                  <tr><td style="font-weight:600;">Weight:</td><td>${donor.weight || ''} kg</td></tr>
+                  <tr><td style="font-weight:600;">Blood Type:</td><td>${donor.bloodType || ''}</td></tr>
+                  <tr><td style="font-weight:600;">Contact:</td><td>${donor.contact || ''}</td></tr>
+                  <tr><td style="font-weight:600;">Address:</td><td>${donor.address || ''}</td></tr>
+                  <tr><td style="font-weight:600;">District:</td><td>${donor.district || ''}</td></tr>
+                  <tr><td style="font-weight:600;">Coordinates:</td><td>${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</td></tr>
+                  <tr><td style="font-weight:600;">Submitted At:</td><td>${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</td></tr>
+                </table>
+                <div style="text-align:center;">
+                  <button class="adddonor" style="background:#1976d2;color:#fff;padding:8px 24px;border-radius:6px;font-size:1em;" onclick="navigateToDonoredit()">Edit Submission</button>
+                </div>
+              </div>
+            `;
+          });
+          container.innerHTML = donorHtml;
+        }
+      } catch (error) {
+        container.innerHTML = `
+          <div class="donor-details">
+            <button class="adddonor" onclick="goBack()">Go Back</button>
+            <p style="text-align:center; color:#b00;">Error loading donor details. Please try again.</p>
+          </div>
+        `;
+        console.error('Error displaying donor details:', error);
+      }
+      container.style.opacity = 1;
+    }, 300);
   }
     function navigateToDonoredit() {
       const container = document.querySelector('.container');

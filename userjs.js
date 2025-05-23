@@ -34,7 +34,8 @@
     return data;
   } catch (error) {
     console.error('Fetch error:', error);
-    throw error; // Re-throw for the caller to handle
+    // Instead of throwing, return an empty array to avoid breaking the flow
+    return [];
   }
 }
 
@@ -56,7 +57,7 @@
       
    */
     window.onload = function() {
-      auth.onAuthStateChanged((user) => {
+      auth.onAuthStateChanged(async (user) => {
         if (user) { // User is authenticated checked by auth.onAuthStateChanged()
           // User is authenticated
           getAndPushIP(); //function call to Get and push the IP address to Firebase

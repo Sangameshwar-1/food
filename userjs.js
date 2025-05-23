@@ -136,6 +136,11 @@
             console.error('Error checking access:', error);
             alert('Error verifying access. Please try again.');
           }
+          console.log('User email:', user.email);
+          console.log('User ID:', user.uid);
+          console.log('User allowed:', isuserallowed);
+          console.log('User donor form submitted:', isdonorformsubmitted);
+
         } else {
           console.log('No user logged in');
           document.getElementById("user-info").innerText = "Not logged in";
@@ -197,58 +202,111 @@
    
     // Display donor details
     
-    function navtodisplay() {
-        const container = document.querySelector('.container');
-        if (!container) return;
+    let currentDonorKey = '';
 
-        // Clear and fade out the container
-        container.style.opacity = 0;
-        setTimeout(async () => {
-            // Fetch donor details for the current user
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                container.innerHTML = "<p>You are not logged in.</p>";
-                container.style.opacity = 1;
-                return;
-            }
+// Modified navtodisplay function to store the donor key
+  function navtodisplay() {
+      const container = document.querySelector('.container');
+      if (!container) return;
 
-            try {
-                const snapshot = await database.ref('donors')
-                    .orderByChild('userId')
-                    .equalTo(user.uid)
-                    .once('value');
+      container.style.opacity = 0;
+      setTimeout(async () => {
+          const user = firebase.auth().currentUser;
+          if (!user) {
+              container.innerHTML = "<p>You are not logged in.</p>";
+              container.style.opacity = 1;
+              return;
+          }
 
-                if (!snapshot.exists()) {
-                    container.innerHTML = "<p>No donor details found for your account.</p>";
-                } else {
-                    let donorHtml = '';
-                    snapshot.forEach(child => {
-                        const donor = child.val();
-                        tempstoreddonorDetails = donor;
-                        donorHtml += `
-                            <div class="donor-details">
-                                <h3>Your Donor Submission</h3>
-                                <p><strong>Name:</strong> ${donor.name || ''}</p>
-                                <p><strong>Date of Birth:</strong> ${donor.dob || ''}</p>
-                                <p><strong>Weight:</strong> ${donor.weight || ''} kg</p>
-                                <p><strong>Blood Type:</strong> ${donor.bloodType || ''}</p>
-                                <p><strong>Contact:</strong> ${donor.contact || ''}</p>
-                                <p><strong>Address:</strong> ${donor.address || ''}</p>
-                                <p><strong>District:</strong> ${donor.district || ''}</p>
-                                <p><strong>Coordinates:</strong> ${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</p>
-                                <p><strong>Submitted At:</strong> ${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</p>
-                            </div>
-                            <button class="adddonor" onclick="navigateToDonor()">Edit Submission</button>
-                        `;
-                    });
-                    container.innerHTML = donorHtml;
-                }
-            } catch (error) {
-                container.innerHTML = "<p>Error loading donor details. Please try again.</p>";
-                console.error('Error displaying donor details:', error);
-            }
-            container.style.opacity = 1;
-        }, 300);
+          try {
+              const snapshot = await database.ref('donors')
+                  .orderByChild('userId')
+                  .equalTo(user.uid)
+                  .once('value');
+
+              if (!snapshot.exists()) {
+                  container.innerHTML = "<p>No donor details found for your account.</p>";
+              } else {
+                  let donorHtml = '';
+                  snapshot.forEach(child => {
+                      const donor = child.val();
+                      currentDonorKey = child.key; // Store the key for editing
+                      tempstoreddonorDetails = donor;
+                      donorHtml += `
+                          <div class="donor-details">
+                              <button class="adddonor" onclick="goBack()">Go Back</button>
+                              <h3>Your Donor Submission</h3>
+                              <p><strong>Name:</strong> ${donor.name || ''}</p>
+                              <p><strong>Date of Birth:</strong> ${donor.dob || ''}</p>
+                              <p><strong>Weight:</strong> ${donor.weight || ''} kg</p>
+                              <p><strong>Blood Type:</strong> ${donor.bloodType || ''}</p>
+                              <p><strong>Contact:</strong> ${donor.contact || ''}</p>
+                              <p><strong>Address:</strong> ${donor.address || ''}</p>
+                              <p><strong>District:</strong> ${donor.district || ''}</p>
+                              <p><strong>Coordinates:</strong> ${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</p>
+                              <p><strong>Submitted At:</strong> ${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</p>
+                          </div>
+                          <button class="adddonor" onclick="navigateToDonoredit()">Edit Submission</button>
+                      `;
+                  });
+                  container.innerHTML = donorHtml;
+              }
+          } catch (error) {
+              container.innerHTML = "<p>Error loading donor details. Please try again.</p>";
+              console.error('Error displaying donor details:', error);
+          }
+          container.style.opacity = 1;
+      }, 300);
+  }
+    function navigateToDonoredit() {
+      const container = document.querySelector('.container');
+      container.style.opacity = 0;
+      setTimeout(() => {
+        container.innerHTML = `
+          <form id="donorForm">
+          <button class="adddonor" onclick="goBack()">Go Back</button>
+          <input type="text" id="name" placeholder="Name" required>
+          
+          <!-- Date of Birth field -->
+          <input type="date" id="dob" placeholder="Date of Birth" required>
+          
+          <!-- Weight field -->
+          <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
+          
+          <select id="bloodType" required>
+            <option value="" disabled selected>Select Blood Type</option>
+            <option value="A+">A+ve</option>
+            <option value="A-">A-ve</option>
+            <option value="B+">B+ve</option>
+            <option value="B-">B-ve</option>
+            <option value="AB+">AB+ve</option>
+            <option value="AB-">AB-ve</option>
+            <option value="O+">O+ve</option>
+            <option value="O-">O-ve</option>
+          </select>
+          
+          <input type="text" id="contact" placeholder="Contact Number" required>
+          <input type="text" id="address" placeholder="Address" required>
+          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+          <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
+          <input type="text" id="district" placeholder="District" required>
+          <button type="submit" class="adddonor">Edit Donor</button>
+        </form>`;
+        container.style.opacity = 1;
+      }, 300);
+      // Move this block inside the setTimeout callback to ensure elements exist
+      setTimeout(() => {
+        if(tempstoreddonorDetails) {
+          document.getElementById('name').value = tempstoreddonorDetails.name || '';
+          document.getElementById('dob').value = tempstoreddonorDetails.dob || '';
+          document.getElementById('weight').value = tempstoreddonorDetails.weight || '';
+          document.getElementById('bloodType').value = tempstoreddonorDetails.bloodType || '';
+          document.getElementById('contact').value = tempstoreddonorDetails.contact || '';
+          document.getElementById('address').value = tempstoreddonorDetails.address || '';
+          document.getElementById('district').value = tempstoreddonorDetails.district || '';
+        }
+      }, 350);
+
     }
     // donor form
     function navigateToDonor() {
@@ -307,18 +365,7 @@
         `;
         container.style.opacity = 1;
       }, 300);
-      // Move this block inside the setTimeout callback to ensure elements exist
-      setTimeout(() => {
-        if(tempstoreddonorDetails) {
-          document.getElementById('name').value = tempstoreddonorDetails.name || '';
-          document.getElementById('dob').value = tempstoreddonorDetails.dob || '';
-          document.getElementById('weight').value = tempstoreddonorDetails.weight || '';
-          document.getElementById('bloodType').value = tempstoreddonorDetails.bloodType || '';
-          document.getElementById('contact').value = tempstoreddonorDetails.contact || '';
-          document.getElementById('address').value = tempstoreddonorDetails.address || '';
-          document.getElementById('district').value = tempstoreddonorDetails.district || '';
-        }
-      }, 350);
+      
     }
 
     //>>>>>>>>>
@@ -351,55 +398,78 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function handleDonorFormSubmit(event) {
-  const form = event.target;
-  const name = form.querySelector('#name').value;
-  const dob = form.querySelector('#dob').value;
-  const weight = form.querySelector('#weight').value;
-  const bloodType = form.querySelector('#bloodType').value;
-  const contact = form.querySelector('#contact').value;
-  const address = form.querySelector('#address').value;
-  const district = form.querySelector('#district').value;
+    event.preventDefault();
+    const form = event.target;
+    const name = form.querySelector('#name').value;
+    const dob = form.querySelector('#dob').value;
+    const weight = form.querySelector('#weight').value;
+    const bloodType = form.querySelector('#bloodType').value;
+    const contact = form.querySelector('#contact').value;
+    const address = form.querySelector('#address').value;
+    const district = form.querySelector('#district').value;
+    const user = firebase.auth().currentUser;
 
-  // Basic validation
-  if (weight < 40) {
-    alert('Minimum weight for donation is 40kg');
-    return;
-  }
+    // Basic validation
+    if (weight < 40) {
+        alert('Minimum weight for donation is 40kg');
+        return;
+    }
 
-  try {
-    // Add donor details to Firebase
-    await database.ref('donors').push({
-      name,
-      dob,
-      weight,
-      bloodType,
-      contact,
-      address,
-      district,
-      lat,
-      lng,
-      timestamp: new Date().toISOString()
-    });
+    try {
+        // Check if we're editing an existing record
+        if (currentDonorKey) {
+            // Update the existing record
+            await database.ref('donors/' + currentDonorKey).update({
+                name,
+                dob,
+                weight,
+                bloodType,
+                contact,
+                address,
+                district,
+                lat: lat || tempstoreddonorDetails.lat,
+                lng: lng || tempstoreddonorDetails.lng,
+                timestamp: new Date().toISOString()
+            });
+            
+            alert('Donor details updated successfully!');
+            navtodisplay(); // Return to view mode
+        } else {
+            // Add new donor
+            await database.ref('donors').push({
+                name,
+                dob,
+                weight,
+                bloodType,
+                contact,
+                address,
+                district,
+                lat,
+                lng,
+                userId: user.uid,
+                timestamp: new Date().toISOString()
+            });
 
-    alert('Donor added successfully!');
-    form.reset();
-    
-    // Upload data to Google Spreadsheet
-    uploadToSpreadsheet({
-      Name: name,
-      "Date of Birth": dob,
-      "Weight (kg)": weight,
-      "Mobile No": contact,
-      Address: address,
-      "Blood Group": bloodType,
-      District: district,
-      "Coordinates": `${lat}, ${lng}`,
-      "Date Added": new Date().toLocaleString()
-    });
-  } catch (error) {
-    console.error('Error adding donor:', error);
-    alert('Error adding donor. Please try again.');
-  }
+            alert('Donor added successfully!');
+            form.reset();
+            
+            // Upload data to Google Spreadsheet
+            uploadToSpreadsheet({
+                Name: name,
+                "Date of Birth": dob,
+                "Weight (kg)": weight,
+                "Mobile No": contact,
+                Address: address,
+                "Blood Group": bloodType,
+                District: district,
+                "Coordinates": `${lat}, ${lng}`,
+                "Date Added": new Date().toLocaleString()
+            });
+        }
+    } catch (error) {
+        console.error('Error processing donor:', error);
+        alert('Error processing donor. Please try again.');
+    }
 }
     //>>>>>>>>>
     let lat, lng;

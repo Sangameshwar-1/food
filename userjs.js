@@ -1,263 +1,295 @@
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
+        authDomain: "blood-7b054.firebaseapp.com",
+        databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
+        projectId: "blood-7b054",
+        storageBucket: "blood-7b054.firebasestorage.app",
+        messagingSenderId: "926378767902",
+        appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
+        measurementId: "G-HTGC1SJYH6"
+    };
 
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAHt06CtReHyQRip-QqEGILFjOWH5cI98c",
-    authDomain: "blood-7b054.firebaseapp.com",
-    databaseURL: "https://blood-7b054-default-rtdb.firebaseio.com",
-    projectId: "blood-7b054",
-    storageBucket: "blood-7b054.firebasestorage.app",
-    messagingSenderId: "926378767902",
-    appId: "1:926378767902:web:21591c4e5d77c90c9ca00f",
-    measurementId: "G-HTGC1SJYH6"
-};
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const database = firebase.database();
-
-// Global variables
-let lat, lng;
-
-window.onload = function () {
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
-            try {
-                const allowedEmails = await fetchAllowedEmails();
-                if (!allowedEmails.includes(user.email)) {
-                    document.getElementById('viewDonorsButton').style.display = 'none';
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+ 
+ // user-info           
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                    document.getElementById("user-info").innerText = `Logged in as: ${user.email}`;
+                    try {
+                        const allowedEmails = await fetchAllowedEmails(); // fetch the allowed users from allowed_users.json function call
+                        if (!allowedEmails.includes(user.email)) { // Check if the user's email is in the allowed users list
+                            window.location.href = 'user.html'; // Redirect to user.html if the user's email is not in the allowed users list
+                        } else {
+                            // Create a button dynamically and append it to the user-info section
+                            const button = document.createElement('button');
+                            button.textContent = 'View Donors';
+                            button.id = 'viewDonorsButton';
+                            button.addEventListener('click', () => {
+                                window.location.href = 'list.html';
+                            });
+                            document.getElementById('user-info').appendChild(button);
+                        }
+                    } catch (error) {
+                        alert('Error fetching allowed users. Please try again later.');
+                    }
                 } else {
-                    document.getElementById('viewDonorsButton').style.display = 'inline-block';
+                    document.getElementById("user-info").innerText = "Not logged in";
                 }
+            });
 
-                getAndPushIP();
 
-                const isExistingDonor = await checkExistingDonor(user.email);
-                if (isExistingDonor) {
-                    navigateToeditdonor();
-                } else {
-                    navigateToDonor();
-                }
-            } catch (error) {
-                console.error('Error during initialization:', error);
-                alert('Initialization failed.');
-            }
-        } else {
+   //>>>>>>>>
+   /*
+      M in js :
+        1. window.onload // Check if the user is authenticated
+        2. fetch() // Fetch the IP address from ipinfo.io
+        3. .then() // Process the fetched IP address
+        4. .catch() // Handle errors
+        5. window.location.href // Redirect to index.html
+
+      M in firebase :
+        1. onAuthStateChanged() // Check if the user is authenticated
+      
+   */
+    window.onload = function() {
+      auth.onAuthStateChanged((user) => {
+        if (user) { // User is authenticated checked by auth.onAuthStateChanged()
+          // User is authenticated
+          getAndPushIP(); //function call to Get and push the IP address to Firebase
+        }
+         else { // User is not authenticated, redirect to index.html
             window.location.href = 'index.html';
         }
+      });
+    };
+    //>>>>>>>>>>>
+    //>>>>>>>>>
+    /*
+      M in js :
+        1. fetch() // Fetch the IP address from ipinfo.io
+        2. .then() // Process the fetched IP address
+        3. .catch() // Handle errors
+        4. console.log() // Log the fetched IP
+        5. .ref
+      M in firebase :
+        1. .ref() // Reference to the viewerIPs node ; eg: database.ref('viewerIPs')
+        2. .orderByChild() // Order the IP addresses by the child node 'ip' ; eg: ipRef.orderByChild('ip').equalTo(userIP)
+        3. .once() // Check if the IP address exists in Firebase ; eg: ipRef.orderByChild('ip').equalTo(userIP).once('value', snapshot => {})
+        4. .forEach() // Loop through the IP addresses ; eg: snapshot.forEach(childSnapshot => {})
+        5. .child() // Reference to the child node ; eg: \
+        6. .update() // Update the timestamp of the existing IP address
+        7. .push() // Push the new IP address to Firebase
+        8. .exists() // Check if the snapshot exists
+        9. .forEach() // Loop through the snapshot
+    */
+    function getAndPushIP() {
+      fetch('https://ipinfo.io/json')  // Using ipinfo.io
+        .then(response => response.json())
+        .then(data => {
+          const userIP = data.ip;
+          console.log('Fetched IP Address:', userIP);  // Debugging: Log the fetched IP
+
+          const ipRef = database.ref('viewerIPs');
+
+          // Checking if the IP already exists in Firebase
+          ipRef.orderByChild('ip').equalTo(userIP).once('value', snapshot => { // Check if the IP address exists in Firebase
+            if (snapshot.exists()) { // Update the timestamp if IP exists
+              snapshot.forEach(childSnapshot => { // Loop through the IP addresses
+                const childKey = childSnapshot.key; // Reference to the child node
+                ipRef.child(childKey).update({  // Update the timestamp of the existing IP address
+                  timestamp /*key */ : formatDate(new Date()) // Use formatted local date and time
+                }).then(() => {
+                  console.log('Timestamp updated for existing IP address!');
+                }).catch(error => {
+                  console.error('Error updating timestamp:', error);
+                });
+              });
+            }
+             else { // Push the new IP address to Firebase
+              ipRef.push({  
+                ip: userIP,
+                timestamp: formatDate(new Date()) // Use formatted local date and time
+              }).then(() => {
+                console.log('IP address pushed to Firebase successfully!');
+              }).catch(error => {
+                console.error('Error pushing IP address to Firebase:', error);
+              });
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching IP address:', error);
+        });
+    }
+    //>>>>>>>>>
+
+    //>>>>>>>>>
+    // Function to format date and time
+    function formatDate(date) {
+      return date.toLocaleString();
+    }
+    //>>>>>>>>>
+
+    //>>>>>>>>>
+    // view list
+    document.getElementById('viewDonorsButton').addEventListener('click', () => {
+      window.location.href = 'list.html'; // Redirect to list.html
     });
-};
+    //>>>>>>>>>
 
-async function fetchAllowedEmails() {
-    try {
-        const response = await fetch('allowed_users.json');
-        if (!response.ok) throw new Error('Failed to fetch allowed users');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching allowed users:', error);
-        throw error;
-    }
-}
-
-async function checkExistingDonor(email) {
-    try {
-        const donorsRef = database.ref('donors');
-        const snapshot = await donorsRef.orderByChild('email').equalTo(email).once('value');
-        return snapshot.exists();
-    } catch (error) {
-        console.error('Error checking donor:', error);
-        return false;
-    }
-}
-
-function navigateToDonor() {
-    const container = document.querySelector('.container');
-    container.style.opacity = 0;
-    setTimeout(() => {
-        container.innerHTML = `
-            <form id="donorForm">
-                <button type="button" class="adddonor" onclick="goBack()">Go Back</button>
-                <input type="text" id="name" placeholder="Name" required>
-                <input type="date" id="dob" required>
-                <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
-                <select id="bloodType" required>
-                    <option value="" disabled selected>Select Blood Type</option>
-                    <option value="A+">A+ve</option>
-                    <option value="A-">A-ve</option>
-                    <option value="B+">B+ve</option>
-                    <option value="B-">B-ve</option>
-                    <option value="AB+">AB+ve</option>
-                    <option value="AB-">AB-ve</option>
-                    <option value="O+">O+ve</option>
-                    <option value="O-">O-ve</option>
-                </select>
-                <input type="text" id="contact" placeholder="Contact Number" required>
-                <input type="text" id="address" placeholder="Address" required>
-                <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-                <p id="output"></p>
-                <input type="text" id="district" placeholder="District" required>
-                <button type="submit" class="adddonor">Add Donor</button>
-            </form>
-        `;
-        container.style.opacity = 1;
-
-        document.getElementById('donorForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const dob = document.getElementById('dob').value;
-            const weight = document.getElementById('weight').value;
-            const bloodType = document.getElementById('bloodType').value;
-            const contact = document.getElementById('contact').value;
-            const address = document.getElementById('address').value;
-            const district = document.getElementById('district').value;
-
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const donorRef = database.ref('donors').push();
-            await donorRef.set({
-                email: user.email,
-                name,
-                dob,
-                weight,
-                bloodType,
-                contact,
-                address,
-                district,
-                latitude: lat || null,
-                longitude: lng || null
-            });
-            alert('Donor info added.');
-            navigateToeditdonor();
-        });
-    }, 300);
-}
-
-function navigateToeditdonor() {
-    const container = document.querySelector('.container');
-    container.style.opacity = 0;
-    setTimeout(() => {
-        container.innerHTML = `
-            <h1>Donor Information</h1>
-            <div id="donorDetails">
-                <p><strong>Name:</strong> <span id="displayName"></span></p>
-                <p><strong>Date of Birth:</strong> <span id="displayDob"></span></p>
-                <p><strong>Weight:</strong> <span id="displayWeight"></span></p>
-                <p><strong>Blood Type:</strong> <span id="displayBloodType"></span></p>
-                <p><strong>Contact:</strong> <span id="displayContact"></span></p>
-                <p><strong>Address:</strong> <span id="displayAddress"></span></p>
-                <p><strong>District:</strong> <span id="displayDistrict"></span></p>
-                <button class="adddonor" id="editButton">Edit Information</button>
-            </div>
-            <form id="editDonorForm" style="display:none;">
-                <input type="text" id="editName" required>
-                <input type="date" id="editDob" required>
-                <input type="number" id="editWeight" min="40" required>
-                <select id="editBloodType" required>
-                    <option value="" disabled selected>Select Blood Type</option>
-                    <option value="A+">A+ve</option>
-                    <option value="A-">A-ve</option>
-                    <option value="B+">B+ve</option>
-                    <option value="B-">B-ve</option>
-                    <option value="AB+">AB+ve</option>
-                    <option value="AB-">AB-ve</option>
-                    <option value="O+">O+ve</option>
-                    <option value="O-">O-ve</option>
-                </select>
-                <input type="text" id="editContact" required>
-                <input type="text" id="editAddress" required>
-                <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-                <p id="output"></p>
-                <input type="text" id="editDistrict" required>
-                <button type="submit" class="adddonor">Update Donor</button>
-            </form>
-        `;
-        container.style.opacity = 1;
-
-        document.getElementById('editButton').addEventListener('click', () => {
-            document.getElementById('donorDetails').style.display = 'none';
-            document.getElementById('editDonorForm').style.display = 'block';
-        });
-
-        fetchDonorDetails();
-    }, 300);
-}
-
-async function fetchDonorDetails() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const donorsRef = database.ref('donors');
-    const snapshot = await donorsRef.orderByChild('email').equalTo(user.email).once('value');
-    if (snapshot.exists()) {
-        const donorId = Object.keys(snapshot.val())[0];
-        const donorData = snapshot.val()[donorId];
-
-        document.getElementById('displayName').innerText = donorData.name;
-        document.getElementById('displayDob').innerText = donorData.dob;
-        document.getElementById('displayWeight').innerText = donorData.weight + ' kg';
-        document.getElementById('displayBloodType').innerText = donorData.bloodType;
-        document.getElementById('displayContact').innerText = donorData.contact;
-        document.getElementById('displayAddress').innerText = donorData.address;
-        document.getElementById('displayDistrict').innerText = donorData.district;
-
-        document.getElementById('editName').value = donorData.name;
-        document.getElementById('editDob').value = donorData.dob;
-        document.getElementById('editWeight').value = donorData.weight;
-        document.getElementById('editBloodType').value = donorData.bloodType;
-        document.getElementById('editContact').value = donorData.contact;
-        document.getElementById('editAddress').value = donorData.address;
-        document.getElementById('editDistrict').value = donorData.district;
-
-        document.getElementById('editDonorForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const updatedData = {
-                name: document.getElementById('editName').value,
-                dob: document.getElementById('editDob').value,
-                weight: document.getElementById('editWeight').value,
-                bloodType: document.getElementById('editBloodType').value,
-                contact: document.getElementById('editContact').value,
-                address: document.getElementById('editAddress').value,
-                district: document.getElementById('editDistrict').value,
-                latitude: lat || donorData.latitude || null,
-                longitude: lng || donorData.longitude || null
-            };
-            await updateDonorDetails(donorId, updatedData);
-        });
-    }
-}
-
-async function updateDonorDetails(donorId, updatedData) {
-    try {
-        await database.ref('donors/' + donorId).update(updatedData);
-        alert('Donor info updated.');
-        navigateToeditdonor();
-    } catch (error) {
-        console.error('Error updating donor:', error);
-        alert('Failed to update donor.');
-    }
-}
-
-function getCoords() {
-    if (!navigator.geolocation) {
-        alert('Geolocation not supported by your browser.');
-        return;
-    }
-    navigator.geolocation.getCurrentPosition((position) => {
-        lat = position.coords.latitude;
-        lng = position.coords.longitude;
-        document.getElementById('output').innerText = `Lat: ${lat}, Lng: ${lng}`;
-    }, () => {
-        alert('Unable to retrieve your location.');
+    //>>>>>>>>>
+    /*
+      M in firebase :
+        1. .ref() // Reference to the donors node ; eg: database.ref('donors')
+        2. .push() // Push the donor details to Firebase ; eg: database.ref('donors').push({})
+        3. .signOut() // Sign out the user ; eg: auth.signOut()
+    */
+    // logout
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
     });
-}
+    //>>>>>>>>>
 
-function goBack() {
-    window.location.reload();
-}
+    //>>>>>>>>>
+    /*
+        M in firebase :
+          1. .push() // Push the donor details to Firebase ; eg: database.ref('donors').push({})
 
-function getAndPushIP() {
-    // Optional function to get IP address
+    */
+    // Add donor
+  // Replace the direct event listener with this:
+document.addEventListener('DOMContentLoaded', function() {
+  // Use event delegation for the donor form
+  document.body.addEventListener('submit', function(event) {
+    if (event.target.id === 'donorForm') {
+      event.preventDefault();
+      handleDonorFormSubmit(event);
+    }
+  });
+});
+
+async function handleDonorFormSubmit(event) {
+  const form = event.target;
+  const name = form.querySelector('#name').value;
+  const dob = form.querySelector('#dob').value;
+  const weight = form.querySelector('#weight').value;
+  const bloodType = form.querySelector('#bloodType').value;
+  const contact = form.querySelector('#contact').value;
+  const address = form.querySelector('#address').value;
+  const district = form.querySelector('#district').value;
+
+  // Basic validation
+  if (weight < 40) {
+    alert('Minimum weight for donation is 40kg');
+    return;
+  }
+
+  try {
+    // Add donor details to Firebase
+    await database.ref('donors').push({
+      name,
+      dob,
+      weight,
+      bloodType,
+      contact,
+      address,
+      district,
+      lat,
+      lng,
+      timestamp: new Date().toISOString()
+    });
+
+    alert('Donor added successfully!');
+    form.reset();
+    
+    // Upload data to Google Spreadsheet
+    uploadToSpreadsheet({
+      Name: name,
+      "Date of Birth": dob,
+      "Weight (kg)": weight,
+      "Mobile No": contact,
+      Address: address,
+      "Blood Group": bloodType,
+      District: district,
+      "Coordinates": `${lat}, ${lng}`,
+      "Date Added": new Date().toLocaleString()
+    });
+  } catch (error) {
+    console.error('Error adding donor:', error);
+    alert('Error adding donor. Please try again.');
+  }
 }
+    //>>>>>>>>>
+    let lat, lng;
+    function getCoords() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            lat = position.coords.latitude;
+            lng = position.coords.longitude;
+            document.getElementById("output").textContent =
+              "Latitude: " + lat + ", Longitude: " + lng;
+          }, function(error) {
+            document.getElementById("output").textContent =
+              "Error: " + error.message;
+          });
+        } else {
+          document.getElementById("output").textContent =
+            "Geolocation is not supported by this browser.";
+        }
+      }
+
+    //>>>>>>>>>
+    // Redirect to list.html on button click
+    document.getElementById('viewDonorsButton').addEventListener('click', () => {
+      window.location.href = 'list.html';
+    });
+    //>>>>>>>>>
+
+
+    //>>>>>>>>>
+    /*
+        M in firebase :
+          
+          2. .signOut() // Sign out the user ; eg: auth.signOut()
+    */
+    // Logout functionality
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
+    });
+    //>>>>>>>>>
+
+
+    //>>>>>>>>>
+    // Function to upload data to Google Spreadsheet
+    function uploadToSpreadsheet(data) {
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyQmqeF5tvpivhTT0YDKGFDdq3a7Vkyr1CslCg7wZHt23k4_kHQHRBY6xtg1cejYn1y/exec';
+      fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams(data),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+        .then(response => response.json())
+        .then(response => {
+          console.log('Success:', response);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+
+    }
+    //>>>>>>>>>
+  

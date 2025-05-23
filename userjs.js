@@ -18,19 +18,20 @@
     // fecth
      async function fetchAllowedEmails() {
       try {
-        const response = await fetch('allowed_users.json'); // Fetch the allowed users from allowed_users.json(i.e path of file)
+        // Use a relative path if the file is in the same directory as your HTML file
+        const response = await fetch('allowed_users.json');
         if (!response.ok) {
-          throw new Error(`Network response was not ok: ${response.statusText}`); // Error handling
+          throw new Error(`Network response was not ok: ${response.statusText}`);
         }
-        const data = await response.json(); // Parse the response as JSON
-        if (!Array.isArray(data)) { // Check if the fetched data is an array
+        const data = await response.json();
+        if (!Array.isArray(data)) {
           throw new Error('Invalid data format: expected an array');
         }
-        return data; // Return the fetched data (eg : return array of allowed users)
+        return data;
       } catch (error) {
         console.error('Error fetching allowed users:', error);
         alert(`Error fetching allowed users: ${error.message}`);
-        throw error;
+        return []; // Return an empty array to prevent further errors
       }
     }
  // user-info           
@@ -43,13 +44,15 @@
                             window.location.href = 'user.html'; // Redirect to user.html if the user's email is not in the allowed users list
                         } else {
                             // Create a button dynamically and append it to the user-info section
-                            const button = document.createElement('button');
-                            button.textContent = 'View Donors';
-                            button.id = 'viewDonorsButton';
-                            button.addEventListener('click', () => {
-                                window.location.href = 'list.html';
-                            });
-                            document.getElementById('user-info').appendChild(button);
+                            if (!document.getElementById('viewDonorsButton')) {
+                                const button = document.createElement('button');
+                                button.textContent = 'View Donors';
+                                button.id = 'viewDonorsButton';
+                                button.addEventListener('click', () => {
+                                    window.location.href = 'list.html';
+                                });
+                                document.getElementById('user-info').appendChild(button);
+                            }
                         }
                     } catch (error) {
                         alert('Error fetching allowed users. Please try again later.');

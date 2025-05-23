@@ -60,6 +60,11 @@
       auth.onAuthStateChanged(async (user) => {
         if (user) { // User is authenticated checked by auth.onAuthStateChanged()
           // User is authenticated
+            const userInfoElem = document.getElementById("user-info");
+            if (userInfoElem) {
+              userInfoElem.innerText = "Logged in as: " + user.email;
+            }
+            
           getAndPushIP(); //function call to Get and push the IP address to Firebase
          
             console.log('User logged in:', user.email);

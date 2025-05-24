@@ -161,13 +161,12 @@
     */
      const labelTextMap = {};
     async function calculateDistance(name,startCoords, endCoords) {
-      const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
-      const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
-      if (!response.ok) throw new Error('Failed to calculate distance');
-      const data = await response.json(); // Parse the response as JSON
-      const distance = data.features && data.features[0] && data.features[0].properties && data.features[0].properties.segments
-        ? data.features[0].properties.segments[0].distance / 1000 // Convert meters to km
-        : NaN;
+      //const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
+      
+      //const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
+      //if (!response.ok) throw new Error('Failed to calculate distance');
+      //const data = await response.json(); // Parse the response as JSON
+      const distance = haversine(startCoords.lon,startCoords.lat,endCoords.lon,endCoords.lat);
       //if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
       if (typeof distance === 'number' && !isNaN(distance)) {
         // Log the distance in the console

@@ -478,7 +478,7 @@
           <h3 style="display: inline;">Rate this web below</h3>
           <h3 style="color: red; display: inline;">**</h3>
         </div>
-        ${isuserallowed ? '<button id="viewDonorsButton" class="adddonor">View Donors</button>' : ''}
+       
         <style>
           .scrolling-text {
             animation: scroll-left 10s linear infinite;

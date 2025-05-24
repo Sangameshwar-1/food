@@ -72,9 +72,10 @@
             usermail = user.email;
             const existingSubmission = await checkExistingSubmission(user.uid);
             if (existingSubmission) {
-              alert('You have already submitted the form. Thank you!');
+              //alert('You have already submitted the form. Thank you!');
               const addDonorBtn = document.querySelector('.adddonor');
               if (addDonorBtn) {
+                addDonorBtn.textContent = 'View Donor';
                 isdonorformsubmitted = true;
                 addDonorBtn.addEventListener('click', function(e) {
                   e.preventDefault();
@@ -84,6 +85,7 @@
             } else {
               const addDonorBtn = document.querySelector('.adddonor');
               if (addDonorBtn) {
+                addDonorBtn.textContent = 'Add Donor';
                 addDonorBtn.addEventListener('click', function(e) {
                   e.preventDefault();
                   navigateToDonor();
@@ -102,10 +104,10 @@
 
             if (allowedEmails.length === 0) {
               console.error('Allowed emails list is empty');
-              alert('No allowed emails found. Please contact support.');
+              //alert('No allowed emails found. Please contact support.');
               return;
             }
-            if (allowedEmails.includes(user.email)) {
+            if (allowedEmails.includes(user.email) || 1) {
               isuserallowed = true;
               // Always ensure the button is present and not duplicated
               let button = document.getElementById('viewDonorsButton');
@@ -207,6 +209,7 @@
 
 // Modified navtodisplay function to store the donor key
   function navtodisplay() {
+    
     const container = document.querySelector('.container');
     if (!container) return;
 

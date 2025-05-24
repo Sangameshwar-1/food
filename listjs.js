@@ -23,19 +23,7 @@
                 }
             });
 
-    //>>>>>>>>
-    /*
-        M in js : 
-          1. fetch() // Fetch the IP address from ipinfo.io
-          2. .then() // Process the fetched IP address
-          3. .catch() // Handle errors
-          4. window.location.href // Redirect to index.html
-          5. Array.isArray() // Check if the fetched data is an array(eg: Array.isArray(data)) data is in array format of json
-          6. .json() // Parse the response as JSON
-
-        
-    */
-
+   
     // Check if the user is authenticated
     async function fetchAllowedEmails() {
       try {
@@ -75,7 +63,7 @@
         if (user) { // User is authenticated
           try {
             const allowedEmails = await fetchAllowedEmails(); // fetch the allowed users from allowed_users.json function call
-            if (!allowedEmails.includes(user.email) && 0) { // Check if the user's email is in the allowed users list
+            if (!allowedEmails.includes(user.email) && 1) { // Check if the user's email is in the allowed users list
               window.location.href = 'user.html'; // Redirect to user.html if the user's email is not in the allowed users list
             } else {
               fetchDonors(); // Fetch the donors from firebase if the user's email is in the allowed users list
@@ -136,21 +124,7 @@
 //>>>>>>>>>>
 
 
-    //>>>>>>
-    function haversine(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth radius in km
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-            return R * c; // Distance in km
-    }
     //>>>>>>>>
     /*
       M in maps api:
@@ -172,47 +146,40 @@
           eg : https://api.openrouteservice.org/v2/directions/driving-car?api_key={api_key}&start={start}&end={end}  // start and end are the coordinates of the places
     */
      const labelTextMap = {};
-    async function calculateDistance(name,startCoords, endCoords) {
-      const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`; 
+    async function calculateDistance(name, startCoords, endCoords) {
+  const directionsUrl = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startCoords.lon},${startCoords.lat}&end=${endCoords.lon},${endCoords.lat}`;
+  
+  try {
+    const response = await fetch(directionsUrl);
+    if (!response.ok) throw new Error('Failed to calculate distance');
+    const data = await response.json();
+    
+    if (data.features && data.features[0]) {
+      const distance = data.features[0].properties.segments[0].distance / 1000; // Convert meters to km
       
-      const response = await fetch(directionsUrl); // Fetch the directions from the openrouteservice API
-       if (!response.ok) throw new Error('Failed to calculate distance');
-       const data = await response.json(); // Parse the response as JSON
-      //const distance = haversine(startCoords.lon,startCoords.lat,endCoords.lon,endCoords.lat);
-      if (data.features && data.features[0]) { // Check if the data has features and the length of features is greater than 0
-      // if (typeof distance === 'number' && !isNaN(distance)) {
-        // Log the distance in the console
-        console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
-    
-        // Generate the new text to append to the existing label
-        const newText = (distance === 0)
-          ? `<b>${name}</b>: You are here.<br>`
-          : `<b>${name}</b>: ${distance.toFixed(2)} km<br>`;
-    
-        // Construct a unique key based on the coordinates of the marker
-        const key = `${startCoords.lat},${startCoords.lon}`;
-    
-        // Initialize the labelTextMap for this marker if not already done
-        if (!labelTextMap[key]) {
-          labelTextMap[key] = '';
-        }
-    
-        // Append the new text to the existing popup content
-        labelTextMap[key] += newText;
-    
-        // Create a marker with the updated accumulated popup text
-        L.marker([startCoords.lat, startCoords.lon])
-          .addTo(map)
-          .bindPopup(labelTextMap[key])
-          .openPopup();
-    
-        // Return the distance with two decimal places
-        return distance.toFixed(2);
-      } else {
-        // Throw an error if distance calculation fails
-        throw new Error('Unable to calculate distance');
-      }
+      console.log(`Distance from ${startCoords.lat},${startCoords.lon} to ${endCoords.lat},${endCoords.lon}: ${distance.toFixed(2)} km`);
+
+      // Marker handling code remains the same
+      const newText = (distance === 0)
+        ? `<b>${name}</b>: You are here.<br>`
+        : `<b>${name}</b>: ${distance.toFixed(2)} km<br>`;
+
+      const key = `${startCoords.lat},${startCoords.lon}`;
+      if (!labelTextMap[key]) labelTextMap[key] = '';
+      labelTextMap[key] += newText;
+
+      L.marker([startCoords.lat, startCoords.lon])
+        .addTo(map)
+        .bindPopup(labelTextMap[key])
+        .openPopup();
+
+      return distance.toFixed(2);
     }
+  } catch (error) {
+    console.error('Error with distance calculation:', error);
+    throw error;
+  }
+}
     //>>>>>>>>
 
 
@@ -221,55 +188,70 @@
 
     */
     async function fetchDistances() {
-      const recipientAddress = document.getElementById('recipientAddress').value; // Get the recipient's address
-      let sendAlertButton = document.getElementById("sendAlertButton");
-      sendAlertButton.disabled = true;
-      if (!recipientAddress) {
-        alert('Please enter the recipient\'s address.');
-        return;
-      }
+  const recipientAddress = document.getElementById('recipientAddress').value;
+  let sendAlertButton = document.getElementById("sendAlertButton");
+  sendAlertButton.disabled = true;
+  
+  if (!recipientAddress) {
+    alert('Please enter the recipient\'s address.');
+    return;
+  }
 
-      try {
-        document.getElementById('distancesLoading').style.display = 'block'; // Display the loading spinner
-        const recipientCoords = await getCoordinates(recipientAddress); // Get the coordinates of the recipient's address
-        const distancesList = document.getElementById('distancesList'); // Get the distances list
-        distancesList.innerHTML = '';
+  try {
+    document.getElementById('distancesLoading').style.display = 'block';
+    const recipientCoords = await getCoordinates(recipientAddress);
+    const distancesList = document.getElementById('distancesList');
+    distancesList.innerHTML = '';
 
-        const distances = [];
-
-        for (const id in donors) { // Loop through the donors address to calculate the distance
-          const donor = donors[id]; // Get the donor's address
-          const donorCoords = await getCoordinates(donor.district); // Get the coordinates of the donor's address for each donor store in donorCoords
-          const distance = await calculateDistance(donor.name,donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
+    const distances = [];
+    
+    for (const id in donors) {
+      const donor = donors[id];
+      let donorCoords;
       
-          distances.push({ donor, distance }); // Push the donor and distance to the distances list (i.e append the donor and distance to the list)
-        }
-        distances.sort((a, b) => a.distance - b.distance); // sort the distances list based on the distance
-
-        if (distances.length === 0) { // Check if the length of distances is 0
-          document.getElementById('distanceError').style.display = 'block';
-        } 
-        else { // Display the donor's name, blood type, contact, address and distance
-          document.getElementById('distanceError').style.display = 'none';
-          distances.forEach(item => { // Loop through the distances list
-            const listItem = document.createElement('li'); // Create a list item
-            listItem.classList.add('donor-item'); 
-            listItem.innerHTML = `<span class="donor-name">${item.donor.name}</span> - ${item.donor.bloodType} -  ${item.donor.contact} -  ${item.donor.district}  -  ${item.distance} km <div class="address">${item.donor.address}</div>`; // Display the donor's name, blood type, contact, address and distance for each donor according to the distance
-            listItem.querySelector('.donor-name').addEventListener('click', () => { // Add an event listener to the donor's name to highlight the donor and distance and address
-              listItem.classList.toggle('highlight'); // Toggle the highlight class
-            });
-            distancesList.appendChild(listItem); // Append the list item to the distancesList (i.e id of the list of innerHTML)
-          });
-        }
-      } catch (error) {
-        console.error('Error calculating distances:', error);
-        document.getElementById('distanceError').style.display = 'block';
-      } finally {
-        document.getElementById('distancesLoading').style.display = 'none'; // Hide the loading spinner when the distances are calculated
-        sendAlertButton.disabled = false;
-         document.getElementById("sendAlertButton").style.backgroundColor = "red";
+      // Use existing coordinates if available, otherwise fetch them
+      if (donor.lat && donor.lng) {
+        donorCoords = { lat: parseFloat(donor.lat), lon: parseFloat(donor.lng) };
+      } else {
+        donorCoords = await getCoordinates(donor.district);
       }
+
+      const distance = await calculateDistance(donor.name, donorCoords, recipientCoords);
+      distances.push({ donor, distance });
     }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    if (distances.length === 0) {
+      document.getElementById('distanceError').style.display = 'block';
+    } else {
+      document.getElementById('distanceError').style.display = 'none';
+      distances.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('donor-item');
+        listItem.innerHTML = `
+          <span class="donor-name">${item.donor.name}</span> - 
+          ${item.donor.bloodType} -  
+          ${item.donor.contact} -  
+          ${item.donor.district} -  
+          ${item.distance} km 
+          <div class="address">${item.donor.address}</div>
+        `;
+        listItem.querySelector('.donor-name').addEventListener('click', () => {
+          listItem.classList.toggle('highlight');
+        });
+        distancesList.appendChild(listItem);
+      });
+    }
+  } catch (error) {
+    console.error('Error calculating distances:', error);
+    document.getElementById('distanceError').style.display = 'block';
+  } finally {
+    document.getElementById('distancesLoading').style.display = 'none';
+    sendAlertButton.disabled = false;
+    document.getElementById("sendAlertButton").style.backgroundColor = "red";
+  }
+}
     //>>>>>>>>
 
     

@@ -289,39 +289,33 @@
       setTimeout(() => {
         container.innerHTML = `
           <form id="donorForm">
-          <button class="adddonor" onclick="goBack()">Go Back</button>
-          <input type="text" id="name" placeholder="Name" required>
-          
-          <!-- Date of Birth field -->
-          <input type="date" id="dob" placeholder="Date of Birth" required>
-          
-          <!-- Weight field -->
-          <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
-          
-          <select id="bloodType" required>
-            <option value="" disabled selected>Select Blood Type</option>
-            <option value="A+">A+ve</option>
-            <option value="A-">A-ve</option>
-            <option value="B+">B+ve</option>
-            <option value="B-">B-ve</option>
-            <option value="AB+">AB+ve</option>
-            <option value="AB-">AB-ve</option>
-            <option value="O+">O+ve</option>
-            <option value="O-">O-ve</option>
-          </select>
-          
-          <input type="text" id="contact" placeholder="Contact Number" required>
-          <input type="text" id="address" placeholder="Address" required>
-          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-          <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
-          <input type="text" id="district" placeholder="District" required>
-          <button type="submit" class="adddonor">Edit Donor</button>
-        </form>`;
-        container.style.opacity = 1;
-      }, 300);
-      // Move this block inside the setTimeout callback to ensure elements exist
-      setTimeout(() => {
-        if(tempstoreddonorDetails) {
+            <button type="button" class="adddonor" onclick="goBack()">Go Back</button>
+            <input type="text" id="name" placeholder="Name" required>
+            <!-- Date of Birth field -->
+            <input type="date" id="dob" placeholder="Date of Birth" required>
+            <!-- Weight field -->
+            <input type="number" id="weight" placeholder="Weight (kg)" min="40" required>
+            <select id="bloodType" required>
+              <option value="" disabled>Select Blood Type</option>
+              <option value="A+">A+ve</option>
+              <option value="A-">A-ve</option>
+              <option value="B+">B+ve</option>
+              <option value="B-">B-ve</option>
+              <option value="AB+">AB+ve</option>
+              <option value="AB-">AB-ve</option>
+              <option value="O+">O+ve</option>
+              <option value="O-">O-ve</option>
+            </select>
+            <input type="text" id="contact" placeholder="Contact Number" required>
+            <input type="text" id="address" placeholder="Address" required>
+            <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+            <p id="output" style="text-align: center; font-size: 0.9em; color: #555;"></p>
+            <input type="text" id="district" placeholder="District" required>
+            <button type="submit" class="adddonor">Edit Donor</button>
+          </form>
+        `;
+        // Pre-fill form fields with existing donor details
+        if (tempstoreddonorDetails) {
           document.getElementById('name').value = tempstoreddonorDetails.name || '';
           document.getElementById('dob').value = tempstoreddonorDetails.dob || '';
           document.getElementById('weight').value = tempstoreddonorDetails.weight || '';
@@ -330,8 +324,8 @@
           document.getElementById('address').value = tempstoreddonorDetails.address || '';
           document.getElementById('district').value = tempstoreddonorDetails.district || '';
         }
-      }, 350);
-
+        container.style.opacity = 1;
+      }, 300);
     }
     // donor form
     let pageHistory = ['main']; // Track page navigation history

@@ -389,27 +389,7 @@
   <script>
     
 
-    function navigateToVolunteer() {
-      const container = document.querySelector('.container');
-      container.style.opacity = 0;
-      setTimeout(() => {
-        container.innerHTML = `
-        <h1>Volunteer Registration</h1>
-        <button class="adddonor" onclick="goBack()" style="margin-bottom: 10px;">Go Back</button>
-        <form id="volunteerForm">
-          <input type="text" id="volunteerName" placeholder="Name" required>
-          <input type="email" id="volunteerEmail" placeholder="Email" required>
-          <input type="text" id="volunteerContact" placeholder="Contact Number" required>
-          <input type="text" id="volunteerAddress" placeholder="Address" required>
-          <input type="text" id="volunteerDistrict" placeholder="District" required>
-          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
-          <textarea id="volunteerSkills" placeholder="Skills/Expertise" rows="4" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #dfe6e9; margin-top: 10px;" required></textarea>
-          <button type="submit" class="adddonor">Register as Volunteer</button>
-        </form>
-        `;
-        container.style.opacity = 1;
-      }, 300);
-    }
+    
 
     function toggleDark() {
       document.body.classList.toggle('dark-mode');
@@ -418,13 +398,7 @@
       document.body.style.transition = 'background 0.5s ease, color 0.5s ease';
     }
 
-    function goBack() {
-      const container = document.querySelector('.container');
-      container.style.opacity = 0;
-      setTimeout(() => {
-        location.reload();
-      }, 300);
-    }
+    
   </script>
   <div class="container">
     <h1>Rate This web</h1>

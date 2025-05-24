@@ -206,80 +206,83 @@
     // Display donor details
     
     
+    //
+    function navtodisplay() {
+      pageHistory.push(currentPage);
+      currentPage = 'donorDetails';
+      
+      const container = document.querySelector('.container');
+      container.style.opacity = 0;
+      setTimeout(async () => {
+        // Your existing donor details display code
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          container.innerHTML = `
+            <div class="donor-details">
+              <p style="text-align:center; color:#b00;">You are not logged in.</p>
+            </div>
+          `;
+          container.style.opacity = 1;
+          return;
+        }
 
-// Modified navtodisplay function to store the donor key
-  function navtodisplay() {
-    
-    const container = document.querySelector('.container');
-    if (!container) return;
+        try {
+          const snapshot = await database.ref('donors')
+            .orderByChild('userId')
+            .equalTo(user.uid)
+            .once('value');
 
-    container.style.opacity = 0;
-    setTimeout(async () => {
-      const user = firebase.auth().currentUser;
-      if (!user) {
-        container.innerHTML = `
-          <div class="donor-details">
-            <p style="text-align:center; color:#b00;">You are not logged in.</p>
-          </div>
-        `;
-        container.style.opacity = 1;
-        return;
-      }
-
-      try {
-        const snapshot = await database.ref('donors')
-          .orderByChild('userId')
-          .equalTo(user.uid)
-          .once('value');
-
-        if (!snapshot.exists()) {
+          if (!snapshot.exists()) {
+            container.innerHTML = `
+              <div class="donor-details">
+                <button class="adddonor" onclick="goBack()">Go Back</button>
+                <p style="text-align:center; color:#b00;">No donor details found for your account.</p>
+              </div>
+            `;
+          } else {
+            let donorHtml = '';
+            snapshot.forEach(child => {
+              const donor = child.val();
+              currentDonorKey = child.key; // Store the key for editing
+              tempstoreddonorDetails = donor;
+              donorHtml += `
+                <div class="donor-details" style="max-width:400px;margin:30px auto;padding:24px 28px 18px 28px;background:#fff;border-radius:12px;box-shadow:0 2px 16px #0001;">
+                  <button class="adddonor" style="margin-bottom:12px;" onclick="goBack()">Go Back</button>
+                  <h2 style="text-align:center;color:#d32f2f;margin-bottom:18px;">Your Donor Submission</h2>
+                  <table style="width:100%;font-size:1em;color:#222;margin-bottom:16px;">
+                    <tr><td style="font-weight:600;">Name:</td><td>${donor.name || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Date of Birth:</td><td>${donor.dob || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Weight:</td><td>${donor.weight || ''} kg</td></tr>
+                    <tr><td style="font-weight:600;">Blood Type:</td><td>${donor.bloodType || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Contact:</td><td>${donor.contact || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Address:</td><td>${donor.address || ''}</td></tr>
+                    <tr><td style="font-weight:600;">District:</td><td>${donor.district || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Coordinates:</td><td>${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</td></tr>
+                    <tr><td style="font-weight:600;">Submitted At:</td><td>${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</td></tr>
+                  </table>
+                  <div style="text-align:center;">
+                    <button class="adddonor" style="background:#1976d2;color:#fff;padding:8px 24px;border-radius:6px;font-size:1em;" onclick="navigateToDonoredit()">Edit Submission</button>
+                  </div>
+                </div>
+              `;
+            });
+            container.innerHTML = donorHtml;
+          }
+        } catch (error) {
           container.innerHTML = `
             <div class="donor-details">
               <button class="adddonor" onclick="goBack()">Go Back</button>
-              <p style="text-align:center; color:#b00;">No donor details found for your account.</p>
+              <p style="text-align:center; color:#b00;">Error loading donor details. Please try again.</p>
             </div>
           `;
-        } else {
-          let donorHtml = '';
-          snapshot.forEach(child => {
-            const donor = child.val();
-            currentDonorKey = child.key; // Store the key for editing
-            tempstoreddonorDetails = donor;
-            donorHtml += `
-              <div class="donor-details" style="max-width:400px;margin:30px auto;padding:24px 28px 18px 28px;background:#fff;border-radius:12px;box-shadow:0 2px 16px #0001;">
-                <button class="adddonor" style="margin-bottom:12px;" onclick="goBack()">Go Back</button>
-                <h2 style="text-align:center;color:#d32f2f;margin-bottom:18px;">Your Donor Submission</h2>
-                <table style="width:100%;font-size:1em;color:#222;margin-bottom:16px;">
-                  <tr><td style="font-weight:600;">Name:</td><td>${donor.name || ''}</td></tr>
-                  <tr><td style="font-weight:600;">Date of Birth:</td><td>${donor.dob || ''}</td></tr>
-                  <tr><td style="font-weight:600;">Weight:</td><td>${donor.weight || ''} kg</td></tr>
-                  <tr><td style="font-weight:600;">Blood Type:</td><td>${donor.bloodType || ''}</td></tr>
-                  <tr><td style="font-weight:600;">Contact:</td><td>${donor.contact || ''}</td></tr>
-                  <tr><td style="font-weight:600;">Address:</td><td>${donor.address || ''}</td></tr>
-                  <tr><td style="font-weight:600;">District:</td><td>${donor.district || ''}</td></tr>
-                  <tr><td style="font-weight:600;">Coordinates:</td><td>${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</td></tr>
-                  <tr><td style="font-weight:600;">Submitted At:</td><td>${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</td></tr>
-                </table>
-                <div style="text-align:center;">
-                  <button class="adddonor" style="background:#1976d2;color:#fff;padding:8px 24px;border-radius:6px;font-size:1em;" onclick="navigateToDonoredit()">Edit Submission</button>
-                </div>
-              </div>
-            `;
-          });
-          container.innerHTML = donorHtml;
+          console.error('Error displaying donor details:', error);
         }
-      } catch (error) {
-        container.innerHTML = `
-          <div class="donor-details">
-            <button class="adddonor" onclick="goBack()">Go Back</button>
-            <p style="text-align:center; color:#b00;">Error loading donor details. Please try again.</p>
-          </div>
-        `;
-        console.error('Error displaying donor details:', error);
-      }
-      container.style.opacity = 1;
-    }, 300);
-  }
+        
+        container.style.opacity = 1;
+      }, 300);
+    }
+    // edit donor
+
     function navigateToDonoredit() {
       const container = document.querySelector('.container');
       container.style.opacity = 0;
@@ -331,14 +334,22 @@
 
     }
     // donor form
+    let pageHistory = ['main']; // Track page navigation history
+    let currentPage = 'main';   // Track current page
+
+    // Modify your navigation functions to use history
     function navigateToDonor() {
+      pageHistory.push(currentPage);
+      currentPage = 'donorForm';
+      
       const container = document.querySelector('.container');
       container.style.opacity = 0;
       setTimeout(() => {
         container.innerHTML = `
           <form id="donorForm">
-          <button class="adddonor" onclick="goBack()">Go Back</button>
-          <input type="text" id="name" placeholder="Name" required>
+            <button class="adddonor" onclick="goBack()">Go Back</button>
+            <!-- Rest of your donor form HTML -->
+            <input type="text" id="name" placeholder="Name" required>
           
           <!-- Date of Birth field -->
           <input type="date" id="dob" placeholder="Date of Birth" required>
@@ -384,12 +395,115 @@
             }
           }
           </style>
+        
         `;
         container.style.opacity = 1;
       }, 300);
+    }
+    
+    //
+    function navigateToVolunteer() {
+      const container = document.querySelector('.container');
+      container.style.opacity = 0;
+      setTimeout(() => {
+        container.innerHTML = `
+        <h1>Volunteer Registration</h1>
+        <button class="adddonor" onclick="goBack()" style="margin-bottom: 10px;">Go Back</button>
+        <form id="volunteerForm">
+          <input type="text" id="volunteerName" placeholder="Name" required>
+          <input type="email" id="volunteerEmail" placeholder="Email" required>
+          <input type="text" id="volunteerContact" placeholder="Contact Number" required>
+          <input type="text" id="volunteerAddress" placeholder="Address" required>
+          <input type="text" id="volunteerDistrict" placeholder="District" required>
+          <button type="button" onclick="getCoords()" class="adddonor">Get My Location</button>
+          <textarea id="volunteerSkills" placeholder="Skills/Expertise" rows="4" style="width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #dfe6e9; margin-top: 10px;" required></textarea>
+          <button type="submit" class="adddonor">Register as Volunteer</button>
+        </form>
+        `;
+        container.style.opacity = 1;
+      }, 300);
+    }
+    // 
+    function goBack() {
+      if (pageHistory.length === 0) {
+        // If no history, just show main content
+        showMainContent();
+        return;
+      }
       
+      const previousPage = pageHistory.pop();
+      currentPage = previousPage;
+      
+      const container = document.querySelector('.container');
+      container.style.opacity = 0;
+      
+      setTimeout(() => {
+        switch(previousPage) {
+          case 'main':
+            showMainContent();
+            break;
+          case 'donorForm':
+            if (isdonorformsubmitted) {
+              navtodisplay();
+              navigateToVolunteer();
+            } else {
+              navigateToDonor();
+              navigateToVolunteer()
+            }
+            break;
+          case 'donorDetails':
+            default:
+            navtodisplay();
+            break;
+        }
+        container.style.opacity = 1;
+      }, 300);
     }
 
+    // Helper function to show main content
+    function showMainContent() {
+      const container = document.querySelector('.container');
+      container.innerHTML = `
+        <h1>Donor Management System</h1>
+        <div>
+          <button class="adddonor" onclick="${isdonorformsubmitted ? 'navtodisplay()' : 'navigateToDonor()'}">
+            ${isdonorformsubmitted ? 'View Donor' : 'Add Donor'}
+          </button>
+        </div>
+        <div>
+          <button class="adddonor" onclick="navigateToVolunteer()" style="margin-top:7px;">Volunteer</button>
+        </div>
+        <div class="scrolling-text" style="background-color:white; color: black; font-weight: bold; overflow: hidden; white-space: nowrap;margin-top:1;">
+          <h3 style="color: red; display: inline;">**</h3>
+          <h3 style="display: inline;">Rate this web below</h3>
+          <h3 style="color: red; display: inline;">**</h3>
+        </div>
+        ${isuserallowed ? '<button id="viewDonorsButton" class="adddonor">View Donors</button>' : ''}
+        <style>
+          .scrolling-text {
+            animation: scroll-left 10s linear infinite;
+          }
+          @keyframes scroll-left {
+            0% {
+              transform: translateX(100%);
+            }
+            100% {
+              transform: translateX(-100%);
+            }
+          }
+        </style>
+      `;    
+      // Reattach event listeners if needed
+      if (isuserallowed) {
+        document.getElementById('viewDonorsButton').addEventListener('click', () => {
+          window.location.href = 'list.html';
+        });
+      }
+    }
+
+    // Update your existing functions to use this history system:
+    // In your auth.onAuthStateChanged callback, replace direct DOM manipulation with:
+    // (handled in onAuthStateChanged callback above)
     //>>>>>>>>>
     /*
       M in firebase :

@@ -227,7 +227,12 @@
 
         for (const id in donors) { // Loop through the donors address to calculate the distance
           const donor = donors[id]; // Get the donor's address
-          const donorCoords = await getCoordinates(donor.district); // Get the coordinates of the donor's address for each donor store in donorCoords
+          let donorCoords;
+          if (donor.lat != null && donor.lng != null) {
+            donorCoords = { lat: donor.lat, lon: donor.lng };
+          } else {
+            donorCoords = await getCoordinates(donor.district);
+          }
           const distance = await calculateDistance(donor.name,donorCoords, recipientCoords); // Calculate the distance between the donor's address and the recipient's address store in distance
       
           distances.push({ donor, distance }); // Push the donor and distance to the distances list (i.e append the donor and distance to the list)

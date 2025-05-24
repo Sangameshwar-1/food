@@ -107,7 +107,7 @@
               //alert('No allowed emails found. Please contact support.');
               return;
             }
-            if (allowedEmails.includes(user.email) || 1) {
+            if (allowedEmails.includes(user.email) || 0) {
               isuserallowed = true;
               // Always ensure the button is present and not duplicated
               let button = document.getElementById('viewDonorsButton');

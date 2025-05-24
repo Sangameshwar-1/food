@@ -493,12 +493,7 @@
           }
         </style>
       `;    
-      // Reattach event listeners if needed
-      if (isuserallowed) {
-        document.getElementById('viewDonorsButton').addEventListener('click', () => {
-          window.location.href = 'list.html';
-        });
-      }
+     
     }
 
     // Update your existing functions to use this history system:

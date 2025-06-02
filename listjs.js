@@ -428,7 +428,7 @@
     if (lastPage) {
       window.location.href = lastPage;
     } else {
-      console.log("No last page found in localStorage, redirecting to user.html");
+      alert("No previous page found. Redirecting to user page.");
       window.location.href = "user.html";
     }
   }

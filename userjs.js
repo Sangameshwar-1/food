@@ -64,150 +64,156 @@
 
     // 
     window.onload = function() {
-      // First try to render UI from cache
+  // First try to render UI from cache
       const cachedUserEmail = localStorage.getItem('userEmail');
       if (cachedUserEmail) {
         console.log('using the local storage');
-          const userInfoElem = document.getElementById("user-info");
+        const userInfoElem = document.getElementById("user-info");
+        if (userInfoElem) {
+          const isOnline = !!firebase.auth().currentUser ;
+          userInfoElem.innerHTML = isOnline
+            ? `Logged in as: ${cachedUserEmail} <span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Online"></span>`
+            : `Prev Logged in as ${cachedUserEmail} <span style="display:inline-block;width:10px;height:10px;background:#d32f2f;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Offline"></span>`;
+        }
+
+        const addDonorBtn = document.querySelector('.adddonor');
+        if (addDonorBtn) {
+          const isSubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
+          addDonorBtn.textContent = isSubmitted ? 'View Donor' : 'Add Donor';
+        }
+
+        const viewDonorsBtn = document.getElementById('viewDonorsButton');
+        if (viewDonorsBtn) {
+          viewDonorsBtn.style.display = localStorage.getItem('isUserAllowed') === 'true' ? '' : 'none';
+        }
+      }
+
+      // Then proceed with actual auth check
+      auth.onAuthStateChanged(async (user) => {
+        const userInfoElem = document.getElementById("user-info");
+        if (user) {
+          localStorage.setItem("lastPage", "user.html");
           if (userInfoElem) {
-            const isOnline = !!firebase.auth().currentUser ;
-            if (isOnline) {
-              userInfoElem.innerHTML = `Logged in as: ${cachedUserEmail} <span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Online"></span>`;
-            } else {
-              userInfoElem.innerHTML = `Prev Logged in as ${cachedUserEmail} <span style="display:inline-block;width:10px;height:10px;background:#d32f2f;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Offline"></span>`;
+            userInfoElem.innerHTML = `Logged in as: ${user.email} <span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Online"></span>`;
+            usermail = user.email;
+            localStorage.setItem('userEmail', user.email);
+          }
+
+          // Check donor form submission from cache
+          const cachedSubmission = localStorage.getItem('donorSubmission_' + user.uid);
+          let existingSubmission = false;
+
+          if (cachedSubmission) {
+            const submissionData = JSON.parse(cachedSubmission);
+            if (Date.now() - submissionData.timestamp < 3600000) {
+              existingSubmission = submissionData.exists;
             }
           }
-          // Set initial UI state from cache
+
+          if (!existingSubmission) {
+            existingSubmission = await checkExistingSubmission(user.uid);
+            localStorage.setItem('donorSubmission_' + user.uid, JSON.stringify({
+              exists: existingSubmission,
+              timestamp: Date.now()
+            }));
+          }
+
           const addDonorBtn = document.querySelector('.adddonor');
-          if (addDonorBtn) {
-            const isSubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
-            addDonorBtn.textContent = isSubmitted ? 'View Donor' : 'Add Donor';
-          }
-          const viewDonorsBtn = document.getElementById('viewDonorsButton');
-          if (viewDonorsBtn) {
-            viewDonorsBtn.style.display = localStorage.getItem('isUserAllowed') === 'true' ? '' : 'none';
-          }
-              }
-
-              // Then proceed with actual auth check
-              auth.onAuthStateChanged(async (user) => {
-          const userInfoElem = document.getElementById("user-info");
-          if (user) {
-            localStorage.setItem("lastPage", "user.html");
-            if (userInfoElem) {
-              userInfoElem.innerHTML = `Logged in as: ${user.email} <span style="display:inline-block;width:10px;height:10px;background:#4caf50;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Online"></span>`;
-              usermail = user.email;
-              localStorage.setItem('userEmail', user.email);
-
-              // Check existing submission with cache first
-              const cachedSubmission = localStorage.getItem('donorSubmission_' + user.uid);
-              let existingSubmission = false;
-
-              if (cachedSubmission) {
-                const submissionData = JSON.parse(cachedSubmission);
-                if (Date.now() - submissionData.timestamp < 3600000) { // 1 hour cache
-            existingSubmission = submissionData.exists;
-                }
-              }
-
-              if (!existingSubmission) {
-                existingSubmission = await checkExistingSubmission(user.uid);
-                localStorage.setItem('donorSubmission_' + user.uid, JSON.stringify({
-            exists: existingSubmission,
-            timestamp: Date.now()
-                }));
-              }
-
-              if (existingSubmission) {
-                isdonorformsubmitted = true;
-                localStorage.setItem('isDonorFormSubmitted', 'true');
-                const addDonorBtn = document.querySelector('.adddonor');
-                if (addDonorBtn) {
-            addDonorBtn.textContent = 'View Donor';
-            addDonorBtn.onclick = function(e) {
-              e.preventDefault();
-              navtodisplay();
-            };
-                }
-                // Fetch and store donor details and key in localStorage for later use
-                const snapshot = await database.ref('donors')
-            .orderByChild('userId')
-            .equalTo(user.uid)
-            .once('value');
-                if (snapshot.exists()) {
-            snapshot.forEach(child => {
-              localStorage.setItem('tempStoredDonorDetails', JSON.stringify(child.val()));
-              localStorage.setItem('currentDonorKey', child.key);
-            });
-                }
-              } else {
-                isdonorformsubmitted = false;
-                localStorage.setItem('isDonorFormSubmitted', 'false');
-                localStorage.removeItem('tempStoredDonorDetails');
-                localStorage.removeItem('currentDonorKey');
-                const addDonorBtn = document.querySelector('.adddonor');
-                if (addDonorBtn) {
-            addDonorBtn.textContent = 'Add Donor';
-            addDonorBtn.onclick = function(e) {
-              e.preventDefault();
-              navigateToDonor();
-            };
-                }
-              }
-
-              // Check allowed emails with cache
-              const cachedAllowed = localStorage.getItem('allowedEmails');
-              let allowedEmails = [];
-
-              if (!cachedAllowed) {
-                try {
-            allowedEmails = JSON.parse(cachedAllowed);
-            if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) { // 24 hours
-              allowedEmails = await fetchAllowedEmails(); // Refresh if stale
+          if (existingSubmission) {
+            isdonorformsubmitted = true;
+            localStorage.setItem('isDonorFormSubmitted', 'true');
+            if (addDonorBtn) {
+              addDonorBtn.textContent = 'View Donor';
+              addDonorBtn.onclick = function(e) {
+                e.preventDefault();
+                navtodisplay();
+              };
             }
-                } catch (e) {
-            allowedEmails = await fetchAllowedEmails();
-                }
-              } else {
-                allowedEmails = await fetchAllowedEmails();
-              }
 
-              if (allowedEmails.includes(user.email) || 0) {
-                isuserallowed = true;
-                localStorage.setItem('isUserAllowed', 'true');
-                let button = document.getElementById('viewDonorsButton');
-                if (!button) {
-            button = document.createElement('button');
-            button.textContent = 'View Donors';
-            button.id = 'viewDonorsButton';
-            button.className = 'adddonor';
-            button.onclick = () => window.location.href = 'list.html';
-            const listjElem = document.getElementById('listj');
-            if (listjElem) listjElem.appendChild(button);
-                }
-              } else {
-                const button = document.getElementById('viewDonorsButton');
-                if (button) button.style.display = 'none';
-                localStorage.setItem('isUserAllowed', 'false');
-              }
+            const snapshot = await database.ref('donors')
+              .orderByChild('userId')
+              .equalTo(user.uid)
+              .once('value');
 
-              // IP check (once per session)
-              if (!localStorage.getItem('lastIPCheck') ||
-                Date.now() - parseInt(localStorage.getItem('lastIPCheck')) > 86400000) {
-                getAndPushIP();
-                localStorage.setItem('lastIPCheck', Date.now().toString());
-              }
+            if (snapshot.exists()) {
+              snapshot.forEach(child => {
+                localStorage.setItem('tempStoredDonorDetails', JSON.stringify(child.val()));
+                localStorage.setItem('currentDonorKey', child.key);
+              });
             }
           } else {
-            console.log('No user logged in');
-            if (userInfoElem) {
-              userInfoElem.innerHTML = `Offline <span style="display:inline-block;width:10px;height:10px;background:#d32f2f;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Offline"></span>`;
+            isdonorformsubmitted = false;
+            localStorage.setItem('isDonorFormSubmitted', 'false');
+            localStorage.removeItem('tempStoredDonorDetails');
+            localStorage.removeItem('currentDonorKey');
+            if (addDonorBtn) {
+              addDonorBtn.textContent = 'Add Donor';
+              addDonorBtn.onclick = function(e) {
+                e.preventDefault();
+                navigateToDonor();
+              };
             }
+          }
+
+          // Fix: Only parse cache if exists
+          const cachedAllowed = localStorage.getItem('allowedEmails');
+          let allowedEmails = [];
+
+          if (cachedAllowed) {
+            try {
+              allowedEmails = JSON.parse(cachedAllowed);
+              if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) {
+                allowedEmails = await fetchAllowedEmails();
+                localStorage.setItem('allowedEmails', JSON.stringify(allowedEmails));
+                localStorage.setItem('allowedEmailsTime', Date.now().toString());
+              }
+            } catch (e) {
+              allowedEmails = await fetchAllowedEmails();
+              localStorage.setItem('allowedEmails', JSON.stringify(allowedEmails));
+              localStorage.setItem('allowedEmailsTime', Date.now().toString());
+            }
+          } else {
+            allowedEmails = await fetchAllowedEmails();
+            localStorage.setItem('allowedEmails', JSON.stringify(allowedEmails));
+            localStorage.setItem('allowedEmailsTime', Date.now().toString());
+          }
+
+          if (allowedEmails.includes(user.email)) {  // ✅ removed `|| 0`
+            isuserallowed = true;
+            localStorage.setItem('isUserAllowed', 'true');
+            let button = document.getElementById('viewDonorsButton');
+            if (!button) {
+              button = document.createElement('button');
+              button.textContent = 'View Donors';
+              button.id = 'viewDonorsButton';
+              button.className = 'adddonor';
+              button.onclick = () => window.location.href = 'list.html';
+              const listjElem = document.getElementById('listj');
+              if (listjElem) listjElem.appendChild(button);
+            }
+          } else {
             const button = document.getElementById('viewDonorsButton');
             if (button) button.style.display = 'none';
+            localStorage.setItem('isUserAllowed', 'false');
           }
-              });
-            };
+
+          // IP check once per day
+          if (!localStorage.getItem('lastIPCheck') ||
+            Date.now() - parseInt(localStorage.getItem('lastIPCheck')) > 86400000) {
+            getAndPushIP();
+            localStorage.setItem('lastIPCheck', Date.now().toString());
+          }
+        } else {
+          console.log('No user logged in');
+          if (userInfoElem) {
+            userInfoElem.innerHTML = `Offline <span style="display:inline-block;width:10px;height:10px;background:#d32f2f;border-radius:50%;margin-left:6px;vertical-align:middle;" title="Offline"></span>`;
+          }
+          const button = document.getElementById('viewDonorsButton');
+          if (button) button.style.display = 'none';
+        }
+      });
+    };
+
     
     //  PUSH IP
     function getAndPushIP() {

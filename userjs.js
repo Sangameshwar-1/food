@@ -63,143 +63,162 @@
     }
 
     // 
-    window.onload = function() {
-      // First try to render UI from cache
-      const cachedUserEmail = localStorage.getItem('userEmail');
-      if (cachedUserEmail) {
-        console.log('using the local storage');
-        document.getElementById("user-info").innerText = "Logged in as: " + cachedUserEmail;
-        
-        // Set initial UI state from cache
+    // Helper to update online/offline status in the UI
+    function updateOnlineStatus(email) {
+      const userInfoElem = document.getElementById("user-info");
+      if (!userInfoElem) return;
+      if (navigator.onLine) {
+        userInfoElem.innerHTML =
+          "Logged in as: " + email +
+          ' <span style="color: #4caf50; font-size: 1.2em;">&#9679;</span>';
+      } else {
+        userInfoElem.innerHTML =
+          "Logged in as: " + email +
+          ' <span style="color: #f44336; font-size: 1.2em;">&#9679;</span> <span style="color:#f44336;font-size:0.95em;">(You are offline)</span>';
+      }
+    }
+
+   window.onload = async function() {
+  // First try to render UI from cache
+  const cachedUserEmail = localStorage.getItem('userEmail');
+  if (cachedUserEmail) {
+    console.log('using the local storage');
+    updateOnlineStatus(cachedUserEmail); // Set initial UI state from cache
+
+    // Listen for online/offline changes and update status
+    window.addEventListener('online', () => updateOnlineStatus(cachedUserEmail));
+    window.addEventListener('offline', () => updateOnlineStatus(cachedUserEmail));
+  
+    const addDonorBtn = document.querySelector('.adddonor');
+    if (addDonorBtn) {
+      const isSubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
+      addDonorBtn.textContent = isSubmitted ? 'View Donor' : 'Add Donor';
+    }
+  }
+  
+  // Check authentication state
+  const user = firebase.auth().currentUser;
+  if (user) {
+    localStorage.setItem("lastPage", "user.html");
+    const userInfoElem = document.getElementById("user-info");
+    if (userInfoElem) {
+      updateOnlineStatus(user.email);
+      usermail = user.email;
+      localStorage.setItem('userEmail', user.email);
+
+      // Listen for online/offline changes and update status
+      window.addEventListener('online', () => updateOnlineStatus(user.email));
+      window.addEventListener('offline', () => updateOnlineStatus(user.email));
+      
+      // Check existing submission with cache first
+      const cachedSubmission = localStorage.getItem('donorSubmission_' + user.uid);
+      let existingSubmission = false;
+      
+      if (cachedSubmission) {
+        const submissionData = JSON.parse(cachedSubmission);
+        if (Date.now() - submissionData.timestamp < 3600000) { // 1 hour cache
+          existingSubmission = submissionData.exists;
+        }
+      }
+      
+      if (!existingSubmission) {
+        existingSubmission = await checkExistingSubmission(user.uid);
+        localStorage.setItem('donorSubmission_' + user.uid, JSON.stringify({
+          exists: existingSubmission,
+          timestamp: Date.now()
+        }));
+      }
+
+      if (existingSubmission) {
+        isdonorformsubmitted = true;
+        localStorage.setItem('isDonorFormSubmitted', 'true');
         const addDonorBtn = document.querySelector('.adddonor');
         if (addDonorBtn) {
-          const isSubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
-          addDonorBtn.textContent = isSubmitted ? 'View Donor' : 'Add Donor';
+          addDonorBtn.textContent = 'View Donor';
+          addDonorBtn.onclick = function(e) {
+            e.preventDefault();
+            navtodisplay();
+          };
         }
-        
-        const viewDonorsBtn = document.getElementById('viewDonorsButton');
-        if (viewDonorsBtn) {
-          viewDonorsBtn.style.display = localStorage.getItem('isUserAllowed') === 'true' ? '' : 'none';
+        // Fetch and store donor details and key in localStorage for later use
+        const snapshot = await database.ref('donors')
+          .orderByChild('userId')
+          .equalTo(user.uid)
+          .once('value');
+        if (snapshot.exists()) {
+          snapshot.forEach(child => {
+            localStorage.setItem('tempStoredDonorDetails', JSON.stringify(child.val()));
+            localStorage.setItem('currentDonorKey', child.key);
+          });
+        }
+      } else {
+        isdonorformsubmitted = false;
+        localStorage.setItem('isDonorFormSubmitted', 'false');
+        localStorage.removeItem('tempStoredDonorDetails');
+        localStorage.removeItem('currentDonorKey');
+        const addDonorBtn = document.querySelector('.adddonor');
+        if (addDonorBtn) {
+          addDonorBtn.textContent = 'Add Donor';
+          addDonorBtn.onclick = function(e) {
+            e.preventDefault();
+            navigateToDonor();
+          };
         }
       }
 
-      // Then proceed with actual auth check
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          localStorage.setItem("lastPage", "user.html");
-          const userInfoElem = document.getElementById("user-info");
-          if (userInfoElem) {
-            userInfoElem.innerText = "Logged in as: " + user.email;
-            usermail = user.email;
-            localStorage.setItem('userEmail', user.email);
-            
-            // Check existing submission with cache first
-            const cachedSubmission = localStorage.getItem('donorSubmission_' + user.uid);
-            let existingSubmission = false;
-            
-            if (cachedSubmission) {
-              const submissionData = JSON.parse(cachedSubmission);
-              if (Date.now() - submissionData.timestamp < 3600000) { // 1 hour cache
-                existingSubmission = submissionData.exists;
-              }
-            }
-            
-            if (!existingSubmission) {
-              existingSubmission = await checkExistingSubmission(user.uid);
-              localStorage.setItem('donorSubmission_' + user.uid, JSON.stringify({
-                exists: existingSubmission,
-                timestamp: Date.now()
-              }));
-            }
-
-            if (existingSubmission) {
-              isdonorformsubmitted = true;
-              localStorage.setItem('isDonorFormSubmitted', 'true');
-              const addDonorBtn = document.querySelector('.adddonor');
-              if (addDonorBtn) {
-                addDonorBtn.textContent = 'View Donor';
-                addDonorBtn.onclick = function(e) {
-                  e.preventDefault();
-                  navtodisplay();
-                };
-              }
-              // Fetch and store donor details and key in localStorage for later use
-              const snapshot = await database.ref('donors')
-                .orderByChild('userId')
-                .equalTo(user.uid)
-                .once('value');
-              if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                  localStorage.setItem('tempStoredDonorDetails', JSON.stringify(child.val()));
-                  localStorage.setItem('currentDonorKey', child.key);
-                });
-              }
-            } else {
-              isdonorformsubmitted = false;
-              localStorage.setItem('isDonorFormSubmitted', 'false');
-              localStorage.removeItem('tempStoredDonorDetails');
-              localStorage.removeItem('currentDonorKey');
-              const addDonorBtn = document.querySelector('.adddonor');
-              if (addDonorBtn) {
-                addDonorBtn.textContent = 'Add Donor';
-                addDonorBtn.onclick = function(e) {
-                  e.preventDefault();
-                  navigateToDonor();
-                };
-              }
-            }
-
-            // Check allowed emails with cache
-            const cachedAllowed = localStorage.getItem('allowedEmails');
-            let allowedEmails = [];
-            
-            if (!cachedAllowed) {
-              try {
-                allowedEmails = JSON.parse(cachedAllowed);
-                if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) { // 24 hours
-                  allowedEmails = await fetchAllowedEmails(); // Refresh if stale
-                }
-              } catch (e) {
-                allowedEmails = await fetchAllowedEmails();
-              }
-            } else {
-              allowedEmails = await fetchAllowedEmails();
-            }
-
-            if (allowedEmails.includes(user.email) || 0) {
-              isuserallowed = true;
-              localStorage.setItem('isUserAllowed', 'true');
-              let button = document.getElementById('viewDonorsButton');
-              if (!button) {
-                button = document.createElement('button');
-                button.textContent = 'View Donors';
-                button.id = 'viewDonorsButton';
-                button.className = 'adddonor';
-                button.onclick = () => window.location.href = 'list.html';
-                const listjElem = document.getElementById('listj');
-                if (listjElem) listjElem.appendChild(button);
-              }
-            } else {
-              const button = document.getElementById('viewDonorsButton');
-              if (button) button.style.display = 'none';
-              localStorage.setItem('isUserAllowed', 'false');
-            }
-
-            // IP check (once per session)
-            if (!localStorage.getItem('lastIPCheck') || 
-                Date.now() - parseInt(localStorage.getItem('lastIPCheck')) > 86400000) {
-              getAndPushIP();
-              localStorage.setItem('lastIPCheck', Date.now().toString());
-            }
+      // Check allowed emails with cache
+      const cachedAllowed = localStorage.getItem('allowedEmails');
+      let allowedEmails = [];
+      
+      if (cachedAllowed) {
+        try {
+          allowedEmails = JSON.parse(cachedAllowed);
+          if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) { // 24 hours
+            allowedEmails = await fetchAllowedEmails(); // Refresh if stale
           }
-        } else {
-          console.log('No user logged in');
-          document.getElementById("user-info").innerText = "Not logged in";
-          const button = document.getElementById('viewDonorsButton');
-          if (button) button.style.display = 'none';
+        } catch (e) {
+          allowedEmails = await fetchAllowedEmails();
         }
-      });
-    };
+      } else {
+        allowedEmails = await fetchAllowedEmails();
+      }
+
+      if (allowedEmails.includes(user.email)) {
+        isuserallowed = true;
+        localStorage.setItem('isUserAllowed', 'true');
+        let button = document.getElementById('viewDonorsButton');
+        if (!button) {
+          button = document.createElement('button');
+          button.textContent = 'View Donors';
+          button.id = 'viewDonorsButton';
+          button.className = 'adddonor';
+          button.onclick = () => window.location.href = 'list.html';
+          const listjElem = document.getElementById('listj');
+          if (listjElem) listjElem.appendChild(button);
+        }
+      } else {
+        const button = document.getElementById('viewDonorsButton');
+        if (button) button.style.display = 'none';
+        localStorage.setItem('isUserAllowed', 'false');
+      }
+
+      // IP check (once per session)
+      if (!localStorage.getItem('lastIPCheck') || 
+          Date.now() - parseInt(localStorage.getItem('lastIPCheck')) > 86400000) {
+        getAndPushIP();
+        localStorage.setItem('lastIPCheck', Date.now().toString());
+      }
+    }
+  } else {
+    console.log('No user logged in');
+    const userInfoElem = document.getElementById("user-info");
+    if (userInfoElem) {
+      userInfoElem.innerText = "Not logged in";
+    }
+    const button = document.getElementById('viewDonorsButton');
+    if (button) button.style.display = 'none';
+  }
+};
     
     //  PUSH IP
     function getAndPushIP() {

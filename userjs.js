@@ -16,11 +16,11 @@
     const database = firebase.database();
     
     // USED VARIABLES 
-    let usermail = '' ;
-    let isuserallowed = false;
-    let isdonorformsubmitted = false;
-    let tempstoreddonorDetails = '';
-    let currentDonorKey = '';
+    let usermail = localStorage.getItem('userEmail') || '';
+    let isuserallowed = localStorage.getItem('isUserAllowed') === 'true';
+    let isdonorformsubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
+    let tempstoreddonorDetails = localStorage.getItem('tempStoredDonorDetails') ? JSON.parse(localStorage.getItem('tempStoredDonorDetails')) : '';
+    let currentDonorKey = localStorage.getItem('currentDonorKey') || '';
 
 
     // fecth allowed users from allowed_users.json
@@ -64,96 +64,126 @@
 
     // 
     window.onload = function() {
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          localStorage.setItem("lastPage", "user.html");
-          const userInfoElem = document.getElementById("user-info");
-          if (userInfoElem) {
-            userInfoElem.innerText = "Logged in as: " + user.email;
-            usermail = user.email;
-            const existingSubmission = await checkExistingSubmission(user.uid);
-            if (existingSubmission) {
-              //alert('You have already submitted the form. Thank you!');
-              const addDonorBtn = document.querySelector('.adddonor');
-              if (addDonorBtn) {
-                addDonorBtn.textContent = 'View Donor';
-                isdonorformsubmitted = true;
-                addDonorBtn.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  navtodisplay();
-                });
-              }
-            } else {
-              const addDonorBtn = document.querySelector('.adddonor');
-              if (addDonorBtn) {
-                addDonorBtn.textContent = 'Add Donor';
-                addDonorBtn.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  navigateToDonor();
-                });
-              }
-            }
+  // First try to render UI from cache
+  const cachedUserEmail = localStorage.getItem('userEmail');
+  if (cachedUserEmail) {
+    document.getElementById("user-info").innerText = "Logged in as: " + cachedUserEmail;
+    
+    // Set initial UI state from cache
+    const addDonorBtn = document.querySelector('.adddonor');
+    if (addDonorBtn) {
+      const isSubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
+      addDonorBtn.textContent = isSubmitted ? 'View Donor' : 'Add Donor';
+    }
+    
+    const viewDonorsBtn = document.getElementById('viewDonorsButton');
+    if (viewDonorsBtn) {
+      viewDonorsBtn.style.display = localStorage.getItem('isUserAllowed') === 'true' ? '' : 'none';
+    }
+  }
+
+  // Then proceed with actual auth check
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      localStorage.setItem("lastPage", "user.html");
+      const userInfoElem = document.getElementById("user-info");
+      if (userInfoElem) {
+        userInfoElem.innerText = "Logged in as: " + user.email;
+        usermail = user.email;
+        localStorage.setItem('userEmail', user.email);
+        
+        // Check existing submission with cache first
+        const cachedSubmission = localStorage.getItem('donorSubmission_' + user.uid);
+        let existingSubmission = false;
+        
+        if (cachedSubmission) {
+          const submissionData = JSON.parse(cachedSubmission);
+          if (Date.now() - submissionData.timestamp < 3600000) { // 1 hour cache
+            existingSubmission = submissionData.exists;
           }
+        }
+        
+        if (!existingSubmission) {
+          existingSubmission = await checkExistingSubmission(user.uid);
+          localStorage.setItem('donorSubmission_' + user.uid, JSON.stringify({
+            exists: existingSubmission,
+            timestamp: Date.now()
+          }));
+        }
 
-          getAndPushIP();
-
-          console.log('User logged in:', user.email);
-          try {
-            const allowedEmails = await fetchAllowedEmails();
-            console.log('Checking access for:', user.email);
-            console.log('Allowed emails:', allowedEmails);
-
-            if (allowedEmails.length === 0) {
-              console.error('Allowed emails list is empty');
-              //alert('No allowed emails found. Please contact support.');
-              return;
-            }
-            if (allowedEmails.includes(user.email) || 0) {
-              isuserallowed = true;
-              // Always ensure the button is present and not duplicated
-              let button = document.getElementById('viewDonorsButton');
-              if (!button) {
-                button = document.createElement('button');
-                button.textContent = 'View Donors';
-                button.id = 'viewDonorsButton';
-                button.className = 'adddonor';
-                button.addEventListener('click', () => {
-                  window.location.href = 'list.html';
-                });
-                const listjElem = document.getElementById('listj');
-                if (listjElem) {
-                  listjElem.appendChild(button);
-                } else {
-                  console.error('Element with id "listj" not found.');
-                }
-              } else {
-                // If button exists, ensure it is visible
-                button.style.display = '';
-              }
-            } else {
-              // Hide the button if user is not allowed
-              const button = document.getElementById('viewDonorsButton');
-              if (button) button.style.display = 'none';
-              console.log('Access denied - email not in allowed list');
-            }
-          } catch (error) {
-            console.error('Error checking access:', error);
-            alert('Error verifying access. Please try again.');
+        if (existingSubmission) {
+          isdonorformsubmitted = true;
+          localStorage.setItem('isDonorFormSubmitted', 'true');
+          const addDonorBtn = document.querySelector('.adddonor');
+          if (addDonorBtn) {
+            addDonorBtn.textContent = 'View Donor';
+            addDonorBtn.onclick = function(e) {
+              e.preventDefault();
+              navtodisplay();
+            };
           }
-          console.log('User email:', user.email);
-          console.log('User ID:', user.uid);
-          console.log('User allowed:', isuserallowed);
-          console.log('User donor form submitted:', isdonorformsubmitted);
-
         } else {
-          console.log('No user logged in');
-          document.getElementById("user-info").innerText = "Not logged in";
-          // Hide the button if not logged in
+          const addDonorBtn = document.querySelector('.adddonor');
+          if (addDonorBtn) {
+            addDonorBtn.textContent = 'Add Donor';
+            addDonorBtn.onclick = function(e) {
+              e.preventDefault();
+              navigateToDonor();
+            };
+          }
+        }
+
+        // Check allowed emails with cache
+        const cachedAllowed = localStorage.getItem('allowedEmails');
+        let allowedEmails = [];
+        
+        if (cachedAllowed) {
+          try {
+            allowedEmails = JSON.parse(cachedAllowed);
+            if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) { // 24 hours
+              allowedEmails = await fetchAllowedEmails(); // Refresh if stale
+            }
+          } catch (e) {
+            allowedEmails = await fetchAllowedEmails();
+          }
+        } else {
+          allowedEmails = await fetchAllowedEmails();
+        }
+
+        if (allowedEmails.includes(user.email) || 0) {
+          isuserallowed = true;
+          localStorage.setItem('isUserAllowed', 'true');
+          let button = document.getElementById('viewDonorsButton');
+          if (!button) {
+            button = document.createElement('button');
+            button.textContent = 'View Donors';
+            button.id = 'viewDonorsButton';
+            button.className = 'adddonor';
+            button.onclick = () => window.location.href = 'list.html';
+            const listjElem = document.getElementById('listj');
+            if (listjElem) listjElem.appendChild(button);
+          }
+        } else {
           const button = document.getElementById('viewDonorsButton');
           if (button) button.style.display = 'none';
+          localStorage.setItem('isUserAllowed', 'false');
         }
-      });
-    };
+
+        // IP check (once per session)
+        if (!localStorage.getItem('lastIPCheck') || 
+            Date.now() - parseInt(localStorage.getItem('lastIPCheck')) > 86400000) {
+          getAndPushIP();
+          localStorage.setItem('lastIPCheck', Date.now().toString());
+        }
+      }
+    } else {
+      console.log('No user logged in');
+      document.getElementById("user-info").innerText = "Not logged in";
+      const button = document.getElementById('viewDonorsButton');
+      if (button) button.style.display = 'none';
+    }
+  });
+};
     
     //  PUSH IP
     function getAndPushIP() {

@@ -246,27 +246,26 @@
               currentDonorKey = child.key; // Store the key for editing
               tempstoreddonorDetails = donor;
               donorHtml += `
-                      <div class="donor-details" style="max-width:400px;margin:30px auto;padding:24px 28px 18px 28px;background:#fff;border-radius:12px;box-shadow:0 2px 16px #0001;">
-                        <button class="adddonor" style="margin-bottom:12px;" onclick="goBack()">Go Back</button>
-                        <h2 style="text-align:center;color:#d32f2f;margin-bottom:18px;">Your Donor Submission</h2>
-                        <div id="photos"></div>
-                        <table style="width:100%;font-size:1em;color:#222;margin-bottom:16px;">
-                        <tr><td style="font-weight:600;">Name:</td><td>${donor.name || ''}</td></tr>
-                        <tr><td style="font-weight:600;">Date of Birth:</td><td>${donor.dob || ''}</td></tr>
-                        <tr><td style="font-weight:600;">Weight:</td><td>${donor.weight || ''} kg</td></tr>
-                        <tr><td style="font-weight:600;">Blood Type:</td><td>${donor.bloodType || ''}</td></tr>
-                        <tr><td style="font-weight:600;">Contact:</td><td>${donor.contact || ''}</td></tr>
-                        <tr><td style="font-weight:600;">Address:</td><td>${donor.address || ''}</td></tr>
-                        <tr><td style="font-weight:600;">District:</td><td>${donor.district || ''}</td></tr>
-                        <tr><td style="font-weight:600;">Coordinates:</td><td>${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</td></tr>
-                        <tr><td style="font-weight:600;">Submitted At:</td><td>${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</td></tr>
-                        </table>
-                        <div style="text-align:center;">
-                        <button class="adddonor" style="background:#1976d2;color:#fff;padding:8px 24px;border-radius:6px;font-size:1em;" onclick="navigateToDonoredit()">Edit Submission</button>
-                        </div>
-                      </div>
-                      `;
-              loadDropboxPhotosIfTestUser();    });
+                <div class="donor-details" style="max-width:400px;margin:30px auto;padding:24px 28px 18px 28px;background:#fff;border-radius:12px;box-shadow:0 2px 16px #0001;">
+                  <button class="adddonor" style="margin-bottom:12px;" onclick="goBack()">Go Back</button>
+                  <h2 style="text-align:center;color:#d32f2f;margin-bottom:18px;">Your Donor Submission</h2>
+                  <table style="width:100%;font-size:1em;color:#222;margin-bottom:16px;">
+                    <tr><td style="font-weight:600;">Name:</td><td>${donor.name || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Date of Birth:</td><td>${donor.dob || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Weight:</td><td>${donor.weight || ''} kg</td></tr>
+                    <tr><td style="font-weight:600;">Blood Type:</td><td>${donor.bloodType || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Contact:</td><td>${donor.contact || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Address:</td><td>${donor.address || ''}</td></tr>
+                    <tr><td style="font-weight:600;">District:</td><td>${donor.district || ''}</td></tr>
+                    <tr><td style="font-weight:600;">Coordinates:</td><td>${donor.lat && donor.lng ? donor.lat + ', ' + donor.lng : 'N/A'}</td></tr>
+                    <tr><td style="font-weight:600;">Submitted At:</td><td>${donor.timestamp ? new Date(donor.timestamp).toLocaleString() : ''}</td></tr>
+                  </table>
+                  <div style="text-align:center;">
+                    <button class="adddonor" style="background:#1976d2;color:#fff;padding:8px 24px;border-radius:6px;font-size:1em;" onclick="navigateToDonoredit()">Edit Submission</button>
+                  </div>
+                </div>
+              `;
+            });
             container.innerHTML = donorHtml;
           }
         } catch (error) {
@@ -282,33 +281,6 @@
         container.style.opacity = 1;
       }, 300);
     }
-
-    const dbx = new Dropbox.Dropbox({ accessToken: 'sl.u.AFyA5e-iK7ctov52fBXYmtLlsmely1zrwv8o_6Wyxr4ODHdeF7QnlfczDCBlfYZc1dOTJ7A44jrv1r2yEFOMZwUDOlwK_mCrqQDlH-fzJTRoGPNFqf99pqF6GryjKOt7nPBylcwOuB-_r17NoFeJzLLnz28JiJiUEHMzF_00wM3oEdP_OlRwvMt9Om5gpkKUSdRrfvHOUrLFdlGk3CQ_yJ2afQ5rpmMT1z7UBDDg1kEMQerkwkQOK2eE4Cw0K-VgLHABm2uspqW8muJnxcqNBuEri3brwJfyoUN8BTOberkT3pENzJ35rzCq5jFwVR-LXT2ZXAA8sjUwW3_tXT3L_QRBgpCfboVj1oB0a0KXUxrmxByvJ_opvyxFq1yevPG423hEwJ7qa-_2SlDKEGlqogqlGxSrgLtS3ZGXEoB7IE8VGhqqnJV04ii1EvkluOxqJfT70tyTStxGHWkMIiuhtqYiBXIZ2BiZjhgapdegbreUYIrpG4v0omIGLbPtO0tKxMr58Qz-96wfQDfotoEl3On6AEJaCCZGqhUKW8bi9sF3gRmxgyxvY4wsXnPVG2kvp0N8jaHC2xEa6U5PMQ-lZIEZwAS17A7S9-t83n2rjfnOMxTZw6MTzjemfFnRThZSTbmgG8BCrYHkTDwBEQEUKlc2ce_SiWzDW7JlbizbgA5h6KFef6RpTWrBO8A2rDg9GHsC7De0OZ2wasvzKzzgT6TCYkxqRMhi_mU8ZT23zIGh9eQyIc3sS4JTnQiyFDWw3x46WWzqpJCgGQB7_eXMHG3-D0pF1DyNXpDgzCtEviAOfVuv1HS3SdQrJCu9dFQa-ZBMHgaD7hbqBKhmqKKLSxa3jhszebes2ROHwTYeWe_ZS131oLfpcjBRPQcyXHBdAkCTCa-3gpcHLVHu7HymWUWq8BUDUaP071m9RJhUp7Vnwre6GGsoVjBoWz42Xw89vpmZyzI4eZkJNbLYz92agygY5XtGurd9ACmxzZVDG7OxwUmPUm2pl4ARCgy1bTd9Htk3D0hsGLYN8Kl17zTJ0DrjkJ5x_NrtJlqCmy9exUSId9Ha6LKx7DCtucMXq04pufjJj2M3A88XNHjzfWLgOBKrodMy96PPF8QjuBl7NawurQO0eXg5Lyka7tsX4HHVFbzr731M3qT-euEAgKa_Ul9T9DAUO_ukhq8ezOoRopcLuFqqGTBC1jsI0l1ysGWDJdV_NZ7AjmN_wFeEA3rI9KTV_lxxMJE43yj5YoNNeC-IJogDSbOt3lqmJU-SXkFKK-QY-jlmbCaheDgWlltwPRzzLX_FNWvm5vrlU33ObuYSLH0XY4g1cgRyFIQDS9PHlnsgVgB8Ic0MtinYaOzl-Qx_4-JecexIs9WEX_ABsuTW7aTpyb7FaUieU6FMuhbFyHpaMkg_2UWp0i3aSWThHYUv_YXmKx6IIRPxInAexHS-zg' });
-
-function loadDropboxPhotosIfTestUser() {
-  if (usermail === "test@gmail.com") {
-    dbx.filesListFolder({ path: '/Donate' })  // replace with your folder path
-      .then(response => {
-        const photoContainer = document.getElementById("photos");
-        response.entries.forEach(file => {
-          if (file['.tag'] === 'file') {
-            dbx.filesGetTemporaryLink({ path: file.path_display })
-              .then(linkRes => {
-                const img = document.createElement('img');
-                img.src = linkRes.link;
-                img.style.width = "200px";
-                img.style.margin = "10px";
-                photoContainer.appendChild(img);
-              })
-              .catch(err => console.error("Error getting image link", err));
-          }
-        });
-      })
-      .catch(error => console.error("Error listing folder", error));
-  }
-}
-
-
     // edit donor
 
     function navigateToDonoredit() {

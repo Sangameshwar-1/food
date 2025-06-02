@@ -19,7 +19,7 @@
     let usermail = localStorage.getItem('userEmail') || '';
     let isuserallowed = localStorage.getItem('isUserAllowed') === 'true';
     let isdonorformsubmitted = localStorage.getItem('isDonorFormSubmitted') === 'true';
-    let tempstoreddonorDetails = localStorage.getItem('tempStoredDonorDetails') ? JSON.parse(localStorage.getItem('tempStoredDonorDetails')) : '';
+    let tempstoreddonorDetails = localStorage.getItem('tempStoredDonorDetails') ? JSON.parse(localStorage.getItem('tempStoredDonorDetails')) : null;
     let currentDonorKey = localStorage.getItem('currentDonorKey') || '';
 
 
@@ -122,7 +122,22 @@
               navtodisplay();
             };
           }
+          // Fetch and store donor details and key in localStorage for later use
+          const snapshot = await database.ref('donors')
+            .orderByChild('userId')
+            .equalTo(user.uid)
+            .once('value');
+          if (snapshot.exists()) {
+            snapshot.forEach(child => {
+              localStorage.setItem('tempStoredDonorDetails', JSON.stringify(child.val()));
+              localStorage.setItem('currentDonorKey', child.key);
+            });
+          }
         } else {
+          isdonorformsubmitted = false;
+          localStorage.setItem('isDonorFormSubmitted', 'false');
+          localStorage.removeItem('tempStoredDonorDetails');
+          localStorage.removeItem('currentDonorKey');
           const addDonorBtn = document.querySelector('.adddonor');
           if (addDonorBtn) {
             addDonorBtn.textContent = 'Add Donor';

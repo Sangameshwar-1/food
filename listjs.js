@@ -424,14 +424,20 @@
       
 
   function goBack() {
-    const lastPage = localStorage.getItem("lastPage");
-    if (lastPage) {
-      window.location.href = lastPage;
+    if (window.history.length > 1) {
+      window.history.back();
     } else {
-      alert("No previous page found. Redirecting to user page.");
-      window.location.href = "user.html";
+      // fallback to localStorage if needed
+      const lastPage = localStorage.getItem("lastPage");
+      if (lastPage) {
+        window.location.href = lastPage;  // May use data if not cached
+      } else {
+        alert("No previous page found.");
+        window.location.href = "user.html"; // Redirect to index.html if no previous page is found
+      }
     }
   }
+
 
   //   //twilio
   

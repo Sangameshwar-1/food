@@ -153,7 +153,7 @@
             const cachedAllowed = localStorage.getItem('allowedEmails');
             let allowedEmails = [];
             
-            if (cachedAllowed) {
+            if (!cachedAllowed) {
               try {
                 allowedEmails = JSON.parse(cachedAllowed);
                 if (Date.now() - parseInt(localStorage.getItem('allowedEmailsTime') || 0) > 86400000) { // 24 hours

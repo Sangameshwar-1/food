@@ -66,6 +66,7 @@
     window.onload = function() {
       auth.onAuthStateChanged(async (user) => {
         if (user) {
+          localStorage.setItem("lastPage", "user.html");
           const userInfoElem = document.getElementById("user-info");
           if (userInfoElem) {
             userInfoElem.innerText = "Logged in as: " + user.email;

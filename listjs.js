@@ -423,6 +423,15 @@
       });
       
 
+  function goBack() {
+    const lastPage = localStorage.getItem("lastPage");
+    if (lastPage) {
+      window.location.href = lastPage;
+    } else {
+      window.location.href = "user.html";
+    }
+  }
+
   //   //twilio
   
    

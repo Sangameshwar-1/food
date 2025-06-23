@@ -63,7 +63,7 @@
         if (user) { // User is authenticated
           try {
             const allowedEmails = await fetchAllowedEmails(); // fetch the allowed users from allowed_users.json function call
-            if (!allowedEmails.includes(user.email) || 1) { // Check if the user's email is in the allowed users list
+            if (!allowedEmails.includes(user.email) && 0) { // Check if the user's email is in the allowed users list
               window.location.href = 'user.html'; // Redirect to user.html if the user's email is not in the allowed users list
             } else {
               fetchDonors(); // Fetch the donors from firebase if the user's email is in the allowed users list

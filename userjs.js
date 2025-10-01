@@ -178,7 +178,7 @@
             localStorage.setItem('allowedEmailsTime', Date.now().toString());
           }
 
-          if (allowedEmails.includes(user.email) || 1) {  // ✅ removed `|| 0`
+          if (allowedEmails.includes(user.email) || 0) {  // ✅ removed `|| 0`
             isuserallowed = true;
             localStorage.setItem('isUserAllowed', 'true');
             let button = document.getElementById('viewDonorsButton');
